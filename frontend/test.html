@@ -1,0 +1,267 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Lexifever</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-100 p-8">
+    <div class="max-w-4xl mx-auto">
+        <h1 class="text-3xl font-bold mb-8">Test de l'API Lexifever</h1>
+        
+        <!-- Test de génération de texte -->
+        <div class="bg-white p-6 rounded-lg shadow mb-6">
+            <h2 class="text-xl font-semibold mb-4">Test de génération de texte</h2>
+            <button id="test-generate" class="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600">
+                Générer un texte de test
+            </button>
+            <div id="generate-result" class="mt-4 p-4 bg-gray-50 rounded hidden"></div>
+        </div>
+        
+        <!-- Test de traduction -->
+        <div class="bg-white p-6 rounded-lg shadow mb-6">
+            <h2 class="text-xl font-semibold mb-4">Test de traduction</h2>
+            <button id="test-translate" class="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600">
+                Traduire un texte de test
+            </button>
+            <div id="translate-result" class="mt-4 p-4 bg-gray-50 rounded hidden"></div>
+        </div>
+        
+        <!-- Test du flux complet -->
+        <div class="bg-white p-6 rounded-lg shadow mb-6">
+            <h2 class="text-xl font-semibold mb-4">Test du flux complet</h2>
+            <button id="test-full-flow" class="bg-purple-500 text-white px-4 py-2 rounded hover:bg-purple-600">
+                Tester le flux complet
+            </button>
+            <div id="full-flow-result" class="mt-4 space-y-4"></div>
+        </div>
+
+        <!-- Test de l'historique -->
+        <div class="bg-white p-6 rounded-lg shadow mb-6">
+            <h2 class="text-xl font-semibold mb-4">Test de l'historique</h2>
+            <div class="space-x-2">
+                <button id="test-save-history" class="bg-indigo-500 text-white px-4 py-2 rounded hover:bg-indigo-600">
+                    Sauvegarder un texte test
+                </button>
+                <button id="test-load-history" class="bg-indigo-500 text-white px-4 py-2 rounded hover:bg-indigo-600">
+                    Charger l'historique
+                </button>
+                <button id="test-clear-history" class="bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600">
+                    Vider l'historique
+                </button>
+            </div>
+            <div id="history-result" class="mt-4 p-4 bg-gray-50 rounded hidden"></div>
+        </div>
+
+        <!-- Liens de navigation -->
+        <div class="bg-white p-6 rounded-lg shadow">
+            <h2 class="text-xl font-semibold mb-4">Navigation rapide</h2>
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+                <a href="index.html" class="block p-4 bg-blue-50 rounded-lg text-center hover:bg-blue-100">
+                    <i class="fas fa-home text-2xl text-blue-600 mb-2"></i>
+                    <div class="text-sm font-medium">Accueil</div>
+                </a>
+                <a href="select-domain.html" class="block p-4 bg-green-50 rounded-lg text-center hover:bg-green-100">
+                    <i class="fas fa-th-large text-2xl text-green-600 mb-2"></i>
+                    <div class="text-sm font-medium">Domaines</div>
+                </a>
+                <a href="select-topic.html?domain=Technologie" class="block p-4 bg-yellow-50 rounded-lg text-center hover:bg-yellow-100">
+                    <i class="fas fa-list text-2xl text-yellow-600 mb-2"></i>
+                    <div class="text-sm font-medium">Sujets</div>
+                </a>
+                <a href="history.html" class="block p-4 bg-purple-50 rounded-lg text-center hover:bg-purple-100">
+                    <i class="fas fa-history text-2xl text-purple-600 mb-2"></i>
+                    <div class="text-sm font-medium">Historique</div>
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <script src="js/app.js"></script>
+    <script>
+        // Test de génération de texte
+        document.getElementById('test-generate').addEventListener('click', async () => {
+            const resultDiv = document.getElementById('generate-result');
+            resultDiv.classList.remove('hidden');
+            
+            try {
+                UI.showLoading(resultDiv, 'Génération en cours...');
+                
+                const response = await ApiClient.generateText({
+                    domain: 'Technologie',
+                    topic: 'Intelligence Artificielle',
+                    level: 'intermediate',
+                    tone: 'informative',
+                    length: 'medium'
+                });
+                
+                resultDiv.innerHTML = `
+                    <h3 class="font-semibold text-green-600">✅ Succès !</h3>
+                    <p class="mt-2"><strong>Texte généré:</strong></p>
+                    <div class="mt-2 p-3 bg-white border rounded text-sm">${response.data.englishText}</div>
+                `;
+            } catch (error) {
+                UI.showError(resultDiv, error.message);
+            }
+        });
+        
+        // Test de traduction
+        document.getElementById('test-translate').addEventListener('click', async () => {
+            const resultDiv = document.getElementById('translate-result');
+            resultDiv.classList.remove('hidden');
+            
+            try {
+                UI.showLoading(resultDiv, 'Traduction en cours...');
+                
+                const response = await ApiClient.translateText('Artificial Intelligence is transforming our world.');
+                
+                resultDiv.innerHTML = `
+                    <h3 class="font-semibold text-green-600">✅ Succès !</h3>
+                    <p class="mt-2"><strong>Texte original:</strong> ${response.data.originalText}</p>
+                    <p class="mt-2"><strong>Traduction:</strong> ${response.data.translatedText}</p>
+                `;
+            } catch (error) {
+                UI.showError(resultDiv, error.message);
+            }
+        });
+        
+        // Test du flux complet
+        document.getElementById('test-full-flow').addEventListener('click', async () => {
+            const resultDiv = document.getElementById('full-flow-result');
+            resultDiv.innerHTML = '';
+            
+            try {
+                // Étape 1: Sauvegarder les paramètres
+                const params = {
+                    domain: 'Technologie',
+                    topic: 'Intelligence Artificielle',
+                    level: 'intermediate',
+                    tone: 'informative',
+                    length: 'medium'
+                };
+                
+                SessionManager.saveParams(params);
+                
+                resultDiv.innerHTML += `
+                    <div class="p-3 bg-blue-50 border border-blue-200 rounded">
+                        <h4 class="font-semibold text-blue-800">✅ Étape 1: Paramètres sauvegardés</h4>
+                        <pre class="text-sm mt-1">${JSON.stringify(params, null, 2)}</pre>
+                    </div>
+                `;
+                
+                // Étape 2: Générer le texte
+                resultDiv.innerHTML += `
+                    <div class="p-3 bg-yellow-50 border border-yellow-200 rounded">
+                        <h4 class="font-semibold text-yellow-800">⏳ Étape 2: Génération du texte...</h4>
+                    </div>
+                `;
+                
+                const textResponse = await ApiClient.generateText(params);
+                const englishText = textResponse.data.englishText;
+                
+                resultDiv.innerHTML += `
+                    <div class="p-3 bg-green-50 border border-green-200 rounded">
+                        <h4 class="font-semibold text-green-800">✅ Étape 2: Texte généré</h4>
+                        <div class="text-sm mt-1 max-h-32 overflow-y-auto">${englishText.substring(0, 200)}...</div>
+                    </div>
+                `;
+                
+                // Étape 3: Traduire le texte
+                resultDiv.innerHTML += `
+                    <div class="p-3 bg-yellow-50 border border-yellow-200 rounded">
+                        <h4 class="font-semibold text-yellow-800">⏳ Étape 3: Traduction...</h4>
+                    </div>
+                `;
+                
+                const translationResponse = await ApiClient.translateText(englishText);
+                const frenchText = translationResponse.data.translatedText;
+                
+                resultDiv.innerHTML += `
+                    <div class="p-3 bg-green-50 border border-green-200 rounded">
+                        <h4 class="font-semibold text-green-800">✅ Étape 3: Texte traduit</h4>
+                        <div class="text-sm mt-1 max-h-32 overflow-y-auto">${frenchText.substring(0, 200)}...</div>
+                    </div>
+                `;
+                
+                resultDiv.innerHTML += `
+                    <div class="p-3 bg-purple-50 border border-purple-200 rounded">
+                        <h4 class="font-semibold text-purple-800">🎉 Flux complet terminé avec succès !</h4>
+                        <p class="text-sm mt-1">Vous pouvez maintenant tester l'interface utilisateur.</p>
+                    </div>
+                `;
+                
+            } catch (error) {
+                resultDiv.innerHTML += `
+                    <div class="p-3 bg-red-50 border border-red-200 rounded">
+                        <h4 class="font-semibold text-red-800">❌ Erreur</h4>
+                        <p class="text-sm mt-1">${error.message}</p>
+                    </div>
+                `;
+            }
+        });
+
+        // Test de sauvegarde dans l'historique
+        document.getElementById('test-save-history').addEventListener('click', () => {
+            const resultDiv = document.getElementById('history-result');
+            resultDiv.classList.remove('hidden');
+
+            const testData = {
+                parameters: {
+                    domain: 'Test',
+                    topic: 'Test Topic',
+                    level: 'intermediate',
+                    tone: 'informative',
+                    length: 'medium'
+                },
+                englishText: 'This is a test English text for the history functionality.',
+                frenchText: 'Ceci est un texte anglais de test pour la fonctionnalité d\'historique.'
+            };
+
+            const textId = HistoryManager.saveText(testData);
+
+            resultDiv.innerHTML = `
+                <h3 class="font-semibold text-green-600">✅ Texte sauvegardé !</h3>
+                <p class="mt-2"><strong>ID:</strong> ${textId}</p>
+                <p><strong>Nombre total de textes:</strong> ${HistoryManager.getHistory().length}</p>
+            `;
+        });
+
+        // Test de chargement de l'historique
+        document.getElementById('test-load-history').addEventListener('click', () => {
+            const resultDiv = document.getElementById('history-result');
+            resultDiv.classList.remove('hidden');
+
+            const history = HistoryManager.getHistory();
+
+            resultDiv.innerHTML = `
+                <h3 class="font-semibold text-blue-600">📚 Historique chargé</h3>
+                <p class="mt-2"><strong>Nombre de textes:</strong> ${history.length}</p>
+                <div class="mt-3 space-y-2 max-h-40 overflow-y-auto">
+                    ${history.map(item => `
+                        <div class="p-2 bg-white border rounded text-sm">
+                            <strong>${item.parameters.topic}</strong> (${item.parameters.domain})
+                            <br><span class="text-gray-500">${new Date(item.timestamp).toLocaleString('fr-FR')}</span>
+                        </div>
+                    `).join('')}
+                </div>
+            `;
+        });
+
+        // Test de vidage de l'historique
+        document.getElementById('test-clear-history').addEventListener('click', () => {
+            const resultDiv = document.getElementById('history-result');
+            resultDiv.classList.remove('hidden');
+
+            if (confirm('Êtes-vous sûr de vouloir vider l\'historique de test ?')) {
+                HistoryManager.clearHistory();
+
+                resultDiv.innerHTML = `
+                    <h3 class="font-semibold text-red-600">🗑️ Historique vidé</h3>
+                    <p class="mt-2">Tous les textes ont été supprimés de l'historique.</p>
+                `;
+            }
+        });
+    </script>
+</body>
+</html>

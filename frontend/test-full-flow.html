@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Flux Complet - Lexifever</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-100 p-8">
+    <div class="max-w-6xl mx-auto">
+        <h1 class="text-3xl font-bold mb-8">🚀 Test Flux Complet Lexifever</h1>
+        
+        <!-- Status -->
+        <div class="bg-white rounded-lg shadow p-6 mb-6">
+            <h2 class="text-xl font-semibold mb-4">📊 Status du Test</h2>
+            <div id="test-status" class="space-y-2"></div>
+        </div>
+        
+        <!-- Controls -->
+        <div class="bg-white rounded-lg shadow p-6 mb-6">
+            <h2 class="text-xl font-semibold mb-4">🎮 Contrôles</h2>
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+                <button id="test-api" class="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600">
+                    1. Test API
+                </button>
+                <button id="test-session" class="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600">
+                    2. Test Session
+                </button>
+                <button id="test-topics" class="bg-yellow-500 text-white px-4 py-2 rounded hover:bg-yellow-600">
+                    3. Test Sujets
+                </button>
+                <button id="test-full" class="bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600">
+                    4. Test Complet
+                </button>
+            </div>
+        </div>
+        
+        <!-- Results -->
+        <div class="bg-white rounded-lg shadow p-6">
+            <h2 class="text-xl font-semibold mb-4">📋 Résultats</h2>
+            <div id="test-results" class="space-y-4"></div>
+        </div>
+    </div>
+
+    <script src="js/app.js"></script>
+    <script>
+        let testResults = [];
+        
+        function updateStatus() {
+            const statusDiv = document.getElementById('test-status');
+            statusDiv.innerHTML = `
+                <div><strong>🌐 API URL:</strong> ${API_BASE_URL}</div>
+                <div><strong>📄 Page:</strong> ${window.location.pathname}</div>
+                <div><strong>🕒 Heure:</strong> ${new Date().toLocaleTimeString()}</div>
+                <div><strong>✅ Tests réussis:</strong> ${testResults.filter(r => r.success).length}</div>
+                <div><strong>❌ Tests échoués:</strong> ${testResults.filter(r => !r.success).length}</div>
+            `;
+        }
+        
+        function addResult(name, success, message, data = null) {
+            testResults.push({ name, success, message, data, timestamp: new Date() });
+            
+            const resultsDiv = document.getElementById('test-results');
+            const resultClass = success ? 'bg-green-50 border-green-200 text-green-800' : 'bg-red-50 border-red-200 text-red-800';
+            const icon = success ? '✅' : '❌';
+            
+            resultsDiv.innerHTML += `
+                <div class="border rounded p-4 ${resultClass}">
+                    <div class="flex items-center">
+                        <span class="text-lg mr-2">${icon}</span>
+                        <strong>${name}</strong>
+                        <span class="ml-auto text-sm">${new Date().toLocaleTimeString()}</span>
+                    </div>
+                    <p class="mt-2 text-sm">${message}</p>
+                    ${data ? `<pre class="mt-2 text-xs bg-white p-2 rounded border overflow-auto max-h-32">${JSON.stringify(data, null, 2)}</pre>` : ''}
+                </div>
+            `;
+            
+            updateStatus();
+        }
+        
+        // Test 1: API
+        document.getElementById('test-api').addEventListener('click', async () => {
+            try {
+                console.log('🧪 Test API Health...');
+                const healthResponse = await ApiClient.healthCheck();
+                addResult('API Health', true, 'API accessible et fonctionnelle', healthResponse);
+                
+                console.log('🧪 Test API Generate...');
+                const generateResponse = await ApiClient.generateText({
+                    domain: 'Technologie',
+                    topic: 'Intelligence Artificielle',
+                    level: 'intermediate',
+                    tone: 'conversational'
+                });
+                addResult('API Generate', true, `Texte généré (${generateResponse.data.englishText.length} caractères)`, {
+                    preview: generateResponse.data.englishText.substring(0, 100) + '...'
+                });
+                
+                console.log('🧪 Test API Translate...');
+                const translateResponse = await ApiClient.translateText('Hello world, this is a test.');
+                addResult('API Translate', true, 'Traduction réussie', translateResponse);
+                
+            } catch (error) {
+                addResult('API Test', false, error.message, { error: error.stack });
+            }
+        });
+        
+        // Test 2: Session
+        document.getElementById('test-session').addEventListener('click', () => {
+            try {
+                // Test sauvegarde
+                const testParams = {
+                    domain: 'Technologie',
+                    topic: 'Intelligence Artificielle',
+                    level: 'intermediate',
+                    tone: 'conversational',
+                    length: 'medium'
+                };
+                
+                SessionManager.saveParams(testParams);
+                addResult('Session Save', true, 'Paramètres sauvegardés', testParams);
+                
+                // Test récupération
+                const retrievedParams = SessionManager.getParams();
+                const isEqual = JSON.stringify(testParams) === JSON.stringify(retrievedParams);
+                addResult('Session Retrieve', isEqual, isEqual ? 'Paramètres récupérés correctement' : 'Erreur de récupération', retrievedParams);
+                
+                // Test validation
+                const hasRequired = retrievedParams.domain && retrievedParams.topic && retrievedParams.level;
+                addResult('Session Validation', hasRequired, hasRequired ? 'Paramètres requis présents' : 'Paramètres requis manquants');
+                
+            } catch (error) {
+                addResult('Session Test', false, error.message);
+            }
+        });
+        
+        // Test 3: Topics
+        document.getElementById('test-topics').addEventListener('click', () => {
+            try {
+                // Test configuration des domaines
+                const domainsCount = Object.keys(DOMAINS_CONFIG).length;
+                addResult('Domains Config', domainsCount > 0, `${domainsCount} domaines configurés`, Object.keys(DOMAINS_CONFIG));
+                
+                // Test sujets par domaine
+                let totalTopics = 0;
+                Object.keys(DOMAINS_CONFIG).forEach(domain => {
+                    const topics = DOMAINS_CONFIG[domain];
+                    totalTopics += topics.length;
+                    addResult(`Topics ${domain}`, topics.length > 0, `${topics.length} sujets trouvés`, topics.map(t => t.name));
+                });
+                
+                addResult('Total Topics', totalTopics > 0, `${totalTopics} sujets au total`);
+                
+            } catch (error) {
+                addResult('Topics Test', false, error.message);
+            }
+        });
+        
+        // Test 4: Flux Complet
+        document.getElementById('test-full').addEventListener('click', async () => {
+            try {
+                addResult('Flux Complet', true, 'Démarrage du test complet...');
+                
+                // Étape 1: Configuration
+                const params = {
+                    domain: 'Technologie',
+                    topic: 'Intelligence Artificielle',
+                    level: 'intermediate',
+                    tone: 'conversational',
+                    length: 'medium'
+                };
+                SessionManager.saveParams(params);
+                addResult('Étape 1', true, 'Paramètres configurés', params);
+                
+                // Étape 2: Génération
+                const textResponse = await ApiClient.generateText(params);
+                addResult('Étape 2', true, 'Texte généré avec succès', {
+                    length: textResponse.data.englishText.length,
+                    preview: textResponse.data.englishText.substring(0, 150) + '...'
+                });
+                
+                // Étape 3: Traduction
+                const translationResponse = await ApiClient.translateText(textResponse.data.englishText);
+                addResult('Étape 3', true, 'Traduction réussie', {
+                    length: translationResponse.data.translatedText.length,
+                    preview: translationResponse.data.translatedText.substring(0, 150) + '...'
+                });
+                
+                // Étape 4: Sauvegarde historique
+                const textId = HistoryManager.saveText({
+                    parameters: params,
+                    englishText: textResponse.data.englishText,
+                    frenchText: translationResponse.data.translatedText
+                });
+                addResult('Étape 4', true, 'Texte sauvegardé dans l\'historique', { textId });
+                
+                addResult('🎉 FLUX COMPLET', true, 'Tous les tests sont passés avec succès ! Le système fonctionne parfaitement.');
+                
+                // Redirection automatique vers result.html
+                setTimeout(() => {
+                    addResult('Redirection', true, 'Redirection vers result.html dans 3 secondes...');
+                    setTimeout(() => {
+                        window.location.href = 'result.html';
+                    }, 3000);
+                }, 1000);
+                
+            } catch (error) {
+                addResult('Flux Complet', false, `Erreur dans le flux: ${error.message}`, { error: error.stack });
+            }
+        });
+        
+        // Initialisation
+        updateStatus();
+        setInterval(updateStatus, 5000);
+        
+        // Message de bienvenue
+        addResult('Système', true, 'Page de test chargée. Cliquez sur les boutons pour tester chaque composant.');
+    </script>
+</body>
+</html>

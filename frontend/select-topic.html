@@ -1,0 +1,628 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lexifever - Choisissez un sujet</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: {
+                            50: '#f0f9ff',
+                            100: '#e0f2fe',
+                            200: '#bae6fd',
+                            300: '#7dd3fc',
+                            400: '#38bdf8',
+                            500: '#0ea5e9',
+                            600: '#0284c7',
+                            700: '#0369a1',
+                            800: '#075985',
+                            900: '#0c4a6e',
+                        },
+                        secondary: {
+                            50: '#fff7ed',
+                            100: '#ffedd5',
+                            200: '#fed7aa',
+                            300: '#fdba74',
+                            400: '#fb923c',
+                            500: '#f97316',
+                            600: '#ea580c',
+                            700: '#c2410c',
+                            800: '#9a3412',
+                            900: '#7c2d12',
+                        },
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                    },
+                    animation: {
+                        'fade-in': 'fadeIn 0.6s ease-out',
+                        'slide-up': 'slideUp 0.6s ease-out',
+                        'slide-in-left': 'slideInLeft 0.6s ease-out',
+                        'slide-in-right': 'slideInRight 0.6s ease-out',
+                        'bounce-gentle': 'bounceGentle 2s ease-in-out infinite',
+                        'pulse-glow': 'pulseGlow 2s ease-in-out infinite',
+                        'float': 'float 3s ease-in-out infinite',
+                    },
+                    backdropBlur: {
+                        xs: '2px',
+                    }
+                },
+            },
+        }
+    </script>
+    <style type="text/tailwindcss">
+        @layer utilities {
+            .text-shadow {
+                text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            }
+            .text-shadow-lg {
+                text-shadow: 0 4px 8px rgba(0, 0, 0, 0.12);
+            }
+            .transition-all {
+                transition: all 0.3s ease;
+            }
+            .glass-effect {
+                background: rgba(255, 255, 255, 0.1);
+                backdrop-filter: blur(10px);
+                border: 1px solid rgba(255, 255, 255, 0.2);
+            }
+            .gradient-border {
+                background: linear-gradient(white, white) padding-box,
+                           linear-gradient(45deg, #0ea5e9, #f97316) border-box;
+                border: 2px solid transparent;
+            }
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+        
+        @keyframes slideUp {
+            from { 
+                opacity: 0; 
+                transform: translateY(30px); 
+            }
+            to { 
+                opacity: 1; 
+                transform: translateY(0); 
+            }
+        }
+        
+        @keyframes slideInLeft {
+            from { 
+                opacity: 0; 
+                transform: translateX(-30px); 
+            }
+            to { 
+                opacity: 1; 
+                transform: translateX(0); 
+            }
+        }
+        
+        @keyframes slideInRight {
+            from { 
+                opacity: 0; 
+                transform: translateX(30px); 
+            }
+            to { 
+                opacity: 1; 
+                transform: translateX(0); 
+            }
+        }
+        
+        @keyframes bounceGentle {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-10px); }
+        }
+        
+        @keyframes pulseGlow {
+            0%, 100% { box-shadow: 0 0 20px rgba(14, 165, 233, 0.3); }
+            50% { box-shadow: 0 0 30px rgba(14, 165, 233, 0.6); }
+        }
+        
+        @keyframes float {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-20px); }
+        }
+        
+        .scroll-smooth {
+            scroll-behavior: smooth;
+        }
+        
+        /* Improved hover effects */
+        .hover-lift {
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        
+        .hover-lift:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+        }
+        
+        .topic-card {
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .topic-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(14, 165, 233, 0.1), transparent);
+            transition: left 0.6s;
+        }
+        
+        .topic-card:hover::before {
+            left: 100%;
+        }
+        
+        .topic-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 35px rgba(14, 165, 233, 0.15);
+        }
+        
+        /* Custom scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        
+        ::-webkit-scrollbar-track {
+            background: #f1f5f9;
+        }
+        
+        ::-webkit-scrollbar-thumb {
+            background: #0ea5e9;
+            border-radius: 4px;
+        }
+        
+        ::-webkit-scrollbar-thumb:hover {
+            background: #0284c7;
+        }
+        
+        /* Topic card image hover effect */
+        .topic-image {
+            transition: transform 0.5s ease;
+        }
+        
+        .topic-card:hover .topic-image {
+            transform: scale(1.05);
+        }
+        
+        /* Search highlight */
+        .highlight {
+            background-color: rgba(14, 165, 233, 0.2);
+            padding: 0 2px;
+            border-radius: 2px;
+        }
+        
+        /* Breadcrumb styles */
+        .breadcrumb-item {
+            position: relative;
+        }
+        
+        .breadcrumb-arrow {
+            position: relative;
+            width: 20px;
+            height: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .breadcrumb-arrow::before {
+            content: '';
+            position: absolute;
+            width: 6px;
+            height: 6px;
+            border-top: 2px solid #9ca3af;
+            border-right: 2px solid #9ca3af;
+            transform: rotate(45deg);
+        }
+    </style>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+</head>
+<body class="font-sans text-gray-800 bg-gray-50 min-h-screen scroll-smooth">
+    <!-- Navigation -->
+    <nav class="bg-white/80 backdrop-blur-md shadow-sm fixed w-full z-50 transition-all duration-300" id="navbar">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between h-16">
+                <div class="flex items-center">
+                    <div class="flex-shrink-0 flex items-center animate-slide-in-left">
+                        <a href="index.html" class="text-primary-600 text-2xl font-bold bg-gradient-to-r from-primary-600 to-secondary-500 bg-clip-text text-transparent">
+                            Lexifever
+                        </a>
+                    </div>
+                </div>
+                <div class="hidden sm:ml-6 sm:flex sm:items-center animate-slide-in-right">
+                    <a href="#" class="text-gray-500 hover:text-primary-600 px-3 py-2 rounded-md text-sm font-medium transition-all duration-300">Mon compte</a>
+                    <a href="#" class="ml-4 bg-gradient-to-r from-primary-600 to-primary-700 hover:from-primary-700 hover:to-primary-800 text-white px-4 py-2 rounded-lg text-sm font-medium transition-all duration-300 transform hover:scale-105">
+                        Déconnexion
+                    </a>
+                </div>
+                <div class="-mr-2 flex items-center sm:hidden">
+                    <button id="mobile-menu-button" type="button" class="inline-flex items-center justify-center p-2 rounded-md text-gray-400 hover:text-gray-500 hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-primary-500 transition-all duration-300" aria-expanded="false">
+                        <span class="sr-only">Ouvrir le menu principal</span>
+                        <i class="fas fa-bars transition-transform duration-300" id="menu-icon"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Mobile menu -->
+        <div id="mobile-menu" class="sm:hidden hidden bg-white/95 backdrop-blur-md border-t border-gray-200">
+            <div class="pt-2 pb-3 space-y-1">
+                <a href="#" class="block pl-3 pr-4 py-2 text-base font-medium text-gray-500 hover:text-primary-600 hover:bg-gray-50 transition-all duration-300">
+                    Mon compte
+                </a>
+                <a href="#" class="block pl-3 pr-4 py-2 text-base font-medium text-gray-500 hover:text-primary-600 hover:bg-gray-50 transition-all duration-300">
+                    Déconnexion
+                </a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-28 pb-12">
+        <!-- Breadcrumb -->
+        <nav class="flex mb-8 animate-slide-up" aria-label="Breadcrumb">
+            <ol class="inline-flex items-center space-x-1 md:space-x-3">
+                <li class="inline-flex items-center">
+                    <a href="select-domain.html" class="inline-flex items-center text-sm font-medium text-gray-500 hover:text-primary-600 transition-colors duration-300">
+                        <i class="fas fa-th-large mr-2"></i>
+                        Domaines
+                    </a>
+                </li>
+                <li>
+                    <div class="flex items-center">
+                        <i class="fas fa-chevron-right text-gray-400 mx-2 text-xs"></i>
+                        <span class="text-sm font-medium text-primary-600">Technologie</span>
+                    </div>
+                </li>
+            </ol>
+        </nav>
+
+        <div class="text-center mb-12 animate-slide-up" style="animation-delay: 0.1s;">
+            <h1 class="text-3xl font-extrabold text-gray-900 sm:text-4xl lg:text-5xl">
+                <span class="bg-gradient-to-r from-primary-600 to-secondary-500 bg-clip-text text-transparent">Choisissez un sujet en Technologie</span>
+            </h1>
+            <p class="mt-4 max-w-2xl mx-auto text-xl text-gray-600">
+                Sélectionnez un sujet spécifique pour générer un texte personnalisé.
+            </p>
+        </div>
+
+        <!-- Search Bar -->
+        <div class="max-w-xl mx-auto mb-12 animate-slide-up" style="animation-delay: 0.2s;">
+            <div class="relative">
+                <input 
+                    type="text" 
+                    id="topic-search" 
+                    class="w-full pl-12 pr-4 py-4 rounded-xl border border-gray-300 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500 shadow-sm transition-all duration-300" 
+                    placeholder="Rechercher un sujet..."
+                >
+                <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+                    <i class="fas fa-search text-primary-500"></i>
+                </div>
+                <div id="search-clear" class="absolute inset-y-0 right-0 pr-4 flex items-center cursor-pointer hidden">
+                    <i class="fas fa-times-circle text-gray-400 hover:text-gray-600 transition-colors"></i>
+                </div>
+            </div>
+            <div id="search-results" class="mt-2 text-sm text-gray-500"></div>
+        </div>
+
+        <!-- Topics Grid -->
+        <div id="topics-container" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 animate-slide-up" style="animation-delay: 0.3s;">
+            <!-- Les sujets seront chargés dynamiquement ici -->
+            <div class="col-span-full text-center py-8">
+                <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-primary-600 mx-auto mb-4"></div>
+                <p class="text-gray-600">Chargement des sujets...</p>
+        </div>
+
+        <!-- No Results Message -->
+        <div id="no-results" class="hidden text-center py-12 animate-slide-up">
+            <div class="text-gray-500 mb-4">
+                <i class="fas fa-search text-5xl opacity-30"></i>
+            </div>
+            <h3 class="text-xl font-semibold text-gray-700 mb-2">Aucun sujet trouvé</h3>
+            <p class="text-gray-500">Essayez avec un autre terme de recherche</p>
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-gray-900 text-white relative overflow-hidden">
+        <!-- Background pattern -->
+        <div class="absolute inset-0 opacity-5">
+            <div class="absolute inset-0" style="background-image: linear-gradient(45deg, #0ea5e9 25%, transparent 25%), linear-gradient(-45deg, #0ea5e9 25%, transparent 25%), linear-gradient(45deg, transparent 75%, #0ea5e9 75%), linear-gradient(-45deg, transparent 75%, #0ea5e9 75%); background-size: 20px 20px; background-position: 0 0, 0 10px, 10px -10px, -10px 0px;"></div>
+        </div>
+        
+        <div class="max-w-7xl mx-auto py-16 px-4 sm:px-6 lg:px-8 relative">
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-8">
+                <div class="md:col-span-1 animate-slide-up">
+                    <div class="flex items-center mb-4">
+                        <span class="text-3xl font-bold bg-gradient-to-r from-primary-400 to-secondary-400 bg-clip-text text-transparent">Lexifever</span>
+                    </div>
+                    <p class="text-gray-400 leading-relaxed mb-6">
+                        Enrichissez votre vocabulaire anglais avec des textes personnalisés et des traductions instantanées.
+                    </p>
+                    <div class="flex space-x-4">
+                        <a href="#" class="text-gray-400 hover:text-white transition-all duration-300 transform hover:scale-110">
+                            <i class="fab fa-facebook-f text-xl"></i>
+                        </a>
+                        <a href="#" class="text-gray-400 hover:text-white transition-all duration-300 transform hover:scale-110">
+                            <i class="fab fa-twitter text-xl"></i>
+                        </a>
+                        <a href="#" class="text-gray-400 hover:text-white transition-all duration-300 transform hover:scale-110">
+                            <i class="fab fa-instagram text-xl"></i>
+                        </a>
+                        <a href="#" class="text-gray-400 hover:text-white transition-all duration-300 transform hover:scale-110">
+                            <i class="fab fa-linkedin-in text-xl"></i>
+                        </a>
+                    </div>
+                </div>
+                <div class="animate-slide-up" style="animation-delay: 0.1s;">
+                    <h3 class="text-sm font-semibold text-gray-300 uppercase tracking-wider mb-4">Produit</h3>
+                    <ul class="space-y-3">
+                        <li>
+                            <a href="index.html#features" class="text-base text-gray-400 hover:text-white transition-colors duration-300">
+                                Fonctionnalités
+                            </a>
+                        </li>
+                        <li>
+                            <a href="#" class="text-base text-gray-400 hover:text-white transition-colors duration-300">
+                                Tarifs
+                            </a>
+                        </li>
+                        <li>
+                            <a href="index.html#faq" class="text-base text-gray-400 hover:text-white transition-colors duration-300">
+                                FAQ
+                            </a>
+                        </li>
+                        <li>
+                            <a href="index.html#testimonials" class="text-base text-gray-400 hover:text-white transition-colors duration-300">
+                                Témoignages
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+                <div class="animate-slide-up" style="animation-delay: 0.2s;">
+                    <h3 class="text-sm font-semibold text-gray-300 uppercase tracking-wider mb-4">Support</h3>
+                    <ul class="space-y-3">
+                        <li>
+                            <a href="#" class="text-base text-gray-400 hover:text-white transition-colors duration-300">
+                                Centre d'aide
+                            </a>
+                        </li>
+                        <li>
+                            <a href="#" class="text-base text-gray-400 hover:text-white transition-colors duration-300">
+                                Contact
+                            </a>
+                        </li>
+                        <li>
+                            <a href="#" class="text-base text-gray-400 hover:text-white transition-colors duration-300">
+                                Tutoriels
+                            </a>
+                        </li>
+                        <li>
+                            <a href="#" class="text-base text-gray-400 hover:text-white transition-colors duration-300">
+                                Communauté
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+                <div class="animate-slide-up" style="animation-delay: 0.3s;">
+                    <h3 class="text-sm font-semibold text-gray-300 uppercase tracking-wider mb-4">Légal</h3>
+                    <ul class="space-y-3">
+                        <li>
+                            <a href="#" class="text-base text-gray-400 hover:text-white transition-colors duration-300">
+                                Confidentialité
+                            </a>
+                        </li>
+                        <li>
+                            <a href="#" class="text-base text-gray-400 hover:text-white transition-colors duration-300">
+                                Conditions d'utilisation
+                            </a>
+                        </li>
+                        <li>
+                            <a href="#" class="text-base text-gray-400 hover:text-white transition-colors duration-300">
+                                Cookies
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+            <div class="mt-12 border-t border-gray-800 pt-8 md:flex md:items-center md:justify-between">
+                <div class="flex space-x-6 md:order-2">
+                    <a href="#" class="text-gray-400 hover:text-white transition-colors duration-300">
+                        Conditions
+                    </a>
+                    <a href="#" class="text-gray-400 hover:text-white transition-colors duration-300">
+                        Confidentialité
+                    </a>
+                    <a href="#" class="text-gray-400 hover:text-white transition-colors duration-300">
+                        Cookies
+                    </a>
+                </div>
+                <p class="mt-8 text-base text-gray-400 md:mt-0 md:order-1">
+                    &copy; 2023 Lexifever. Tous droits réservés.
+                </p>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        // Mobile menu toggle with animation
+        const mobileMenuButton = document.getElementById('mobile-menu-button');
+        const mobileMenu = document.getElementById('mobile-menu');
+        const menuIcon = document.getElementById('menu-icon');
+
+        mobileMenuButton.addEventListener('click', () => {
+            mobileMenu.classList.toggle('hidden');
+            
+            if (mobileMenu.classList.contains('hidden')) {
+                menuIcon.classList.remove('fa-times');
+                menuIcon.classList.add('fa-bars');
+                menuIcon.style.transform = 'rotate(0deg)';
+            } else {
+                menuIcon.classList.remove('fa-bars');
+                menuIcon.classList.add('fa-times');
+                menuIcon.style.transform = 'rotate(180deg)';
+            }
+        });
+
+        // Navbar background change on scroll
+        const navbar = document.getElementById('navbar');
+        
+        window.addEventListener('scroll', () => {
+            if (window.scrollY > 50) {
+                navbar.classList.add('bg-white/95');
+                navbar.classList.remove('bg-white/80');
+            } else {
+                navbar.classList.add('bg-white/80');
+                navbar.classList.remove('bg-white/95');
+            }
+        });
+
+        // Topic search functionality
+        const searchInput = document.getElementById('topic-search');
+        const searchClear = document.getElementById('search-clear');
+        const searchResults = document.getElementById('search-results');
+        const topicsGrid = document.getElementById('topics-grid');
+        const noResults = document.getElementById('no-results');
+        const topicItems = document.querySelectorAll('.topic-item');
+
+        // Function to filter topics based on search input
+        function filterTopics() {
+            const searchTerm = searchInput.value.toLowerCase().trim();
+            let matchCount = 0;
+            
+            // Show/hide clear button
+            if (searchTerm.length > 0) {
+                searchClear.classList.remove('hidden');
+            } else {
+                searchClear.classList.add('hidden');
+            }
+            
+            // Filter topics
+            topicItems.forEach(item => {
+                const topicText = item.getAttribute('data-topic').toLowerCase();
+                const topicTitle = item.querySelector('h3').textContent.toLowerCase();
+                const topicDescription = item.querySelector('p').textContent.toLowerCase();
+                
+                if (searchTerm === '' || 
+                    topicText.includes(searchTerm) || 
+                    topicTitle.includes(searchTerm) || 
+                    topicDescription.includes(searchTerm)) {
+                    item.classList.remove('hidden');
+                    matchCount++;
+                    
+                    // Highlight matching text if there's a search term
+                    if (searchTerm !== '') {
+                        const description = item.querySelector('p');
+                        const originalText = description.textContent;
+                        
+                        // Create a regex to find the search term with word boundaries
+                        const regex = new RegExp(`(${searchTerm})`, 'gi');
+                        
+                        // Replace matching text with highlighted version
+                        description.innerHTML = originalText.replace(regex, '<span class="highlight">$1</span>');
+                    }
+                } else {
+                    item.classList.add('hidden');
+                }
+            });
+            
+            // Update search results message
+            if (searchTerm !== '') {
+                searchResults.textContent = `${matchCount} sujet(s) trouvé(s) pour "${searchTerm}"`;
+                searchResults.classList.remove('hidden');
+            } else {
+                searchResults.classList.add('hidden');
+            }
+            
+            // Show/hide no results message
+            if (matchCount === 0) {
+                noResults.classList.remove('hidden');
+                topicsGrid.classList.add('hidden');
+            } else {
+                noResults.classList.add('hidden');
+                topicsGrid.classList.remove('hidden');
+            }
+        }
+
+        // Search input event listeners
+        searchInput.addEventListener('input', filterTopics);
+        
+        // Clear search button
+        searchClear.addEventListener('click', () => {
+            searchInput.value = '';
+            filterTopics();
+            searchInput.focus();
+        });
+        
+        // Reset descriptions when clearing search
+        function resetDescriptions() {
+            topicItems.forEach(item => {
+                const description = item.querySelector('p');
+                const originalText = description.getAttribute('data-original-text');
+                if (originalText) {
+                    description.textContent = originalText;
+                }
+            });
+        }
+        
+        // Store original description texts
+        topicItems.forEach(item => {
+            const description = item.querySelector('p');
+            description.setAttribute('data-original-text', description.textContent);
+        });
+
+        // Intersection Observer for animations
+        const observerOptions = {
+            threshold: 0.1,
+            rootMargin: '0px 0px -50px 0px'
+        };
+
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.style.opacity = '1';
+                    entry.target.style.transform = 'translateY(0)';
+                }
+            });
+        }, observerOptions);
+
+        // Observe all animated elements
+        document.querySelectorAll('.animate-slide-up, .animate-slide-in-left, .animate-slide-in-right, .animate-fade-in').forEach(el => {
+            el.style.opacity = '0';
+            el.style.transform = 'translateY(30px)';
+            observer.observe(el);
+        });
+
+        // Add loading animation
+        window.addEventListener('load', () => {
+            document.body.classList.add('loaded');
+        });
+    </script>
+
+    <!-- Include our app script -->
+    <script src="js/app.js"></script>
+
+    <script>
+        // Function to handle topic selection (pour compatibilité)
+        function selectTopic(topicName) {
+            TopicPageHandler.selectTopic(topicName);
+        }
+    </script>
+</body>
+</html>

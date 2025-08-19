@@ -1,0 +1,769 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lexifever - Choisissez un domaine</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: {
+                            50: '#f0f9ff',
+                            100: '#e0f2fe',
+                            200: '#bae6fd',
+                            300: '#7dd3fc',
+                            400: '#38bdf8',
+                            500: '#0ea5e9',
+                            600: '#0284c7',
+                            700: '#0369a1',
+                            800: '#075985',
+                            900: '#0c4a6e',
+                        },
+                        secondary: {
+                            50: '#fff7ed',
+                            100: '#ffedd5',
+                            200: '#fed7aa',
+                            300: '#fdba74',
+                            400: '#fb923c',
+                            500: '#f97316',
+                            600: '#ea580c',
+                            700: '#c2410c',
+                            800: '#9a3412',
+                            900: '#7c2d12',
+                        },
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                    },
+                    animation: {
+                        'fade-in': 'fadeIn 0.6s ease-out',
+                        'slide-up': 'slideUp 0.6s ease-out',
+                        'slide-in-left': 'slideInLeft 0.6s ease-out',
+                        'slide-in-right': 'slideInRight 0.6s ease-out',
+                        'bounce-gentle': 'bounceGentle 2s ease-in-out infinite',
+                        'pulse-glow': 'pulseGlow 2s ease-in-out infinite',
+                        'float': 'float 3s ease-in-out infinite',
+                    },
+                    backdropBlur: {
+                        xs: '2px',
+                    }
+                },
+            },
+        }
+    </script>
+    <style type="text/tailwindcss">
+        @layer utilities {
+            .text-shadow {
+                text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            }
+            .text-shadow-lg {
+                text-shadow: 0 4px 8px rgba(0, 0, 0, 0.12);
+            }
+            .transition-all {
+                transition: all 0.3s ease;
+            }
+            .glass-effect {
+                background: rgba(255, 255, 255, 0.1);
+                backdrop-filter: blur(10px);
+                border: 1px solid rgba(255, 255, 255, 0.2);
+            }
+            .gradient-border {
+                background: linear-gradient(white, white) padding-box,
+                           linear-gradient(45deg, #0ea5e9, #f97316) border-box;
+                border: 2px solid transparent;
+            }
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+        
+        @keyframes slideUp {
+            from { 
+                opacity: 0; 
+                transform: translateY(30px); 
+            }
+            to { 
+                opacity: 1; 
+                transform: translateY(0); 
+            }
+        }
+        
+        @keyframes slideInLeft {
+            from { 
+                opacity: 0; 
+                transform: translateX(-30px); 
+            }
+            to { 
+                opacity: 1; 
+                transform: translateX(0); 
+            }
+        }
+        
+        @keyframes slideInRight {
+            from { 
+                opacity: 0; 
+                transform: translateX(30px); 
+            }
+            to { 
+                opacity: 1; 
+                transform: translateX(0); 
+            }
+        }
+        
+        @keyframes bounceGentle {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-10px); }
+        }
+        
+        @keyframes pulseGlow {
+            0%, 100% { box-shadow: 0 0 20px rgba(14, 165, 233, 0.3); }
+            50% { box-shadow: 0 0 30px rgba(14, 165, 233, 0.6); }
+        }
+        
+        @keyframes float {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-20px); }
+        }
+        
+        .scroll-smooth {
+            scroll-behavior: smooth;
+        }
+        
+        /* Improved hover effects */
+        .hover-lift {
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        
+        .hover-lift:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+        }
+        
+        .domain-card {
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .domain-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(14, 165, 233, 0.1), transparent);
+            transition: left 0.6s;
+        }
+        
+        .domain-card:hover::before {
+            left: 100%;
+        }
+        
+        .domain-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 35px rgba(14, 165, 233, 0.15);
+        }
+        
+        /* Custom scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        
+        ::-webkit-scrollbar-track {
+            background: #f1f5f9;
+        }
+        
+        ::-webkit-scrollbar-thumb {
+            background: #0ea5e9;
+            border-radius: 4px;
+        }
+        
+        ::-webkit-scrollbar-thumb:hover {
+            background: #0284c7;
+        }
+        
+        /* Domain card image hover effect */
+        .domain-image {
+            transition: transform 0.5s ease;
+        }
+        
+        .domain-card:hover .domain-image {
+            transform: scale(1.05);
+        }
+        
+        /* Search highlight */
+        .highlight {
+            background-color: rgba(14, 165, 233, 0.2);
+            padding: 0 2px;
+            border-radius: 2px;
+        }
+    </style>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+</head>
+<body class="font-sans text-gray-800 bg-gray-50 min-h-screen scroll-smooth">
+    <!-- Navigation -->
+    <nav class="bg-white/80 backdrop-blur-md shadow-sm fixed w-full z-50 transition-all duration-300" id="navbar">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between h-16">
+                <div class="flex items-center">
+                    <div class="flex-shrink-0 flex items-center animate-slide-in-left">
+                        <a href="index.html" class="text-primary-600 text-2xl font-bold bg-gradient-to-r from-primary-600 to-secondary-500 bg-clip-text text-transparent">
+                            Lexifever
+                        </a>
+                    </div>
+                </div>
+                <div class="hidden sm:ml-6 sm:flex sm:items-center animate-slide-in-right">
+                    <a href="#" class="text-gray-500 hover:text-primary-600 px-3 py-2 rounded-md text-sm font-medium transition-all duration-300">Mon compte</a>
+                    <a href="#" class="ml-4 bg-gradient-to-r from-primary-600 to-primary-700 hover:from-primary-700 hover:to-primary-800 text-white px-4 py-2 rounded-lg text-sm font-medium transition-all duration-300 transform hover:scale-105">
+                        Déconnexion
+                    </a>
+                </div>
+                <div class="-mr-2 flex items-center sm:hidden">
+                    <button id="mobile-menu-button" type="button" class="inline-flex items-center justify-center p-2 rounded-md text-gray-400 hover:text-gray-500 hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-primary-500 transition-all duration-300" aria-expanded="false">
+                        <span class="sr-only">Ouvrir le menu principal</span>
+                        <i class="fas fa-bars transition-transform duration-300" id="menu-icon"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Mobile menu -->
+        <div id="mobile-menu" class="sm:hidden hidden bg-white/95 backdrop-blur-md border-t border-gray-200">
+            <div class="pt-2 pb-3 space-y-1">
+                <a href="#" class="block pl-3 pr-4 py-2 text-base font-medium text-gray-500 hover:text-primary-600 hover:bg-gray-50 transition-all duration-300">
+                    Mon compte
+                </a>
+                <a href="#" class="block pl-3 pr-4 py-2 text-base font-medium text-gray-500 hover:text-primary-600 hover:bg-gray-50 transition-all duration-300">
+                    Déconnexion
+                </a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-28 pb-12">
+        <div class="text-center mb-12 animate-slide-up">
+            <h1 class="text-3xl font-extrabold text-gray-900 sm:text-4xl lg:text-5xl">
+                <span class="bg-gradient-to-r from-primary-600 to-secondary-500 bg-clip-text text-transparent">Choisissez un domaine</span>
+            </h1>
+            <p class="mt-4 max-w-2xl mx-auto text-xl text-gray-600">
+                Sélectionnez un domaine qui vous intéresse pour générer un texte personnalisé.
+            </p>
+        </div>
+
+        <!-- Search Bar -->
+        <div class="max-w-xl mx-auto mb-12 animate-slide-up" style="animation-delay: 0.2s;">
+            <div class="relative">
+                <input 
+                    type="text" 
+                    id="domain-search" 
+                    class="w-full pl-12 pr-4 py-4 rounded-xl border border-gray-300 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500 shadow-sm transition-all duration-300" 
+                    placeholder="Rechercher un domaine..."
+                >
+                <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+                    <i class="fas fa-search text-primary-500"></i>
+                </div>
+                <div id="search-clear" class="absolute inset-y-0 right-0 pr-4 flex items-center cursor-pointer hidden">
+                    <i class="fas fa-times-circle text-gray-400 hover:text-gray-600 transition-colors"></i>
+                </div>
+            </div>
+            <div id="search-results" class="mt-2 text-sm text-gray-500"></div>
+        </div>
+
+        <!-- Domains Grid -->
+        <div id="domains-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 animate-slide-up" style="animation-delay: 0.3s;">
+            <!-- Technology Domain -->
+            <a href="select-topic.html?domain=Technologie" class="group domain-item" data-domain="technologie intelligence artificielle développement web cybersécurité blockchain">
+                <div class="domain-card bg-white rounded-xl shadow-sm overflow-hidden hover:shadow-md transition-all border border-gray-100 h-full">
+                    <div class="aspect-w-16 aspect-h-9 bg-primary-100 relative overflow-hidden">
+                        <img src="https://images.unsplash.com/photo-1518770660439-4636190af475?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1470&q=80" alt="Technologie" class="w-full h-48 object-cover domain-image">
+                        <div class="absolute inset-0 bg-gradient-to-t from-black/70 to-transparent"></div>
+                        <div class="absolute bottom-0 left-0 p-4">
+                            <h3 class="text-xl font-bold text-white text-shadow-lg">Technologie</h3>
+                        </div>
+                    </div>
+                    <div class="p-5">
+                        <p class="text-gray-600">
+                            Intelligence artificielle, développement web, cybersécurité, blockchain et plus encore.
+                        </p>
+                        <div class="mt-4 flex items-center text-primary-600 group-hover:text-primary-700">
+                            <span class="font-medium">Explorer</span>
+                            <i class="fas fa-arrow-right ml-2 transition-transform group-hover:translate-x-2"></i>
+                        </div>
+                    </div>
+                </div>
+            </a>
+
+            <!-- Science Domain -->
+            <a href="select-topic.html?domain=Sciences" class="group domain-item" data-domain="sciences physique biologie astronomie chimie mathématiques découvertes scientifiques">
+                <div class="domain-card bg-white rounded-xl shadow-sm overflow-hidden hover:shadow-md transition-all border border-gray-100 h-full">
+                    <div class="aspect-w-16 aspect-h-9 bg-primary-100 relative overflow-hidden">
+                        <img src="https://images.unsplash.com/photo-1532094349884-543bc11b234d?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1470&q=80" alt="Sciences" class="w-full h-48 object-cover domain-image">
+                        <div class="absolute inset-0 bg-gradient-to-t from-black/70 to-transparent"></div>
+                        <div class="absolute bottom-0 left-0 p-4">
+                            <h3 class="text-xl font-bold text-white text-shadow-lg">Sciences</h3>
+                        </div>
+                    </div>
+                    <div class="p-5">
+                        <p class="text-gray-600">
+                            Physique, biologie, astronomie, chimie, mathématiques et découvertes scientifiques.
+                        </p>
+                        <div class="mt-4 flex items-center text-primary-600 group-hover:text-primary-700">
+                            <span class="font-medium">Explorer</span>
+                            <i class="fas fa-arrow-right ml-2 transition-transform group-hover:translate-x-2"></i>
+                        </div>
+                    </div>
+                </div>
+            </a>
+
+            <!-- Travel Domain -->
+            <a href="select-topic.html" class="group domain-item" data-domain="voyages destinations cultures conseils voyage aventures expériences monde">
+                <div class="domain-card bg-white rounded-xl shadow-sm overflow-hidden hover:shadow-md transition-all border border-gray-100 h-full">
+                    <div class="aspect-w-16 aspect-h-9 bg-primary-100 relative overflow-hidden">
+                        <img src="https://images.unsplash.com/photo-1488085061387-422e29b40080?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1631&q=80" alt="Voyages" class="w-full h-48 object-cover domain-image">
+                        <div class="absolute inset-0 bg-gradient-to-t from-black/70 to-transparent"></div>
+                        <div class="absolute bottom-0 left-0 p-4">
+                            <h3 class="text-xl font-bold text-white text-shadow-lg">Voyages</h3>
+                        </div>
+                    </div>
+                    <div class="p-5">
+                        <p class="text-gray-600">
+                            Destinations, cultures, conseils de voyage, aventures et expériences autour du monde.
+                        </p>
+                        <div class="mt-4 flex items-center text-primary-600 group-hover:text-primary-700">
+                            <span class="font-medium">Explorer</span>
+                            <i class="fas fa-arrow-right ml-2 transition-transform group-hover:translate-x-2"></i>
+                        </div>
+                    </div>
+                </div>
+            </a>
+
+            <!-- Business Domain -->
+            <a href="select-topic.html" class="group domain-item" data-domain="business entrepreneuriat marketing finance management stratégie économie">
+                <div class="domain-card bg-white rounded-xl shadow-sm overflow-hidden hover:shadow-md transition-all border border-gray-100 h-full">
+                    <div class="aspect-w-16 aspect-h-9 bg-primary-100 relative overflow-hidden">
+                        <img src="https://images.unsplash.com/photo-1664575599736-c5197c684128?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1470&q=80" alt="Business" class="w-full h-48 object-cover domain-image">
+                        <div class="absolute inset-0 bg-gradient-to-t from-black/70 to-transparent"></div>
+                        <div class="absolute bottom-0 left-0 p-4">
+                            <h3 class="text-xl font-bold text-white text-shadow-lg">Business</h3>
+                        </div>
+                    </div>
+                    <div class="p-5">
+                        <p class="text-gray-600">
+                            Entrepreneuriat, marketing, finance, management, stratégie et économie.
+                        </p>
+                        <div class="mt-4 flex items-center text-primary-600 group-hover:text-primary-700">
+                            <span class="font-medium">Explorer</span>
+                            <i class="fas fa-arrow-right ml-2 transition-transform group-hover:translate-x-2"></i>
+                        </div>
+                    </div>
+                </div>
+            </a>
+
+            <!-- Health Domain -->
+            <a href="select-topic.html" class="group domain-item" data-domain="santé bien-être nutrition fitness médecine santé mentale mode de vie sain">
+                <div class="domain-card bg-white rounded-xl shadow-sm overflow-hidden hover:shadow-md transition-all border border-gray-100 h-full">
+                    <div class="aspect-w-16 aspect-h-9 bg-primary-100 relative overflow-hidden">
+                        <img src="https://images.unsplash.com/photo-1505576399279-565b52d4ac71?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1470&q=80" alt="Santé" class="w-full h-48 object-cover domain-image">
+                        <div class="absolute inset-0 bg-gradient-to-t from-black/70 to-transparent"></div>
+                        <div class="absolute bottom-0 left-0 p-4">
+                            <h3 class="text-xl font-bold text-white text-shadow-lg">Santé</h3>
+                        </div>
+                    </div>
+                    <div class="p-5">
+                        <p class="text-gray-600">
+                            Bien-être, nutrition, fitness, médecine, santé mentale et mode de vie sain.
+                        </p>
+                        <div class="mt-4 flex items-center text-primary-600 group-hover:text-primary-700">
+                            <span class="font-medium">Explorer</span>
+                            <i class="fas fa-arrow-right ml-2 transition-transform group-hover:translate-x-2"></i>
+                        </div>
+                    </div>
+                </div>
+            </a>
+
+            <!-- Spirituality Domain -->
+            <a href="select-topic.html" class="group domain-item" data-domain="spiritualité philosophie méditation développement personnel religions pratiques spirituelles">
+                <div class="domain-card bg-white rounded-xl shadow-sm overflow-hidden hover:shadow-md transition-all border border-gray-100 h-full">
+                    <div class="aspect-w-16 aspect-h-9 bg-primary-100 relative overflow-hidden">
+                        <img src="https://images.unsplash.com/photo-1507692049790-de58290a4334?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1470&q=80" alt="Spiritualité" class="w-full h-48 object-cover domain-image">
+                        <div class="absolute inset-0 bg-gradient-to-t from-black/70 to-transparent"></div>
+                        <div class="absolute bottom-0 left-0 p-4">
+                            <h3 class="text-xl font-bold text-white text-shadow-lg">Spiritualité</h3>
+                        </div>
+                    </div>
+                    <div class="p-5">
+                        <p class="text-gray-600">
+                            Philosophie, méditation, développement personnel, religions et pratiques spirituelles.
+                        </p>
+                        <div class="mt-4 flex items-center text-primary-600 group-hover:text-primary-700">
+                            <span class="font-medium">Explorer</span>
+                            <i class="fas fa-arrow-right ml-2 transition-transform group-hover:translate-x-2"></i>
+                        </div>
+                    </div>
+                </div>
+            </a>
+
+            <!-- Arts Domain -->
+            <a href="select-topic.html" class="group domain-item" data-domain="arts peinture musique littérature cinéma théâtre expressions artistiques">
+                <div class="domain-card bg-white rounded-xl shadow-sm overflow-hidden hover:shadow-md transition-all border border-gray-100 h-full">
+                    <div class="aspect-w-16 aspect-h-9 bg-primary-100 relative overflow-hidden">
+                        <img src="https://images.unsplash.com/photo-1513364776144-60967b0f800f?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1471&q=80" alt="Arts" class="w-full h-48 object-cover domain-image">
+                        <div class="absolute inset-0 bg-gradient-to-t from-black/70 to-transparent"></div>
+                        <div class="absolute bottom-0 left-0 p-4">
+                            <h3 class="text-xl font-bold text-white text-shadow-lg">Arts</h3>
+                        </div>
+                    </div>
+                    <div class="p-5">
+                        <p class="text-gray-600">
+                            Peinture, musique, littérature, cinéma, théâtre et expressions artistiques.
+                        </p>
+                        <div class="mt-4 flex items-center text-primary-600 group-hover:text-primary-700">
+                            <span class="font-medium">Explorer</span>
+                            <i class="fas fa-arrow-right ml-2 transition-transform group-hover:translate-x-2"></i>
+                        </div>
+                    </div>
+                </div>
+            </a>
+
+            <!-- Environment Domain -->
+            <a href="select-topic.html" class="group domain-item" data-domain="environnement écologie développement durable changement climatique conservation énergies renouvelables">
+                <div class="domain-card bg-white rounded-xl shadow-sm overflow-hidden hover:shadow-md transition-all border border-gray-100 h-full">
+                    <div class="aspect-w-16 aspect-h-9 bg-primary-100 relative overflow-hidden">
+                        <img src="https://images.unsplash.com/photo-1623645481161-0d8160281cbf?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1470&q=80" alt="Environnement" class="w-full h-48 object-cover domain-image">
+                        <div class="absolute inset-0 bg-gradient-to-t from-black/70 to-transparent"></div>
+                        <div class="absolute bottom-0 left-0 p-4">
+                            <h3 class="text-xl font-bold text-white text-shadow-lg">Environnement</h3>
+                        </div>
+                    </div>
+                    <div class="p-5">
+                        <p class="text-gray-600">
+                            Écologie, développement durable, changement climatique, conservation et énergies renouvelables.
+                        </p>
+                        <div class="mt-4 flex items-center text-primary-600 group-hover:text-primary-700">
+                            <span class="font-medium">Explorer</span>
+                            <i class="fas fa-arrow-right ml-2 transition-transform group-hover:translate-x-2"></i>
+                        </div>
+                    </div>
+                </div>
+            </a>
+
+            <!-- Sports Domain -->
+            <a href="select-topic.html" class="group domain-item" data-domain="sports football basketball tennis athlétisme compétitions événements sportifs">
+                <div class="domain-card bg-white rounded-xl shadow-sm overflow-hidden hover:shadow-md transition-all border border-gray-100 h-full">
+                    <div class="aspect-w-16 aspect-h-9 bg-primary-100 relative overflow-hidden">
+                        <img src="https://images.unsplash.com/photo-1461896836934-ffe607ba8211?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1470&q=80" alt="Sports" class="w-full h-48 object-cover domain-image">
+                        <div class="absolute inset-0 bg-gradient-to-t from-black/70 to-transparent"></div>
+                        <div class="absolute bottom-0 left-0 p-4">
+                            <h3 class="text-xl font-bold text-white text-shadow-lg">Sports</h3>
+                        </div>
+                    </div>
+                    <div class="p-5">
+                        <p class="text-gray-600">
+                            Football, basketball, tennis, athlétisme, compétitions et événements sportifs.
+                        </p>
+                        <div class="mt-4 flex items-center text-primary-600 group-hover:text-primary-700">
+                            <span class="font-medium">Explorer</span>
+                            <i class="fas fa-arrow-right ml-2 transition-transform group-hover:translate-x-2"></i>
+                        </div>
+                    </div>
+                </div>
+            </a>
+        </div>
+
+        <!-- No Results Message -->
+        <div id="no-results" class="hidden text-center py-12 animate-slide-up">
+            <div class="text-gray-500 mb-4">
+                <i class="fas fa-search text-5xl opacity-30"></i>
+            </div>
+            <h3 class="text-xl font-semibold text-gray-700 mb-2">Aucun domaine trouvé</h3>
+            <p class="text-gray-500">Essayez avec un autre terme de recherche</p>
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-gray-900 text-white relative overflow-hidden">
+        <!-- Background pattern -->
+        <div class="absolute inset-0 opacity-5">
+            <div class="absolute inset-0" style="background-image: linear-gradient(45deg, #0ea5e9 25%, transparent 25%), linear-gradient(-45deg, #0ea5e9 25%, transparent 25%), linear-gradient(45deg, transparent 75%, #0ea5e9 75%), linear-gradient(-45deg, transparent 75%, #0ea5e9 75%); background-size: 20px 20px; background-position: 0 0, 0 10px, 10px -10px, -10px 0px;"></div>
+        </div>
+        
+        <div class="max-w-7xl mx-auto py-16 px-4 sm:px-6 lg:px-8 relative">
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-8">
+                <div class="md:col-span-1 animate-slide-up">
+                    <div class="flex items-center mb-4">
+                        <span class="text-3xl font-bold bg-gradient-to-r from-primary-400 to-secondary-400 bg-clip-text text-transparent">Lexifever</span>
+                    </div>
+                    <p class="text-gray-400 leading-relaxed mb-6">
+                        Enrichissez votre vocabulaire anglais avec des textes personnalisés et des traductions instantanées.
+                    </p>
+                    <div class="flex space-x-4">
+                        <a href="#" class="text-gray-400 hover:text-white transition-all duration-300 transform hover:scale-110">
+                            <i class="fab fa-facebook-f text-xl"></i>
+                        </a>
+                        <a href="#" class="text-gray-400 hover:text-white transition-all duration-300 transform hover:scale-110">
+                            <i class="fab fa-twitter text-xl"></i>
+                        </a>
+                        <a href="#" class="text-gray-400 hover:text-white transition-all duration-300 transform hover:scale-110">
+                            <i class="fab fa-instagram text-xl"></i>
+                        </a>
+                        <a href="#" class="text-gray-400 hover:text-white transition-all duration-300 transform hover:scale-110">
+                            <i class="fab fa-linkedin-in text-xl"></i>
+                        </a>
+                    </div>
+                </div>
+                <div class="animate-slide-up" style="animation-delay: 0.1s;">
+                    <h3 class="text-sm font-semibold text-gray-300 uppercase tracking-wider mb-4">Produit</h3>
+                    <ul class="space-y-3">
+                        <li>
+                            <a href="index.html#features" class="text-base text-gray-400 hover:text-white transition-colors duration-300">
+                                Fonctionnalités
+                            </a>
+                        </li>
+                        <li>
+                            <a href="#" class="text-base text-gray-400 hover:text-white transition-colors duration-300">
+                                Tarifs
+                            </a>
+                        </li>
+                        <li>
+                            <a href="index.html#faq" class="text-base text-gray-400 hover:text-white transition-colors duration-300">
+                                FAQ
+                            </a>
+                        </li>
+                        <li>
+                            <a href="index.html#testimonials" class="text-base text-gray-400 hover:text-white transition-colors duration-300">
+                                Témoignages
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+                <div class="animate-slide-up" style="animation-delay: 0.2s;">
+                    <h3 class="text-sm font-semibold text-gray-300 uppercase tracking-wider mb-4">Support</h3>
+                    <ul class="space-y-3">
+                        <li>
+                            <a href="#" class="text-base text-gray-400 hover:text-white transition-colors duration-300">
+                                Centre d'aide
+                            </a>
+                        </li>
+                        <li>
+                            <a href="#" class="text-base text-gray-400 hover:text-white transition-colors duration-300">
+                                Contact
+                            </a>
+                        </li>
+                        <li>
+                            <a href="#" class="text-base text-gray-400 hover:text-white transition-colors duration-300">
+                                Tutoriels
+                            </a>
+                        </li>
+                        <li>
+                            <a href="#" class="text-base text-gray-400 hover:text-white transition-colors duration-300">
+                                Communauté
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+                <div class="animate-slide-up" style="animation-delay: 0.3s;">
+                    <h3 class="text-sm font-semibold text-gray-300 uppercase tracking-wider mb-4">Légal</h3>
+                    <ul class="space-y-3">
+                        <li>
+                            <a href="#" class="text-base text-gray-400 hover:text-white transition-colors duration-300">
+                                Confidentialité
+                            </a>
+                        </li>
+                        <li>
+                            <a href="#" class="text-base text-gray-400 hover:text-white transition-colors duration-300">
+                                Conditions d'utilisation
+                            </a>
+                        </li>
+                        <li>
+                            <a href="#" class="text-base text-gray-400 hover:text-white transition-colors duration-300">
+                                Cookies
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+            <div class="mt-12 border-t border-gray-800 pt-8 md:flex md:items-center md:justify-between">
+                <div class="flex space-x-6 md:order-2">
+                    <a href="#" class="text-gray-400 hover:text-white transition-colors duration-300">
+                        Conditions
+                    </a>
+                    <a href="#" class="text-gray-400 hover:text-white transition-colors duration-300">
+                        Confidentialité
+                    </a>
+                    <a href="#" class="text-gray-400 hover:text-white transition-colors duration-300">
+                        Cookies
+                    </a>
+                </div>
+                <p class="mt-8 text-base text-gray-400 md:mt-0 md:order-1">
+                    &copy; 2023 Lexifever. Tous droits réservés.
+                </p>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        // Mobile menu toggle with animation
+        const mobileMenuButton = document.getElementById('mobile-menu-button');
+        const mobileMenu = document.getElementById('mobile-menu');
+        const menuIcon = document.getElementById('menu-icon');
+
+        mobileMenuButton.addEventListener('click', () => {
+            mobileMenu.classList.toggle('hidden');
+            
+            if (mobileMenu.classList.contains('hidden')) {
+                menuIcon.classList.remove('fa-times');
+                menuIcon.classList.add('fa-bars');
+                menuIcon.style.transform = 'rotate(0deg)';
+            } else {
+                menuIcon.classList.remove('fa-bars');
+                menuIcon.classList.add('fa-times');
+                menuIcon.style.transform = 'rotate(180deg)';
+            }
+        });
+
+        // Navbar background change on scroll
+        const navbar = document.getElementById('navbar');
+        
+        window.addEventListener('scroll', () => {
+            if (window.scrollY > 50) {
+                navbar.classList.add('bg-white/95');
+                navbar.classList.remove('bg-white/80');
+            } else {
+                navbar.classList.add('bg-white/80');
+                navbar.classList.remove('bg-white/95');
+            }
+        });
+
+        // Domain search functionality
+        const searchInput = document.getElementById('domain-search');
+        const searchClear = document.getElementById('search-clear');
+        const searchResults = document.getElementById('search-results');
+        const domainsGrid = document.getElementById('domains-grid');
+        const noResults = document.getElementById('no-results');
+        const domainItems = document.querySelectorAll('.domain-item');
+
+        // Function to filter domains based on search input
+        function filterDomains() {
+            const searchTerm = searchInput.value.toLowerCase().trim();
+            let matchCount = 0;
+            
+            // Show/hide clear button
+            if (searchTerm.length > 0) {
+                searchClear.classList.remove('hidden');
+            } else {
+                searchClear.classList.add('hidden');
+            }
+            
+            // Filter domains
+            domainItems.forEach(item => {
+                const domainText = item.getAttribute('data-domain').toLowerCase();
+                const domainTitle = item.querySelector('h3').textContent.toLowerCase();
+                const domainDescription = item.querySelector('p').textContent.toLowerCase();
+                
+                if (searchTerm === '' || 
+                    domainText.includes(searchTerm) || 
+                    domainTitle.includes(searchTerm) || 
+                    domainDescription.includes(searchTerm)) {
+                    item.classList.remove('hidden');
+                    matchCount++;
+                    
+                    // Highlight matching text if there's a search term
+                    if (searchTerm !== '') {
+                        const description = item.querySelector('p');
+                        const originalText = description.textContent;
+                        
+                        // Create a regex to find the search term with word boundaries
+                        const regex = new RegExp(`(${searchTerm})`, 'gi');
+                        
+                        // Replace matching text with highlighted version
+                        description.innerHTML = originalText.replace(regex, '<span class="highlight">$1</span>');
+                    }
+                } else {
+                    item.classList.add('hidden');
+                }
+            });
+            
+            // Update search results message
+            if (searchTerm !== '') {
+                searchResults.textContent = `${matchCount} domaine(s) trouvé(s) pour "${searchTerm}"`;
+                searchResults.classList.remove('hidden');
+            } else {
+                searchResults.classList.add('hidden');
+            }
+            
+            // Show/hide no results message
+            if (matchCount === 0) {
+                noResults.classList.remove('hidden');
+                domainsGrid.classList.add('hidden');
+            } else {
+                noResults.classList.add('hidden');
+                domainsGrid.classList.remove('hidden');
+            }
+        }
+
+        // Search input event listeners
+        searchInput.addEventListener('input', filterDomains);
+        
+        // Clear search button
+        searchClear.addEventListener('click', () => {
+            searchInput.value = '';
+            filterDomains();
+            searchInput.focus();
+        });
+        
+        // Reset descriptions when clearing search
+        function resetDescriptions() {
+            domainItems.forEach(item => {
+                const description = item.querySelector('p');
+                const originalText = description.getAttribute('data-original-text');
+                if (originalText) {
+                    description.textContent = originalText;
+                }
+            });
+        }
+        
+        // Store original description texts
+        domainItems.forEach(item => {
+            const description = item.querySelector('p');
+            description.setAttribute('data-original-text', description.textContent);
+        });
+
+        // Intersection Observer for animations
+        const observerOptions = {
+            threshold: 0.1,
+            rootMargin: '0px 0px -50px 0px'
+        };
+
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.style.opacity = '1';
+                    entry.target.style.transform = 'translateY(0)';
+                }
+            });
+        }, observerOptions);
+
+        // Observe all animated elements
+        document.querySelectorAll('.animate-slide-up, .animate-slide-in-left, .animate-slide-in-right, .animate-fade-in').forEach(el => {
+            el.style.opacity = '0';
+            el.style.transform = 'translateY(30px)';
+            observer.observe(el);
+        });
+
+        // Add loading animation
+        window.addEventListener('load', () => {
+            document.body.classList.add('loaded');
+        });
+    </script>
+</body>
+</html>

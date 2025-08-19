@@ -1,0 +1,776 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lexifever - Personnalisez votre texte</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: {
+                            50: '#f0f9ff',
+                            100: '#e0f2fe',
+                            200: '#bae6fd',
+                            300: '#7dd3fc',
+                            400: '#38bdf8',
+                            500: '#0ea5e9',
+                            600: '#0284c7',
+                            700: '#0369a1',
+                            800: '#075985',
+                            900: '#0c4a6e',
+                        },
+                        secondary: {
+                            50: '#fff7ed',
+                            100: '#ffedd5',
+                            200: '#fed7aa',
+                            300: '#fdba74',
+                            400: '#fb923c',
+                            500: '#f97316',
+                            600: '#ea580c',
+                            700: '#c2410c',
+                            800: '#9a3412',
+                            900: '#7c2d12',
+                        },
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                    },
+                    animation: {
+                        'fade-in': 'fadeIn 0.6s ease-out',
+                        'slide-up': 'slideUp 0.6s ease-out',
+                        'slide-in-left': 'slideInLeft 0.6s ease-out',
+                        'slide-in-right': 'slideInRight 0.6s ease-out',
+                        'bounce-gentle': 'bounceGentle 2s ease-in-out infinite',
+                        'pulse-glow': 'pulseGlow 2s ease-in-out infinite',
+                        'float': 'float 3s ease-in-out infinite',
+                    },
+                    backdropBlur: {
+                        xs: '2px',
+                    }
+                },
+            },
+        }
+    </script>
+    <style type="text/tailwindcss">
+        @layer utilities {
+            .text-shadow {
+                text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            }
+            .text-shadow-lg {
+                text-shadow: 0 4px 8px rgba(0, 0, 0, 0.12);
+            }
+            .transition-all {
+                transition: all 0.3s ease;
+            }
+            .glass-effect {
+                background: rgba(255, 255, 255, 0.1);
+                backdrop-filter: blur(10px);
+                border: 1px solid rgba(255, 255, 255, 0.2);
+            }
+            .gradient-border {
+                background: linear-gradient(white, white) padding-box,
+                           linear-gradient(45deg, #0ea5e9, #f97316) border-box;
+                border: 2px solid transparent;
+            }
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+        
+        @keyframes slideUp {
+            from { 
+                opacity: 0; 
+                transform: translateY(30px); 
+            }
+            to { 
+                opacity: 1; 
+                transform: translateY(0); 
+            }
+        }
+        
+        @keyframes slideInLeft {
+            from { 
+                opacity: 0; 
+                transform: translateX(-30px); 
+            }
+            to { 
+                opacity: 1; 
+                transform: translateX(0); 
+            }
+        }
+        
+        @keyframes slideInRight {
+            from { 
+                opacity: 0; 
+                transform: translateX(30px); 
+            }
+            to { 
+                opacity: 1; 
+                transform: translateX(0); 
+            }
+        }
+        
+        @keyframes bounceGentle {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-10px); }
+        }
+        
+        @keyframes pulseGlow {
+            0%, 100% { box-shadow: 0 0 20px rgba(14, 165, 233, 0.3); }
+            50% { box-shadow: 0 0 30px rgba(14, 165, 233, 0.6); }
+        }
+        
+        @keyframes float {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-20px); }
+        }
+        
+        .scroll-smooth {
+            scroll-behavior: smooth;
+        }
+        
+        /* Custom range slider */
+        input[type="range"] {
+            -webkit-appearance: none;
+            appearance: none;
+            height: 8px;
+            background: linear-gradient(to right, #0ea5e9, #f97316);
+            border-radius: 8px;
+            outline: none;
+        }
+        
+        input[type="range"]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 24px;
+            height: 24px;
+            background: white;
+            border: 2px solid #0ea5e9;
+            border-radius: 50%;
+            cursor: pointer;
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+            transition: all 0.2s ease;
+        }
+        
+        input[type="range"]::-webkit-slider-thumb:hover {
+            box-shadow: 0 0 0 10px rgba(14, 165, 233, 0.1);
+        }
+        
+        input[type="range"]::-webkit-slider-thumb:active {
+            box-shadow: 0 0 0 12px rgba(14, 165, 233, 0.2);
+            transform: scale(1.1);
+        }
+        
+        /* Custom checkbox */
+        input[type="checkbox"] {
+            position: relative;
+            width: 18px;
+            height: 18px;
+            -webkit-appearance: none;
+            appearance: none;
+            background-color: #fff;
+            border: 2px solid #d1d5db;
+            border-radius: 4px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            outline: none;
+            transition: all 0.2s ease;
+        }
+        
+        input[type="checkbox"]:checked {
+            background-color: #0ea5e9;
+            border-color: #0ea5e9;
+        }
+        
+        input[type="checkbox"]:checked::before {
+            content: '✓';
+            color: white;
+            font-size: 12px;
+            font-weight: bold;
+        }
+        
+        input[type="checkbox"]:hover {
+            border-color: #0ea5e9;
+        }
+        
+        /* Form card hover effect */
+        .form-card {
+            transition: all 0.3s ease;
+        }
+        
+        .form-card:hover {
+            box-shadow: 0 10px 25px rgba(14, 165, 233, 0.1);
+            transform: translateY(-5px);
+        }
+        
+        /* Custom scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        
+        ::-webkit-scrollbar-track {
+            background: #f1f5f9;
+        }
+        
+        ::-webkit-scrollbar-thumb {
+            background: #0ea5e9;
+            border-radius: 4px;
+        }
+        
+        ::-webkit-scrollbar-thumb:hover {
+            background: #0284c7;
+        }
+        
+        /* Breadcrumb styles */
+        .breadcrumb-item {
+            position: relative;
+        }
+        
+        .breadcrumb-arrow {
+            position: relative;
+            width: 20px;
+            height: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .breadcrumb-arrow::before {
+            content: '';
+            position: absolute;
+            width: 6px;
+            height: 6px;
+            border-top: 2px solid #9ca3af;
+            border-right: 2px solid #9ca3af;
+            transform: rotate(45deg);
+        }
+    </style>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+</head>
+<body class="font-sans text-gray-800 bg-gray-50 min-h-screen scroll-smooth">
+    <!-- Navigation -->
+    <nav class="bg-white/80 backdrop-blur-md shadow-sm fixed w-full z-50 transition-all duration-300" id="navbar">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between h-16">
+                <div class="flex items-center">
+                    <div class="flex-shrink-0 flex items-center animate-slide-in-left">
+                        <a href="index.html" class="text-primary-600 text-2xl font-bold bg-gradient-to-r from-primary-600 to-secondary-500 bg-clip-text text-transparent">
+                            Lexifever
+                        </a>
+                    </div>
+                </div>
+                <div class="hidden sm:ml-6 sm:flex sm:items-center animate-slide-in-right">
+                    <a href="#" class="text-gray-500 hover:text-primary-600 px-3 py-2 rounded-md text-sm font-medium transition-all duration-300">Mon compte</a>
+                    <a href="#" class="ml-4 bg-gradient-to-r from-primary-600 to-primary-700 hover:from-primary-700 hover:to-primary-800 text-white px-4 py-2 rounded-lg text-sm font-medium transition-all duration-300 transform hover:scale-105">
+                        Déconnexion
+                    </a>
+                </div>
+                <div class="-mr-2 flex items-center sm:hidden">
+                    <button id="mobile-menu-button" type="button" class="inline-flex items-center justify-center p-2 rounded-md text-gray-400 hover:text-gray-500 hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-primary-500 transition-all duration-300" aria-expanded="false">
+                        <span class="sr-only">Ouvrir le menu principal</span>
+                        <i class="fas fa-bars transition-transform duration-300" id="menu-icon"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Mobile menu -->
+        <div id="mobile-menu" class="sm:hidden hidden bg-white/95 backdrop-blur-md border-t border-gray-200">
+            <div class="pt-2 pb-3 space-y-1">
+                <a href="#" class="block pl-3 pr-4 py-2 text-base font-medium text-gray-500 hover:text-primary-600 hover:bg-gray-50 transition-all duration-300">
+                    Mon compte
+                </a>
+                <a href="#" class="block pl-3 pr-4 py-2 text-base font-medium text-gray-500 hover:text-primary-600 hover:bg-gray-50 transition-all duration-300">
+                    Déconnexion
+                </a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-28 pb-12">
+        <!-- Breadcrumb -->
+        <nav class="flex mb-8 animate-slide-up" aria-label="Breadcrumb">
+            <ol class="inline-flex items-center space-x-1 md:space-x-3">
+                <li class="inline-flex items-center">
+                    <a href="select-domain.html" class="inline-flex items-center text-sm font-medium text-gray-500 hover:text-primary-600 transition-colors duration-300">
+                        <i class="fas fa-th-large mr-2"></i>
+                        Domaines
+                    </a>
+                </li>
+                <li>
+                    <div class="flex items-center">
+                        <i class="fas fa-chevron-right text-gray-400 mx-2 text-xs"></i>
+                        <a href="select-topic.html" class="breadcrumb-domain text-sm font-medium text-gray-500 hover:text-primary-600 transition-colors duration-300">Technologie</a>
+                    </div>
+                </li>
+                <li>
+                    <div class="flex items-center">
+                        <i class="fas fa-chevron-right text-gray-400 mx-2 text-xs"></i>
+                        <span class="breadcrumb-topic text-sm font-medium text-primary-600">Intelligence Artificielle</span>
+                    </div>
+                </li>
+            </ol>
+        </nav>
+
+        <div class="text-center mb-12 animate-slide-up" style="animation-delay: 0.1s;">
+            <h1 class="text-3xl font-extrabold text-gray-900 sm:text-4xl lg:text-5xl">
+                <span class="bg-gradient-to-r from-primary-600 to-secondary-500 bg-clip-text text-transparent">Personnalisez votre texte</span>
+            </h1>
+            <p class="mt-4 max-w-2xl mx-auto text-xl text-gray-600">
+                Définissez les caractéristiques du texte que vous souhaitez générer.
+            </p>
+        </div>
+
+        <!-- Background decorative elements -->
+        <div class="absolute inset-0 overflow-hidden -z-10">
+            <div class="absolute top-40 -right-40 w-80 h-80 bg-primary-200 rounded-full mix-blend-multiply filter blur-xl opacity-20 animate-float"></div>
+            <div class="absolute bottom-40 -left-40 w-80 h-80 bg-secondary-200 rounded-full mix-blend-multiply filter blur-xl opacity-20 animate-float" style="animation-delay: 1s;"></div>
+        </div>
+
+        <!-- Customization Form -->
+        <div class="bg-white rounded-xl shadow-lg overflow-hidden border border-gray-100 max-w-4xl mx-auto form-card animate-slide-up" style="animation-delay: 0.2s;">
+            <div class="p-6 sm:p-8">
+                <form id="customize-form">
+                    <!-- Tone Selection -->
+                    <div class="mb-10 animate-slide-up" style="animation-delay: 0.3s;">
+                        <label for="tone" class="block text-lg font-medium text-gray-900 mb-4 flex items-center">
+                            <i class="fas fa-music text-primary-500 mr-2"></i>
+                            Tonalité du texte
+                        </label>
+                        <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3">
+                            <div>
+                                <input type="radio" id="tone-informative" name="tone" value="informative" class="sr-only peer" checked>
+                                <label for="tone-informative" class="flex items-center justify-center p-3 border rounded-lg cursor-pointer peer-checked:bg-primary-50 peer-checked:border-primary-500 hover:bg-gray-50 transition-all">
+                                    <span class="text-sm font-medium">Informatif</span>
+                                </label>
+                            </div>
+                            <div>
+                                <input type="radio" id="tone-formal" name="tone" value="formal" class="sr-only peer">
+                                <label for="tone-formal" class="flex items-center justify-center p-3 border rounded-lg cursor-pointer peer-checked:bg-primary-50 peer-checked:border-primary-500 hover:bg-gray-50 transition-all">
+                                    <span class="text-sm font-medium">Formel</span>
+                                </label>
+                            </div>
+                            <div>
+                                <input type="radio" id="tone-casual" name="tone" value="casual" class="sr-only peer">
+                                <label for="tone-casual" class="flex items-center justify-center p-3 border rounded-lg cursor-pointer peer-checked:bg-primary-50 peer-checked:border-primary-500 hover:bg-gray-50 transition-all">
+                                    <span class="text-sm font-medium">Décontracté</span>
+                                </label>
+                            </div>
+                            <div>
+                                <input type="radio" id="tone-enthusiastic" name="tone" value="enthusiastic" class="sr-only peer">
+                                <label for="tone-enthusiastic" class="flex items-center justify-center p-3 border rounded-lg cursor-pointer peer-checked:bg-primary-50 peer-checked:border-primary-500 hover:bg-gray-50 transition-all">
+                                    <span class="text-sm font-medium">Enthousiaste</span>
+                                </label>
+                            </div>
+                            <div>
+                                <input type="radio" id="tone-professional" name="tone" value="professional" class="sr-only peer">
+                                <label for="tone-professional" class="flex items-center justify-center p-3 border rounded-lg cursor-pointer peer-checked:bg-primary-50 peer-checked:border-primary-500 hover:bg-gray-50 transition-all">
+                                    <span class="text-sm font-medium">Professionnel</span>
+                                </label>
+                            </div>
+                            <div>
+                                <input type="radio" id="tone-educational" name="tone" value="educational" class="sr-only peer">
+                                <label for="tone-educational" class="flex items-center justify-center p-3 border rounded-lg cursor-pointer peer-checked:bg-primary-50 peer-checked:border-primary-500 hover:bg-gray-50 transition-all">
+                                    <span class="text-sm font-medium">Éducatif</span>
+                                </label>
+                            </div>
+                            <div>
+                                <input type="radio" id="tone-conversational" name="tone" value="conversational" class="sr-only peer">
+                                <label for="tone-conversational" class="flex items-center justify-center p-3 border rounded-lg cursor-pointer peer-checked:bg-primary-50 peer-checked:border-primary-500 hover:bg-gray-50 transition-all">
+                                    <span class="text-sm font-medium">Conversationnel</span>
+                                </label>
+                            </div>
+                            <div>
+                                <input type="radio" id="tone-technical" name="tone" value="technical" class="sr-only peer">
+                                <label for="tone-technical" class="flex items-center justify-center p-3 border rounded-lg cursor-pointer peer-checked:bg-primary-50 peer-checked:border-primary-500 hover:bg-gray-50 transition-all">
+                                    <span class="text-sm font-medium">Technique</span>
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Language Level -->
+                    <div class="mb-10 animate-slide-up" style="animation-delay: 0.4s;">
+                        <label for="level" class="block text-lg font-medium text-gray-900 mb-4 flex items-center">
+                            <i class="fas fa-chart-line text-primary-500 mr-2"></i>
+                            Niveau de langue
+                        </label>
+                        <div class="relative px-2">
+                            <input type="range" id="level" name="level" min="1" max="5" value="3" class="w-full h-2 rounded-lg appearance-none cursor-pointer">
+                            <div class="flex justify-between text-xs text-gray-500 mt-2 px-1">
+                                <span>Débutant</span>
+                                <span class="hidden sm:inline">Élémentaire</span>
+                                <span>Intermédiaire</span>
+                                <span class="hidden sm:inline">Avancé</span>
+                                <span>Expert</span>
+                            </div>
+                            <div class="mt-4 text-center">
+                                <span id="level-display" class="text-sm font-medium text-primary-600 bg-primary-50 px-4 py-1 rounded-full">Intermédiaire</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Text Length -->
+                    <div class="mb-10 animate-slide-up" style="animation-delay: 0.5s;">
+                        <label for="length" class="block text-lg font-medium text-gray-900 mb-4 flex items-center">
+                            <i class="fas fa-text-height text-primary-500 mr-2"></i>
+                            Longueur du texte
+                        </label>
+                        <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                            <div>
+                                <input type="radio" id="length-short" name="length" value="short" class="sr-only peer">
+                                <label for="length-short" class="flex flex-col items-center justify-center p-4 border rounded-lg cursor-pointer peer-checked:bg-primary-50 peer-checked:border-primary-500 hover:bg-gray-50 transition-all">
+                                    <i class="fas fa-align-left text-xl mb-2 text-gray-400 peer-checked:text-primary-500"></i>
+                                    <span class="text-sm font-medium mb-1">Court</span>
+                                    <span class="text-xs text-gray-500">~150 mots</span>
+                                </label>
+                            </div>
+                            <div>
+                                <input type="radio" id="length-medium" name="length" value="medium" class="sr-only peer" checked>
+                                <label for="length-medium" class="flex flex-col items-center justify-center p-4 border rounded-lg cursor-pointer peer-checked:bg-primary-50 peer-checked:border-primary-500 hover:bg-gray-50 transition-all">
+                                    <i class="fas fa-align-justify text-xl mb-2 text-gray-400 peer-checked:text-primary-500"></i>
+                                    <span class="text-sm font-medium mb-1">Moyen</span>
+                                    <span class="text-xs text-gray-500">~300 mots</span>
+                                </label>
+                            </div>
+                            <div>
+                                <input type="radio" id="length-long" name="length" value="long" class="sr-only peer">
+                                <label for="length-long" class="flex flex-col items-center justify-center p-4 border rounded-lg cursor-pointer peer-checked:bg-primary-50 peer-checked:border-primary-500 hover:bg-gray-50 transition-all">
+                                    <i class="fas fa-align-justify text-xl mb-2 text-gray-400 peer-checked:text-primary-500"></i>
+                                    <span class="text-sm font-medium mb-1">Long</span>
+                                    <span class="text-xs text-gray-500">~500 mots</span>
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Additional Options -->
+                    <div class="mb-10 animate-slide-up" style="animation-delay: 0.6s;">
+                        <label class="block text-lg font-medium text-gray-900 mb-4 flex items-center">
+                            <i class="fas fa-sliders-h text-primary-500 mr-2"></i>
+                            Options supplémentaires
+                        </label>
+                        <div class="space-y-4 bg-gray-50 p-4 rounded-lg">
+                            <div class="flex items-start">
+                                <div class="flex items-center h-5">
+                                    <input id="include-examples" name="include-examples" type="checkbox" class="h-5 w-5 text-primary-600 border-gray-300 rounded focus:ring-primary-500">
+                                </div>
+                                <div class="ml-3 text-sm">
+                                    <label for="include-examples" class="font-medium text-gray-700">Inclure des exemples concrets</label>
+                                    <p class="text-gray-500">Le texte contiendra des exemples pratiques pour illustrer les concepts.</p>
+                                </div>
+                            </div>
+                            <div class="flex items-start">
+                                <div class="flex items-center h-5">
+                                    <input id="include-definitions" name="include-definitions" type="checkbox" class="h-5 w-5 text-primary-600 border-gray-300 rounded focus:ring-primary-500" checked>
+                                </div>
+                                <div class="ml-3 text-sm">
+                                    <label for="include-definitions" class="font-medium text-gray-700">Inclure des définitions</label>
+                                    <p class="text-gray-500">Le texte expliquera les termes techniques ou spécifiques au domaine.</p>
+                                </div>
+                            </div>
+                            <div class="flex items-start">
+                                <div class="flex items-center h-5">
+                                    <input id="include-history" name="include-history" type="checkbox" class="h-5 w-5 text-primary-600 border-gray-300 rounded focus:ring-primary-500">
+                                </div>
+                                <div class="ml-3 text-sm">
+                                    <label for="include-history" class="font-medium text-gray-700">Inclure du contexte historique</label>
+                                    <p class="text-gray-500">Le texte mentionnera l'évolution historique du sujet.</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Specific Focus -->
+                    <div class="mb-10 animate-slide-up" style="animation-delay: 0.7s;">
+                        <label for="focus" class="block text-lg font-medium text-gray-900 mb-2 flex items-center">
+                            <i class="fas fa-bullseye text-primary-500 mr-2"></i>
+                            Focus spécifique (optionnel)
+                        </label>
+                        <p class="text-sm text-gray-500 mb-4">Précisez un aspect particulier du sujet sur lequel vous souhaitez que le texte se concentre.</p>
+                        <div class="relative">
+                            <input type="text" id="focus" name="focus" class="w-full pl-10 pr-4 py-3 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition-all" placeholder="Ex: Applications de l'IA dans la médecine">
+                            <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                <i class="fas fa-search text-gray-400"></i>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Submit Button -->
+                    <div class="mt-12 animate-slide-up" style="animation-delay: 0.8s;">
+                        <button type="submit" class="w-full bg-gradient-to-r from-primary-600 to-primary-700 hover:from-primary-700 hover:to-primary-800 text-white px-6 py-4 rounded-lg text-base font-medium transition-all duration-300 transform hover:scale-[1.02] hover:shadow-lg flex items-center justify-center group">
+                            <span>Générer le texte</span>
+                            <i class="fas fa-arrow-right ml-2 transition-transform duration-300 group-hover:translate-x-1"></i>
+                        </button>
+                        <p class="text-center text-sm text-gray-500 mt-4">
+                            <i class="fas fa-bolt text-yellow-500 mr-1"></i>
+                            Génération instantanée avec notre technologie IA avancée
+                        </p>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-gray-900 text-white relative overflow-hidden">
+        <!-- Background pattern -->
+        <div class="absolute inset-0 opacity-5">
+            <div class="absolute inset-0" style="background-image: linear-gradient(45deg, #0ea5e9 25%, transparent 25%), linear-gradient(-45deg, #0ea5e9 25%, transparent 25%), linear-gradient(45deg, transparent 75%, #0ea5e9 75%), linear-gradient(-45deg, transparent 75%, #0ea5e9 75%); background-size: 20px 20px; background-position: 0 0, 0 10px, 10px -10px, -10px 0px;"></div>
+        </div>
+        
+        <div class="max-w-7xl mx-auto py-16 px-4 sm:px-6 lg:px-8 relative">
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-8">
+                <div class="md:col-span-1 animate-slide-up">
+                    <div class="flex items-center mb-4">
+                        <span class="text-3xl font-bold bg-gradient-to-r from-primary-400 to-secondary-400 bg-clip-text text-transparent">Lexifever</span>
+                    </div>
+                    <p class="text-gray-400 leading-relaxed mb-6">
+                        Enrichissez votre vocabulaire anglais avec des textes personnalisés et des traductions instantanées.
+                    </p>
+                    <div class="flex space-x-4">
+                        <a href="#" class="text-gray-400 hover:text-white transition-all duration-300 transform hover:scale-110">
+                            <i class="fab fa-facebook-f text-xl"></i>
+                        </a>
+                        <a href="#" class="text-gray-400 hover:text-white transition-all duration-300 transform hover:scale-110">
+                            <i class="fab fa-twitter text-xl"></i>
+                        </a>
+                        <a href="#" class="text-gray-400 hover:text-white transition-all duration-300 transform hover:scale-110">
+                            <i class="fab fa-instagram text-xl"></i>
+                        </a>
+                        <a href="#" class="text-gray-400 hover:text-white transition-all duration-300 transform hover:scale-110">
+                            <i class="fab fa-linkedin-in text-xl"></i>
+                        </a>
+                    </div>
+                </div>
+                <div class="animate-slide-up" style="animation-delay: 0.1s;">
+                    <h3 class="text-sm font-semibold text-gray-300 uppercase tracking-wider mb-4">Produit</h3>
+                    <ul class="space-y-3">
+                        <li>
+                            <a href="index.html#features" class="text-base text-gray-400 hover:text-white transition-colors duration-300">
+                                Fonctionnalités
+                            </a>
+                        </li>
+                        <li>
+                            <a href="#" class="text-base text-gray-400 hover:text-white transition-colors duration-300">
+                                Tarifs
+                            </a>
+                        </li>
+                        <li>
+                            <a href="index.html#faq" class="text-base text-gray-400 hover:text-white transition-colors duration-300">
+                                FAQ
+                            </a>
+                        </li>
+                        <li>
+                            <a href="index.html#testimonials" class="text-base text-gray-400 hover:text-white transition-colors duration-300">
+                                Témoignages
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+                <div class="animate-slide-up" style="animation-delay: 0.2s;">
+                    <h3 class="text-sm font-semibold text-gray-300 uppercase tracking-wider mb-4">Support</h3>
+                    <ul class="space-y-3">
+                        <li>
+                            <a href="#" class="text-base text-gray-400 hover:text-white transition-colors duration-300">
+                                Centre d'aide
+                            </a>
+                        </li>
+                        <li>
+                            <a href="#" class="text-base text-gray-400 hover:text-white transition-colors duration-300">
+                                Contact
+                            </a>
+                        </li>
+                        <li>
+                            <a href="#" class="text-base text-gray-400 hover:text-white transition-colors duration-300">
+                                Tutoriels
+                            </a>
+                        </li>
+                        <li>
+                            <a href="#" class="text-base text-gray-400 hover:text-white transition-colors duration-300">
+                                Communauté
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+                <div class="animate-slide-up" style="animation-delay: 0.3s;">
+                    <h3 class="text-sm font-semibold text-gray-300 uppercase tracking-wider mb-4">Légal</h3>
+                    <ul class="space-y-3">
+                        <li>
+                            <a href="#" class="text-base text-gray-400 hover:text-white transition-colors duration-300">
+                                Confidentialité
+                            </a>
+                        </li>
+                        <li>
+                            <a href="#" class="text-base text-gray-400 hover:text-white transition-colors duration-300">
+                                Conditions d'utilisation
+                            </a>
+                        </li>
+                        <li>
+                            <a href="#" class="text-base text-gray-400 hover:text-white transition-colors duration-300">
+                                Cookies
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+            <div class="mt-12 border-t border-gray-800 pt-8 md:flex md:items-center md:justify-between">
+                <div class="flex space-x-6 md:order-2">
+                    <a href="#" class="text-gray-400 hover:text-white transition-colors duration-300">
+                        Conditions
+                    </a>
+                    <a href="#" class="text-gray-400 hover:text-white transition-colors duration-300">
+                        Confidentialité
+                    </a>
+                    <a href="#" class="text-gray-400 hover:text-white transition-colors duration-300">
+                        Cookies
+                    </a>
+                </div>
+                <p class="mt-8 text-base text-gray-400 md:mt-0 md:order-1">
+                    &copy; 2023 Lexifever. Tous droits réservés.
+                </p>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        // Mobile menu toggle with animation
+        const mobileMenuButton = document.getElementById('mobile-menu-button');
+        const mobileMenu = document.getElementById('mobile-menu');
+        const menuIcon = document.getElementById('menu-icon');
+
+        mobileMenuButton.addEventListener('click', () => {
+            mobileMenu.classList.toggle('hidden');
+            
+            if (mobileMenu.classList.contains('hidden')) {
+                menuIcon.classList.remove('fa-times');
+                menuIcon.classList.add('fa-bars');
+                menuIcon.style.transform = 'rotate(0deg)';
+            } else {
+                menuIcon.classList.remove('fa-bars');
+                menuIcon.classList.add('fa-times');
+                menuIcon.style.transform = 'rotate(180deg)';
+            }
+        });
+
+        // Navbar background change on scroll
+        const navbar = document.getElementById('navbar');
+        
+        window.addEventListener('scroll', () => {
+            if (window.scrollY > 50) {
+                navbar.classList.add('bg-white/95');
+                navbar.classList.remove('bg-white/80');
+            } else {
+                navbar.classList.add('bg-white/80');
+                navbar.classList.remove('bg-white/95');
+            }
+        });
+
+        // Language level display with enhanced visual feedback
+        const levelSlider = document.getElementById('level');
+        const levelDisplay = document.getElementById('level-display');
+
+        const updateLevelDisplay = () => {
+            const value = levelSlider.value;
+            let levelText = 'Intermédiaire';
+            let levelColor = 'bg-primary-50 text-primary-600';
+            
+            if (value == 1) {
+                levelText = 'Débutant';
+                levelColor = 'bg-green-50 text-green-600';
+            } else if (value == 2) {
+                levelText = 'Élémentaire';
+                levelColor = 'bg-blue-50 text-blue-600';
+            } else if (value == 3) {
+                levelText = 'Intermédiaire';
+                levelColor = 'bg-primary-50 text-primary-600';
+            } else if (value == 4) {
+                levelText = 'Avancé';
+                levelColor = 'bg-purple-50 text-purple-600';
+            } else if (value == 5) {
+                levelText = 'Expert';
+                levelColor = 'bg-secondary-50 text-secondary-600';
+            }
+            
+            levelDisplay.textContent = levelText;
+            
+            // Update the color class
+            levelDisplay.className = `text-sm font-medium px-4 py-1 rounded-full ${levelColor}`;
+        };
+
+        levelSlider.addEventListener('input', updateLevelDisplay);
+        updateLevelDisplay();
+
+        // Enhanced radio button interactions
+        document.querySelectorAll('input[type="radio"]').forEach(radio => {
+            radio.addEventListener('change', function() {
+                if (this.name === 'length') {
+                    // Update icons for length options
+                    document.querySelectorAll('input[name="length"] + label i').forEach(icon => {
+                        icon.classList.add('text-gray-400');
+                        icon.classList.remove('text-primary-500');
+                    });
+                    
+                    const selectedIcon = document.querySelector(`label[for="${this.id}"] i`);
+                    if (selectedIcon) {
+                        selectedIcon.classList.remove('text-gray-400');
+                        selectedIcon.classList.add('text-primary-500');
+                    }
+                }
+            });
+        });
+
+        // Form submission animation
+        document.getElementById('customize-form').addEventListener('submit', function(e) {
+            const submitButton = this.querySelector('button[type="submit"]');
+            submitButton.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i> Génération en cours...';
+            submitButton.disabled = true;
+            
+            // We don't prevent default as we want the form to actually submit
+        });
+
+        // Intersection Observer for animations
+        const observerOptions = {
+            threshold: 0.1,
+            rootMargin: '0px 0px -50px 0px'
+        };
+
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.style.opacity = '1';
+                    entry.target.style.transform = 'translateY(0)';
+                }
+            });
+        }, observerOptions);
+
+        // Observe all animated elements
+        document.querySelectorAll('.animate-slide-up, .animate-slide-in-left, .animate-slide-in-right, .animate-fade-in').forEach(el => {
+            el.style.opacity = '0';
+            el.style.transform = 'translateY(30px)';
+            observer.observe(el);
+        });
+
+        // Add loading animation
+        window.addEventListener('load', () => {
+            document.body.classList.add('loaded');
+        });
+    </script>
+
+    <!-- Include our app script -->
+    <script src="js/app.js"></script>
+
+
+</body>
+</html>

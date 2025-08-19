@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Flow - Lexifever</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-100 p-8">
+    <div class="max-w-4xl mx-auto">
+        <h1 class="text-3xl font-bold mb-8">Test du flux complet</h1>
+        
+        <div class="bg-white rounded-lg shadow p-6 mb-6">
+            <h2 class="text-xl font-semibold mb-4">Simulation du flux</h2>
+            
+            <div class="space-y-4">
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Domaine:</label>
+                    <select id="domain" class="w-full border border-gray-300 rounded-md px-3 py-2">
+                        <option value="Technologie">Technologie</option>
+                        <option value="Sciences">Sciences</option>
+                        <option value="Business">Business</option>
+                        <option value="Santé">Santé</option>
+                    </select>
+                </div>
+                
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Sujet:</label>
+                    <select id="topic" class="w-full border border-gray-300 rounded-md px-3 py-2">
+                        <option value="Intelligence Artificielle">Intelligence Artificielle</option>
+                        <option value="Développement Web">Développement Web</option>
+                        <option value="Cybersécurité">Cybersécurité</option>
+                    </select>
+                </div>
+                
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Niveau:</label>
+                    <select id="level" class="w-full border border-gray-300 rounded-md px-3 py-2">
+                        <option value="beginner">Débutant</option>
+                        <option value="intermediate">Intermédiaire</option>
+                        <option value="advanced">Avancé</option>
+                    </select>
+                </div>
+                
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Ton:</label>
+                    <select id="tone" class="w-full border border-gray-300 rounded-md px-3 py-2">
+                        <option value="conversational">Conversationnel</option>
+                        <option value="formal">Formel</option>
+                        <option value="casual">Décontracté</option>
+                    </select>
+                </div>
+                
+                <button id="simulate-flow" class="bg-blue-500 text-white px-6 py-2 rounded hover:bg-blue-600">
+                    Simuler le flux complet
+                </button>
+            </div>
+            
+            <div id="flow-result" class="mt-6"></div>
+        </div>
+    </div>
+
+    <script src="js/app.js"></script>
+    <script>
+        document.getElementById('simulate-flow').addEventListener('click', async () => {
+            const resultDiv = document.getElementById('flow-result');
+            
+            // Récupérer les paramètres
+            const params = {
+                domain: document.getElementById('domain').value,
+                topic: document.getElementById('topic').value,
+                level: document.getElementById('level').value,
+                tone: document.getElementById('tone').value,
+                length: 'medium'
+            };
+            
+            console.log('🧪 Test du flux avec:', params);
+            
+            // Sauvegarder les paramètres en session
+            SessionManager.saveParams(params);
+            
+            resultDiv.innerHTML = '<div class="text-blue-600">Simulation en cours...</div>';
+            
+            try {
+                // Étape 1: Génération du texte
+                resultDiv.innerHTML += '<div class="text-gray-600 mt-2">📝 Génération du texte...</div>';
+                const textResponse = await ApiClient.generateText(params);
+                
+                // Étape 2: Traduction
+                resultDiv.innerHTML += '<div class="text-gray-600 mt-2">🌍 Traduction en français...</div>';
+                const translationResponse = await ApiClient.translateText(textResponse.data.englishText);
+                
+                // Afficher les résultats
+                resultDiv.innerHTML = `
+                    <div class="bg-green-50 border border-green-200 rounded p-4">
+                        <h3 class="font-semibold text-green-800 mb-4">✅ Flux complet réussi !</h3>
+                        
+                        <div class="mb-4">
+                            <h4 class="font-medium text-gray-800">Paramètres:</h4>
+                            <p class="text-sm text-gray-600">
+                                ${params.domain} > ${params.topic} (${params.level}, ${params.tone})
+                            </p>
+                        </div>
+                        
+                        <div class="mb-4">
+                            <h4 class="font-medium text-gray-800">Texte anglais (extrait):</h4>
+                            <p class="text-sm text-gray-600 bg-white p-2 rounded border">
+                                ${textResponse.data.englishText.substring(0, 200)}...
+                            </p>
+                        </div>
+                        
+                        <div class="mb-4">
+                            <h4 class="font-medium text-gray-800">Traduction française (extrait):</h4>
+                            <p class="text-sm text-gray-600 bg-white p-2 rounded border">
+                                ${translationResponse.data.translatedText.substring(0, 200)}...
+                            </p>
+                        </div>
+                        
+                        <div class="mt-4">
+                            <a href="result.html" class="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600">
+                                Voir la page de résultat
+                            </a>
+                        </div>
+                    </div>
+                `;
+                
+            } catch (error) {
+                resultDiv.innerHTML = `
+                    <div class="bg-red-50 border border-red-200 rounded p-4">
+                        <h3 class="font-semibold text-red-800">❌ Erreur dans le flux</h3>
+                        <p class="text-sm text-red-700 mt-2">${error.message}</p>
+                    </div>
+                `;
+            }
+        });
+    </script>
+</body>
+</html>

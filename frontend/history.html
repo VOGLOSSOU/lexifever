@@ -1,0 +1,249 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Historique - Lexifever</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: {
+                            50: '#f0f9ff',
+                            100: '#e0f2fe',
+                            200: '#bae6fd',
+                            300: '#7dd3fc',
+                            400: '#38bdf8',
+                            500: '#0ea5e9',
+                            600: '#0284c7',
+                            700: '#0369a1',
+                            800: '#075985',
+                            900: '#0c4a6e',
+                        },
+                        secondary: {
+                            50: '#fff7ed',
+                            100: '#ffedd5',
+                            200: '#fed7aa',
+                            300: '#fdba74',
+                            400: '#fb923c',
+                            500: '#f97316',
+                            600: '#ea580c',
+                            700: '#c2410c',
+                            800: '#9a3412',
+                            900: '#7c2d12',
+                        },
+                    },
+                },
+            },
+        }
+    </script>
+</head>
+<body class="bg-gray-50">
+    <!-- Header -->
+    <header class="bg-white shadow-sm">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between h-16">
+                <div class="flex items-center">
+                    <a href="index.html" class="text-primary-600 text-2xl font-bold">Lexifever</a>
+                </div>
+                <nav class="flex items-center space-x-4">
+                    <a href="index.html" class="text-gray-500 hover:text-gray-700">Accueil</a>
+                    <a href="select-domain.html" class="text-gray-500 hover:text-gray-700">Nouveau texte</a>
+                    <a href="history.html" class="text-primary-600 font-medium">Historique</a>
+                </nav>
+            </div>
+        </div>
+    </header>
+
+    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <!-- Page Header -->
+        <div class="text-center mb-8">
+            <h1 class="text-3xl font-extrabold text-gray-900 sm:text-4xl">
+                <span class="bg-gradient-to-r from-primary-600 to-secondary-500 bg-clip-text text-transparent">Historique des textes</span>
+            </h1>
+            <p class="mt-4 max-w-2xl mx-auto text-xl text-gray-600">
+                Retrouvez tous vos textes générés précédemment
+            </p>
+        </div>
+
+        <!-- Actions -->
+        <div class="flex justify-between items-center mb-6">
+            <div class="flex items-center space-x-4">
+                <span id="history-count" class="text-sm text-gray-500">0 texte(s) sauvegardé(s)</span>
+            </div>
+            <div class="flex space-x-2">
+                <button id="clear-history" class="px-4 py-2 text-sm font-medium text-red-600 bg-white border border-red-300 rounded-md hover:bg-red-50">
+                    <i class="fas fa-trash mr-2"></i>Tout supprimer
+                </button>
+                <a href="select-domain.html" class="px-4 py-2 text-sm font-medium text-white bg-primary-600 border border-transparent rounded-md hover:bg-primary-700">
+                    <i class="fas fa-plus mr-2"></i>Nouveau texte
+                </a>
+            </div>
+        </div>
+
+        <!-- History List -->
+        <div id="history-container" class="space-y-4">
+            <!-- Les textes seront chargés ici par JavaScript -->
+        </div>
+
+        <!-- Empty State -->
+        <div id="empty-state" class="text-center py-12 hidden">
+            <div class="mx-auto h-24 w-24 text-gray-400">
+                <i class="fas fa-file-text text-6xl"></i>
+            </div>
+            <h3 class="mt-4 text-lg font-medium text-gray-900">Aucun texte sauvegardé</h3>
+            <p class="mt-2 text-gray-500">Commencez par générer votre premier texte personnalisé.</p>
+            <div class="mt-6">
+                <a href="select-domain.html" class="inline-flex items-center px-4 py-2 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-primary-600 hover:bg-primary-700">
+                    <i class="fas fa-plus mr-2"></i>Créer un texte
+                </a>
+            </div>
+        </div>
+    </main>
+
+    <script src="js/app.js"></script>
+    <script>
+        // Gestionnaire pour la page d'historique
+        const HistoryPageHandler = {
+            init() {
+                this.loadHistory();
+                this.setupEventListeners();
+            },
+
+            loadHistory() {
+                const history = HistoryManager.getHistory();
+                const container = document.getElementById('history-container');
+                const emptyState = document.getElementById('empty-state');
+                const countElement = document.getElementById('history-count');
+
+                // Mettre à jour le compteur
+                countElement.textContent = `${history.length} texte(s) sauvegardé(s)`;
+
+                if (history.length === 0) {
+                    container.classList.add('hidden');
+                    emptyState.classList.remove('hidden');
+                    return;
+                }
+
+                container.classList.remove('hidden');
+                emptyState.classList.add('hidden');
+
+                // Générer le HTML pour chaque texte
+                container.innerHTML = history.map(item => this.createHistoryItemHTML(item)).join('');
+
+                // Ajouter les gestionnaires d'événements pour les boutons
+                this.setupItemEventListeners();
+            },
+
+            createHistoryItemHTML(item) {
+                const date = new Date(item.timestamp).toLocaleDateString('fr-FR', {
+                    year: 'numeric',
+                    month: 'long',
+                    day: 'numeric',
+                    hour: '2-digit',
+                    minute: '2-digit'
+                });
+
+                return `
+                    <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-6" data-id="${item.id}">
+                        <div class="flex justify-between items-start mb-4">
+                            <div>
+                                <h3 class="text-lg font-semibold text-gray-900">${item.parameters.topic}</h3>
+                                <div class="flex items-center space-x-4 mt-1">
+                                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-primary-100 text-primary-800">
+                                        ${item.parameters.domain}
+                                    </span>
+                                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-800">
+                                        ${item.parameters.level}
+                                    </span>
+                                    <span class="text-xs text-gray-500">${date}</span>
+                                </div>
+                            </div>
+                            <div class="flex space-x-2">
+                                <button class="view-text-btn p-2 text-gray-400 hover:text-primary-600" title="Voir le texte">
+                                    <i class="fas fa-eye"></i>
+                                </button>
+                                <button class="delete-text-btn p-2 text-gray-400 hover:text-red-600" title="Supprimer">
+                                    <i class="fas fa-trash"></i>
+                                </button>
+                            </div>
+                        </div>
+                        
+                        <div class="text-collapse">
+                            <div class="text-preview text-sm text-gray-600 line-clamp-2">
+                                ${item.englishText.substring(0, 150)}...
+                            </div>
+                            <div class="text-full hidden">
+                                <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
+                                    <div>
+                                        <h4 class="font-medium text-gray-900 mb-2">Anglais</h4>
+                                        <div class="text-sm text-gray-700 bg-gray-50 p-3 rounded">${item.englishText}</div>
+                                    </div>
+                                    <div>
+                                        <h4 class="font-medium text-gray-900 mb-2">Français</h4>
+                                        <div class="text-sm text-gray-700 bg-gray-50 p-3 rounded">${item.frenchText}</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            },
+
+            setupEventListeners() {
+                // Bouton pour vider l'historique
+                document.getElementById('clear-history').addEventListener('click', () => {
+                    if (confirm('Êtes-vous sûr de vouloir supprimer tout l\'historique ?')) {
+                        HistoryManager.clearHistory();
+                        this.loadHistory();
+                    }
+                });
+            },
+
+            setupItemEventListeners() {
+                // Boutons pour voir le texte complet
+                document.querySelectorAll('.view-text-btn').forEach(btn => {
+                    btn.addEventListener('click', (e) => {
+                        const item = e.target.closest('[data-id]');
+                        const preview = item.querySelector('.text-preview');
+                        const full = item.querySelector('.text-full');
+                        
+                        if (full.classList.contains('hidden')) {
+                            preview.classList.add('hidden');
+                            full.classList.remove('hidden');
+                            btn.innerHTML = '<i class="fas fa-eye-slash"></i>';
+                            btn.title = 'Masquer le texte';
+                        } else {
+                            preview.classList.remove('hidden');
+                            full.classList.add('hidden');
+                            btn.innerHTML = '<i class="fas fa-eye"></i>';
+                            btn.title = 'Voir le texte';
+                        }
+                    });
+                });
+
+                // Boutons pour supprimer un texte
+                document.querySelectorAll('.delete-text-btn').forEach(btn => {
+                    btn.addEventListener('click', (e) => {
+                        const item = e.target.closest('[data-id]');
+                        const id = item.dataset.id;
+                        
+                        if (confirm('Êtes-vous sûr de vouloir supprimer ce texte ?')) {
+                            HistoryManager.deleteText(id);
+                            this.loadHistory();
+                        }
+                    });
+                });
+            }
+        };
+
+        // Initialiser la page
+        document.addEventListener('DOMContentLoaded', () => {
+            HistoryPageHandler.init();
+        });
+    </script>
+</body>
+</html>

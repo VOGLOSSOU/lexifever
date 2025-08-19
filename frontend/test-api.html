@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test API - Lexifever</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-100 p-8">
+    <div class="max-w-4xl mx-auto">
+        <h1 class="text-3xl font-bold mb-8">Test API Lexifever</h1>
+        
+        <div class="bg-white rounded-lg shadow p-6 mb-6">
+            <h2 class="text-xl font-semibold mb-4">Test de génération de texte</h2>
+            <button id="test-generate" class="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600">
+                Tester la génération
+            </button>
+            <div id="generate-result" class="mt-4"></div>
+        </div>
+        
+        <div class="bg-white rounded-lg shadow p-6">
+            <h2 class="text-xl font-semibold mb-4">Test de traduction</h2>
+            <button id="test-translate" class="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600">
+                Tester la traduction
+            </button>
+            <div id="translate-result" class="mt-4"></div>
+        </div>
+    </div>
+
+    <script src="js/app.js"></script>
+    <script>
+        document.getElementById('test-generate').addEventListener('click', async () => {
+            const resultDiv = document.getElementById('generate-result');
+            resultDiv.innerHTML = '<div class="text-blue-600">Test en cours...</div>';
+            
+            try {
+                const params = {
+                    domain: 'Technologie',
+                    topic: 'Intelligence Artificielle',
+                    level: 'intermediate',
+                    tone: 'conversational'
+                };
+                
+                console.log('🧪 Test génération avec:', params);
+                const response = await ApiClient.generateText(params);
+                
+                resultDiv.innerHTML = `
+                    <div class="bg-green-50 border border-green-200 rounded p-4">
+                        <h3 class="font-semibold text-green-800">Succès !</h3>
+                        <p class="text-sm text-green-700 mt-2">${response.data.englishText.substring(0, 200)}...</p>
+                    </div>
+                `;
+            } catch (error) {
+                resultDiv.innerHTML = `
+                    <div class="bg-red-50 border border-red-200 rounded p-4">
+                        <h3 class="font-semibold text-red-800">Erreur</h3>
+                        <p class="text-sm text-red-700 mt-2">${error.message}</p>
+                    </div>
+                `;
+            }
+        });
+        
+        document.getElementById('test-translate').addEventListener('click', async () => {
+            const resultDiv = document.getElementById('translate-result');
+            resultDiv.innerHTML = '<div class="text-green-600">Test en cours...</div>';
+            
+            try {
+                const testText = "Artificial intelligence is transforming our world.";
+                
+                console.log('🧪 Test traduction avec:', testText);
+                const response = await ApiClient.translateText(testText);
+                
+                resultDiv.innerHTML = `
+                    <div class="bg-green-50 border border-green-200 rounded p-4">
+                        <h3 class="font-semibold text-green-800">Succès !</h3>
+                        <p class="text-sm text-green-700 mt-2"><strong>Original:</strong> ${testText}</p>
+                        <p class="text-sm text-green-700 mt-1"><strong>Traduit:</strong> ${response.data.translatedText}</p>
+                    </div>
+                `;
+            } catch (error) {
+                resultDiv.innerHTML = `
+                    <div class="bg-red-50 border border-red-200 rounded p-4">
+                        <h3 class="font-semibold text-red-800">Erreur</h3>
+                        <p class="text-sm text-red-700 mt-2">${error.message}</p>
+                    </div>
+                `;
+            }
+        });
+    </script>
+</body>
+</html>

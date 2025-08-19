@@ -1,0 +1,922 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lexifever - Texte généré</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: {
+                            50: '#f0f9ff',
+                            100: '#e0f2fe',
+                            200: '#bae6fd',
+                            300: '#7dd3fc',
+                            400: '#38bdf8',
+                            500: '#0ea5e9',
+                            600: '#0284c7',
+                            700: '#0369a1',
+                            800: '#075985',
+                            900: '#0c4a6e',
+                        },
+                        secondary: {
+                            50: '#fff7ed',
+                            100: '#ffedd5',
+                            200: '#fed7aa',
+                            300: '#fdba74',
+                            400: '#fb923c',
+                            500: '#f97316',
+                            600: '#ea580c',
+                            700: '#c2410c',
+                            800: '#9a3412',
+                            900: '#7c2d12',
+                        },
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                    },
+                    animation: {
+                        'fade-in': 'fadeIn 0.6s ease-out',
+                        'slide-up': 'slideUp 0.6s ease-out',
+                        'slide-in-left': 'slideInLeft 0.6s ease-out',
+                        'slide-in-right': 'slideInRight 0.6s ease-out',
+                        'bounce-gentle': 'bounceGentle 2s ease-in-out infinite',
+                        'pulse-glow': 'pulseGlow 2s ease-in-out infinite',
+                        'float': 'float 3s ease-in-out infinite',
+                    },
+                    backdropBlur: {
+                        xs: '2px',
+                    }
+                },
+            },
+        }
+    </script>
+    <style type="text/tailwindcss">
+        @layer utilities {
+            .text-shadow {
+                text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            }
+            .text-shadow-lg {
+                text-shadow: 0 4px 8px rgba(0, 0, 0, 0.12);
+            }
+            .transition-all {
+                transition: all 0.3s ease;
+            }
+            .glass-effect {
+                background: rgba(255, 255, 255, 0.1);
+                backdrop-filter: blur(10px);
+                border: 1px solid rgba(255, 255, 255, 0.2);
+            }
+            .gradient-border {
+                background: linear-gradient(white, white) padding-box,
+                           linear-gradient(45deg, #0ea5e9, #f97316) border-box;
+                border: 2px solid transparent;
+            }
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+        
+        @keyframes slideUp {
+            from { 
+                opacity: 0; 
+                transform: translateY(30px); 
+            }
+            to { 
+                opacity: 1; 
+                transform: translateY(0); 
+            }
+        }
+        
+        @keyframes slideInLeft {
+            from { 
+                opacity: 0; 
+                transform: translateX(-30px); 
+            }
+            to { 
+                opacity: 1; 
+                transform: translateX(0); 
+            }
+        }
+        
+        @keyframes slideInRight {
+            from { 
+                opacity: 0; 
+                transform: translateX(30px); 
+            }
+            to { 
+                opacity: 1; 
+                transform: translateX(0); 
+            }
+        }
+        
+        @keyframes bounceGentle {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-10px); }
+        }
+        
+        @keyframes pulseGlow {
+            0%, 100% { box-shadow: 0 0 20px rgba(14, 165, 233, 0.3); }
+            50% { box-shadow: 0 0 30px rgba(14, 165, 233, 0.6); }
+        }
+        
+        @keyframes float {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-20px); }
+        }
+        
+        .scroll-smooth {
+            scroll-behavior: smooth;
+        }
+        
+        /* Improved hover effects */
+        .hover-lift {
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        
+        .hover-lift:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+        }
+        
+        /* Custom scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        
+        ::-webkit-scrollbar-track {
+            background: #f1f5f9;
+        }
+        
+        ::-webkit-scrollbar-thumb {
+            background: #0ea5e9;
+            border-radius: 4px;
+        }
+        
+        ::-webkit-scrollbar-thumb:hover {
+            background: #0284c7;
+        }
+        
+        /* Highlight text */
+        .highlight-text {
+            position: relative;
+            cursor: pointer;
+            border-bottom: 1px dashed #0ea5e9;
+        }
+        
+        .highlight-text:hover {
+            background-color: rgba(14, 165, 233, 0.1);
+        }
+        
+        /* Tooltip */
+        .tooltip {
+            position: relative;
+            display: inline-block;
+        }
+        
+        .tooltip .tooltip-text {
+            visibility: hidden;
+            width: 200px;
+            background-color: #333;
+            color: #fff;
+            text-align: center;
+            border-radius: 6px;
+            padding: 5px;
+            position: absolute;
+            z-index: 1;
+            bottom: 125%;
+            left: 50%;
+            margin-left: -100px;
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+        
+        .tooltip:hover .tooltip-text {
+            visibility: visible;
+            opacity: 1;
+        }
+        
+        /* Print styles */
+        @media print {
+            nav, footer, .no-print {
+                display: none !important;
+            }
+            
+            body {
+                background-color: white !important;
+            }
+            
+            .print-break-inside-avoid {
+                break-inside: avoid;
+            }
+            
+            .print-full-width {
+                width: 100% !important;
+                border: none !important;
+            }
+        }
+        
+        /* Breadcrumb styles */
+        .breadcrumb-item {
+            position: relative;
+        }
+        
+        .breadcrumb-arrow {
+            position: relative;
+            width: 20px;
+            height: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .breadcrumb-arrow::before {
+            content: '';
+            position: absolute;
+            width: 6px;
+            height: 6px;
+            border-top: 2px solid #9ca3af;
+            border-right: 2px solid #9ca3af;
+            transform: rotate(45deg);
+        }
+    </style>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+</head>
+<body class="font-sans text-gray-800 bg-gray-50 min-h-screen scroll-smooth">
+    <!-- Navigation -->
+    <nav class="bg-white/80 backdrop-blur-md shadow-sm fixed w-full z-50 transition-all duration-300" id="navbar">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between h-16">
+                <div class="flex items-center">
+                    <div class="flex-shrink-0 flex items-center animate-slide-in-left">
+                        <a href="index.html" class="text-primary-600 text-2xl font-bold bg-gradient-to-r from-primary-600 to-secondary-500 bg-clip-text text-transparent">
+                            Lexifever
+                        </a>
+                    </div>
+                </div>
+                <div class="hidden sm:ml-6 sm:flex sm:items-center animate-slide-in-right">
+                    <a href="#" class="text-gray-500 hover:text-primary-600 px-3 py-2 rounded-md text-sm font-medium transition-all duration-300">Mon compte</a>
+                    <a href="#" class="ml-4 bg-gradient-to-r from-primary-600 to-primary-700 hover:from-primary-700 hover:to-primary-800 text-white px-4 py-2 rounded-lg text-sm font-medium transition-all duration-300 transform hover:scale-105">
+                        Déconnexion
+                    </a>
+                </div>
+                <div class="-mr-2 flex items-center sm:hidden">
+                    <button id="mobile-menu-button" type="button" class="inline-flex items-center justify-center p-2 rounded-md text-gray-400 hover:text-gray-500 hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-primary-500 transition-all duration-300" aria-expanded="false">
+                        <span class="sr-only">Ouvrir le menu principal</span>
+                        <i class="fas fa-bars transition-transform duration-300" id="menu-icon"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Mobile menu -->
+        <div id="mobile-menu" class="sm:hidden hidden bg-white/95 backdrop-blur-md border-t border-gray-200">
+            <div class="pt-2 pb-3 space-y-1">
+                <a href="#" class="block pl-3 pr-4 py-2 text-base font-medium text-gray-500 hover:text-primary-600 hover:bg-gray-50 transition-all duration-300">
+                    Mon compte
+                </a>
+                <a href="#" class="block pl-3 pr-4 py-2 text-base font-medium text-gray-500 hover:text-primary-600 hover:bg-gray-50 transition-all duration-300">
+                    Déconnexion
+                </a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-28 pb-12">
+        <!-- Breadcrumb -->
+        <nav class="flex mb-8 animate-slide-up" aria-label="Breadcrumb">
+            <ol class="inline-flex items-center space-x-1 md:space-x-3">
+                <li class="inline-flex items-center">
+                    <a href="select-domain.html" class="inline-flex items-center text-sm font-medium text-gray-500 hover:text-primary-600 transition-colors duration-300">
+                        <i class="fas fa-th-large mr-2"></i>
+                        Domaines
+                    </a>
+                </li>
+                <li>
+                    <div class="flex items-center">
+                        <i class="fas fa-chevron-right text-gray-400 mx-2 text-xs"></i>
+                        <a href="select-topic.html" class="text-sm font-medium text-gray-500 hover:text-primary-600 transition-colors duration-300"><span id="selected-domain">Technologie</span></a>
+                    </div>
+                </li>
+                <li>
+                    <div class="flex items-center">
+                        <i class="fas fa-chevron-right text-gray-400 mx-2 text-xs"></i>
+                        <a href="customize-text.html" class="text-sm font-medium text-gray-500 hover:text-primary-600 transition-colors duration-300"><span id="selected-topic">Intelligence Artificielle</span></a>
+                    </div>
+                </li>
+                <li>
+                    <div class="flex items-center">
+                        <i class="fas fa-chevron-right text-gray-400 mx-2 text-xs"></i>
+                        <span class="text-sm font-medium text-primary-600">Texte généré</span>
+                    </div>
+                </li>
+            </ol>
+        </nav>
+
+        <div class="text-center mb-8 animate-slide-up" style="animation-delay: 0.1s;">
+            <h1 class="text-3xl font-extrabold text-gray-900 sm:text-4xl lg:text-5xl">
+                <span class="bg-gradient-to-r from-primary-600 to-secondary-500 bg-clip-text text-transparent" id="page-title">Intelligence Artificielle</span>
+            </h1>
+            <p class="mt-4 max-w-2xl mx-auto text-xl text-gray-600">
+                Texte généré avec les paramètres que vous avez choisis
+            </p>
+
+            <!-- Parameters Display -->
+            <div class="mt-6 flex flex-wrap justify-center gap-3">
+                <span class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-primary-100 text-primary-800">
+                    <i class="fas fa-layer-group mr-1"></i>
+                    <span id="selected-level">Intermédiaire</span>
+                </span>
+                <span class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-secondary-100 text-secondary-800">
+                    <i class="fas fa-music mr-1"></i>
+                    <span id="selected-tone">Informatif</span>
+                </span>
+                <span class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-green-100 text-green-800">
+                    <i class="fas fa-ruler mr-1"></i>
+                    <span id="selected-length">Moyen</span>
+                </span>
+            </div>
+        </div>
+
+        <!-- Background decorative elements -->
+        <div class="absolute inset-0 overflow-hidden -z-10">
+            <div class="absolute top-40 -right-40 w-80 h-80 bg-primary-200 rounded-full mix-blend-multiply filter blur-xl opacity-20 animate-float"></div>
+            <div class="absolute bottom-40 -left-40 w-80 h-80 bg-secondary-200 rounded-full mix-blend-multiply filter blur-xl opacity-20 animate-float" style="animation-delay: 1s;"></div>
+        </div>
+
+        <!-- Action Buttons -->
+        <div class="flex flex-wrap justify-center gap-4 mb-8 animate-slide-up" style="animation-delay: 0.2s;">
+            <button id="listen-button" class="inline-flex items-center px-5 py-2.5 border border-transparent text-sm font-medium rounded-lg shadow-sm text-white bg-gradient-to-r from-primary-600 to-primary-700 hover:from-primary-700 hover:to-primary-800 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500 transition-all duration-300 transform hover:scale-105">
+                <i class="fas fa-volume-up mr-2"></i> Écouter
+            </button>
+            <button id="save-button" class="inline-flex items-center px-5 py-2.5 border border-transparent text-sm font-medium rounded-lg shadow-sm text-primary-600 bg-white hover:bg-primary-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500 transition-all duration-300 transform hover:scale-105">
+                <i class="fas fa-bookmark mr-2"></i> Sauvegarder
+            </button>
+            <button id="share-button" class="inline-flex items-center px-5 py-2.5 border border-transparent text-sm font-medium rounded-lg shadow-sm text-primary-600 bg-white hover:bg-primary-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500 transition-all duration-300 transform hover:scale-105">
+                <i class="fas fa-share-alt mr-2"></i> Partager
+            </button>
+            <button id="print-button" class="inline-flex items-center px-5 py-2.5 border border-transparent text-sm font-medium rounded-lg shadow-sm text-primary-600 bg-white hover:bg-primary-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500 transition-all duration-300 transform hover:scale-105">
+                <i class="fas fa-print mr-2"></i> Imprimer
+            </button>
+        </div>
+
+        <!-- Text Content -->
+        <div class="bg-white rounded-xl shadow-lg overflow-hidden border border-gray-100 hover-lift animate-slide-up" style="animation-delay: 0.3s;">
+            <div class="md:flex">
+                <!-- English Text -->
+                <div class="md:w-1/2 p-6 md:p-8 border-b md:border-b-0 md:border-r border-gray-100 print-full-width print-break-inside-avoid">
+                    <div class="flex items-center justify-between mb-4">
+                        <h2 class="text-xl font-bold text-gray-900 flex items-center">
+                            <span class="inline-block w-6 h-6 rounded-full bg-gradient-to-r from-primary-500 to-secondary-500 mr-2 flex items-center justify-center text-white text-xs">EN</span>
+                            Anglais
+                        </h2>
+                        <div class="flex items-center text-sm text-gray-500">
+                            <span class="mr-2">Niveau:</span>
+                            <span class="font-medium px-2 py-1 bg-primary-50 text-primary-600 rounded-full">Intermédiaire</span>
+                        </div>
+                    </div>
+                    <div class="prose max-w-none" id="english-text">
+                        <h3 class="text-xl font-semibold text-gray-800 mb-4">The Evolution of Artificial Intelligence</h3>
+                        
+                        <p>Artificial Intelligence (AI) has transformed from a theoretical concept into a powerful technology that impacts our daily lives. AI refers to computer systems designed to perform tasks that typically require human intelligence, such as visual perception, speech recognition, decision-making, and language translation.</p>
+                        
+                        <p>The field of AI has experienced remarkable growth in recent years, driven by advances in <span class="highlight-text" data-translation="apprentissage automatique">machine learning</span> algorithms, increased computational power, and the availability of vast amounts of data. Machine learning, a subset of AI, enables computers to learn from experience without being explicitly programmed. This approach has led to significant breakthroughs in various domains.</p>
+                        
+                        <p><span class="highlight-text" data-translation="apprentissage profond">Deep learning</span>, a specialized form of machine learning using <span class="highlight-text" data-translation="réseaux de neurones">neural networks</span> with multiple layers, has revolutionized AI capabilities. These neural networks are inspired by the structure of the human brain and can process complex patterns in data. They power applications like image recognition, <span class="highlight-text" data-translation="traitement du langage naturel">natural language processing</span>, and autonomous vehicles.</p>
+                        
+                        <p>Today, AI technologies are integrated into numerous aspects of our lives. Virtual assistants like Siri and Alexa use natural language processing to understand and respond to our queries. <span class="highlight-text" data-translation="systèmes de recommandation">Recommendation systems</span> on platforms like Netflix and Amazon analyze our preferences to suggest content and products. Healthcare professionals use AI tools to assist in diagnosing diseases and developing treatment plans.</p>
+                        
+                        <p>Despite these advancements, AI still faces significant challenges. <span class="highlight-text" data-translation="préoccupations éthiques">Ethical concerns</span> regarding privacy, bias in algorithms, and the potential impact on employment require careful consideration. As AI continues to evolve, finding the balance between technological innovation and responsible implementation remains crucial.</p>
+                        
+                        <p>The future of AI promises even more sophisticated applications, from fully <span class="highlight-text" data-translation="véhicules autonomes">autonomous vehicles</span> to AI-enhanced scientific research. As these technologies develop, they will likely become more integrated into our society, further transforming how we work, communicate, and solve problems.</p>
+                    </div>
+                </div>
+                
+                <!-- French Translation -->
+                <div class="md:w-1/2 p-6 md:p-8 bg-gray-50 print-full-width print-break-inside-avoid">
+                    <div class="flex items-center justify-between mb-4">
+                        <h2 class="text-xl font-bold text-gray-900 flex items-center">
+                            <span class="inline-block w-6 h-6 rounded-full bg-gradient-to-r from-secondary-500 to-primary-500 mr-2 flex items-center justify-center text-white text-xs">FR</span>
+                            Français
+                        </h2>
+                        <div class="flex items-center text-sm text-gray-500">
+                            <span class="mr-2">Traduction</span>
+                            <button id="toggle-translation" class="text-primary-600 hover:text-primary-700 focus:outline-none">
+                                <i class="fas fa-eye"></i>
+                            </button>
+                        </div>
+                    </div>
+                    <div class="prose max-w-none" id="french-text">
+                        <h3 class="text-xl font-semibold text-gray-800 mb-4">L'Évolution de l'Intelligence Artificielle</h3>
+                        
+                        <p>L'Intelligence Artificielle (IA) est passée d'un concept théorique à une technologie puissante qui impacte notre vie quotidienne. L'IA désigne des systèmes informatiques conçus pour effectuer des tâches qui nécessitent généralement l'intelligence humaine, comme la perception visuelle, la reconnaissance vocale, la prise de décision et la traduction linguistique.</p>
+                        
+                        <p>Le domaine de l'IA a connu une croissance remarquable ces dernières années, stimulée par les avancées des algorithmes d'<span class="highlight-text" data-original="machine learning">apprentissage automatique</span>, l'augmentation de la puissance de calcul et la disponibilité d'énormes quantités de données. L'apprentissage automatique, un sous-ensemble de l'IA, permet aux ordinateurs d'apprendre de l'expérience sans être explicitement programmés. Cette approche a conduit à des percées significatives dans divers domaines.</p>
+                        
+                        <p>L'<span class="highlight-text" data-original="deep learning">apprentissage profond</span>, une forme spécialisée d'apprentissage automatique utilisant des <span class="highlight-text" data-original="neural networks">réseaux de neurones</span> à plusieurs couches, a révolutionné les capacités de l'IA. Ces réseaux de neurones s'inspirent de la structure du cerveau humain et peuvent traiter des modèles complexes dans les données. Ils alimentent des applications comme la reconnaissance d'images, le <span class="highlight-text" data-original="natural language processing">traitement du langage naturel</span> et les véhicules autonomes.</p>
+                        
+                        <p>Aujourd'hui, les technologies d'IA sont intégrées dans de nombreux aspects de notre vie. Les assistants virtuels comme Siri et Alexa utilisent le traitement du langage naturel pour comprendre et répondre à nos requêtes. Les <span class="highlight-text" data-original="recommendation systems">systèmes de recommandation</span> sur des plateformes comme Netflix et Amazon analysent nos préférences pour suggérer du contenu et des produits. Les professionnels de la santé utilisent des outils d'IA pour aider au diagnostic des maladies et à l'élaboration de plans de traitement.</p>
+                        
+                        <p>Malgré ces avancées, l'IA fait encore face à d'importants défis. Les <span class="highlight-text" data-original="ethical concerns">préoccupations éthiques</span> concernant la vie privée, les biais dans les algorithmes et l'impact potentiel sur l'emploi nécessitent une attention particulière. Alors que l'IA continue d'évoluer, trouver l'équilibre entre l'innovation technologique et une mise en œuvre responsable reste crucial.</p>
+                        
+                        <p>L'avenir de l'IA promet des applications encore plus sophistiquées, des systèmes de transport entièrement <span class="highlight-text" data-original="autonomous vehicles">véhicules autonomes</span> à la recherche scientifique améliorée par l'IA. À mesure que ces technologies se développent, elles deviendront probablement plus intégrées dans notre société, transformant davantage notre façon de travailler, de communiquer et de résoudre des problèmes.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Progress Tracker -->
+        <div class="mt-8 animate-slide-up" style="animation-delay: 0.4s;">
+            <div class="bg-white rounded-lg shadow-sm p-4 border border-gray-100">
+                <div class="flex items-center justify-between mb-2">
+                    <h3 class="text-sm font-medium text-gray-700">Progression de lecture</h3>
+                    <span class="text-xs text-primary-600 font-medium" id="progress-percentage">0%</span>
+                </div>
+                <div class="w-full bg-gray-200 rounded-full h-2.5">
+                    <div class="bg-gradient-to-r from-primary-500 to-secondary-500 h-2.5 rounded-full" id="progress-bar" style="width: 0%"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Vocabulary Section -->
+        <div class="mt-12 animate-slide-up" style="animation-delay: 0.5s;">
+            <h2 class="text-2xl font-bold text-gray-900 mb-6 flex items-center">
+                <i class="fas fa-book text-primary-500 mr-3"></i>
+                Vocabulaire clé
+            </h2>
+            <div class="bg-white rounded-xl shadow-lg overflow-hidden border border-gray-100 hover-lift">
+                <div class="p-6">
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div class="border-b border-gray-100 pb-3 md:pb-0 md:border-b-0 md:border-r transition-all hover:bg-gray-50 p-3 rounded-lg">
+                            <div class="font-medium text-primary-600">Artificial Intelligence (AI)</div>
+                            <div class="text-gray-600">Intelligence Artificielle (IA)</div>
+                        </div>
+                        <div class="border-b border-gray-100 pb-3 md:pb-0 md:border-b-0 transition-all hover:bg-gray-50 p-3 rounded-lg">
+                            <div class="font-medium text-primary-600">Machine Learning</div>
+                            <div class="text-gray-600">Apprentissage Automatique</div>
+                        </div>
+                        <div class="border-b border-gray-100 pb-3 md:pb-0 md:border-b-0 md:border-r transition-all hover:bg-gray-50 p-3 rounded-lg">
+                            <div class="font-medium text-primary-600">Deep Learning</div>
+                            <div class="text-gray-600">Apprentissage Profond</div>
+                        </div>
+                        <div class="border-b border-gray-100 pb-3 md:pb-0 md:border-b-0 transition-all hover:bg-gray-50 p-3 rounded-lg">
+                            <div class="font-medium text-primary-600">Neural Networks</div>
+                            <div class="text-gray-600">Réseaux de Neurones</div>
+                        </div>
+                        <div class="border-b border-gray-100 pb-3 md:pb-0 md:border-b-0 md:border-r transition-all hover:bg-gray-50 p-3 rounded-lg">
+                            <div class="font-medium text-primary-600">Natural Language Processing</div>
+                            <div class="text-gray-600">Traitement du Langage Naturel</div>
+                        </div>
+                        <div class="border-b border-gray-100 pb-3 md:pb-0 md:border-b-0 transition-all hover:bg-gray-50 p-3 rounded-lg">
+                            <div class="font-medium text-primary-600">Autonomous Vehicles</div>
+                            <div class="text-gray-600">Véhicules Autonomes</div>
+                        </div>
+                        <div class="md:border-r transition-all hover:bg-gray-50 p-3 rounded-lg">
+                            <div class="font-medium text-primary-600">Recommendation Systems</div>
+                            <div class="text-gray-600">Systèmes de Recommandation</div>
+                        </div>
+                        <div class="transition-all hover:bg-gray-50 p-3 rounded-lg">
+                            <div class="font-medium text-primary-600">Ethical Concerns</div>
+                            <div class="text-gray-600">Préoccupations Éthiques</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Learning Tips -->
+        <div class="mt-12 animate-slide-up" style="animation-delay: 0.6s;">
+            <h2 class="text-2xl font-bold text-gray-900 mb-6 flex items-center">
+                <i class="fas fa-lightbulb text-secondary-500 mr-3"></i>
+                Conseils d'apprentissage
+            </h2>
+            <div class="bg-white rounded-xl shadow-lg overflow-hidden border border-gray-100 hover-lift">
+                <div class="p-6">
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div class="flex">
+                            <div class="flex-shrink-0">
+                                <div class="flex items-center justify-center h-12 w-12 rounded-md bg-primary-100 text-primary-600">
+                                    <i class="fas fa-sync-alt"></i>
+                                </div>
+                            </div>
+                            <div class="ml-4">
+                                <h3 class="text-lg font-medium text-gray-900">Répétition espacée</h3>
+                                <p class="mt-2 text-base text-gray-500">
+                                    Relisez ce texte à intervalles réguliers pour renforcer votre mémorisation du vocabulaire.
+                                </p>
+                            </div>
+                        </div>
+                        <div class="flex">
+                            <div class="flex-shrink-0">
+                                <div class="flex items-center justify-center h-12 w-12 rounded-md bg-primary-100 text-primary-600">
+                                    <i class="fas fa-pen"></i>
+                                </div>
+                            </div>
+                            <div class="ml-4">
+                                <h3 class="text-lg font-medium text-gray-900">Prise de notes active</h3>
+                                <p class="mt-2 text-base text-gray-500">
+                                    Écrivez les nouveaux mots et expressions pour améliorer leur rétention.
+                                </p>
+                            </div>
+                        </div>
+                        <div class="flex">
+                            <div class="flex-shrink-0">
+                                <div class="flex items-center justify-center h-12 w-12 rounded-md bg-primary-100 text-primary-600">
+                                    <i class="fas fa-volume-up"></i>
+                                </div>
+                            </div>
+                            <div class="ml-4">
+                                <h3 class="text-lg font-medium text-gray-900">Écoute active</h3>
+                                <p class="mt-2 text-base text-gray-500">
+                                    Utilisez le bouton "Écouter" pour vous familiariser avec la prononciation.
+                                </p>
+                            </div>
+                        </div>
+                        <div class="flex">
+                            <div class="flex-shrink-0">
+                                <div class="flex items-center justify-center h-12 w-12 rounded-md bg-primary-100 text-primary-600">
+                                    <i class="fas fa-comment"></i>
+                                </div>
+                            </div>
+                            <div class="ml-4">
+                                <h3 class="text-lg font-medium text-gray-900">Pratique orale</h3>
+                                <p class="mt-2 text-base text-gray-500">
+                                    Essayez de résumer ce texte à voix haute pour pratiquer votre expression orale.
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Action Buttons -->
+        <div class="mt-12 flex flex-col sm:flex-row justify-center gap-4 animate-slide-up" style="animation-delay: 0.7s;">
+            <a href="customize-text.html" class="inline-flex items-center justify-center px-6 py-3 border border-transparent text-base font-medium rounded-lg shadow-sm text-primary-600 bg-white hover:bg-primary-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500 transition-all duration-300 transform hover:scale-105">
+                <i class="fas fa-sliders-h mr-2"></i> Modifier les paramètres
+            </a>
+            <a href="select-topic.html" class="inline-flex items-center justify-center px-6 py-3 border border-transparent text-base font-medium rounded-lg shadow-sm text-white bg-gradient-to-r from-primary-600 to-primary-700 hover:from-primary-700 hover:to-primary-800 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500 transition-all duration-300 transform hover:scale-105">
+                <i class="fas fa-sync-alt mr-2"></i> Générer un nouveau texte
+            </a>
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-gray-900 text-white relative overflow-hidden">
+        <!-- Background pattern -->
+        <div class="absolute inset-0 opacity-5">
+            <div class="absolute inset-0" style="background-image: linear-gradient(45deg, #0ea5e9 25%, transparent 25%), linear-gradient(-45deg, #0ea5e9 25%, transparent 25%), linear-gradient(45deg, transparent 75%, #0ea5e9 75%), linear-gradient(-45deg, transparent 75%, #0ea5e9 75%); background-size: 20px 20px; background-position: 0 0, 0 10px, 10px -10px, -10px 0px;"></div>
+        </div>
+        
+        <div class="max-w-7xl mx-auto py-16 px-4 sm:px-6 lg:px-8 relative">
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-8">
+                <div class="md:col-span-1 animate-slide-up">
+                    <div class="flex items-center mb-4">
+                        <span class="text-3xl font-bold bg-gradient-to-r from-primary-400 to-secondary-400 bg-clip-text text-transparent">Lexifever</span>
+                    </div>
+                    <p class="text-gray-400 leading-relaxed mb-6">
+                        Enrichissez votre vocabulaire anglais avec des textes personnalisés et des traductions instantanées.
+                    </p>
+                    <div class="flex space-x-4">
+                        <a href="#" class="text-gray-400 hover:text-white transition-all duration-300 transform hover:scale-110">
+                            <i class="fab fa-facebook-f text-xl"></i>
+                        </a>
+                        <a href="#" class="text-gray-400 hover:text-white transition-all duration-300 transform hover:scale-110">
+                            <i class="fab fa-twitter text-xl"></i>
+                        </a>
+                        <a href="#" class="text-gray-400 hover:text-white transition-all duration-300 transform hover:scale-110">
+                            <i class="fab fa-instagram text-xl"></i>
+                        </a>
+                        <a href="#" class="text-gray-400 hover:text-white transition-all duration-300 transform hover:scale-110">
+                            <i class="fab fa-linkedin-in text-xl"></i>
+                        </a>
+                    </div>
+                </div>
+                <div class="animate-slide-up" style="animation-delay: 0.1s;">
+                    <h3 class="text-sm font-semibold text-gray-300 uppercase tracking-wider mb-4">Produit</h3>
+                    <ul class="space-y-3">
+                        <li>
+                            <a href="index.html#features" class="text-base text-gray-400 hover:text-white transition-colors duration-300">
+                                Fonctionnalités
+                            </a>
+                        </li>
+                        <li>
+                            <a href="#" class="text-base text-gray-400 hover:text-white transition-colors duration-300">
+                                Tarifs
+                            </a>
+                        </li>
+                        <li>
+                            <a href="index.html#faq" class="text-base text-gray-400 hover:text-white transition-colors duration-300">
+                                FAQ
+                            </a>
+                        </li>
+                        <li>
+                            <a href="index.html#testimonials" class="text-base text-gray-400 hover:text-white transition-colors duration-300">
+                                Témoignages
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+                <div class="animate-slide-up" style="animation-delay: 0.2s;">
+                    <h3 class="text-sm font-semibold text-gray-300 uppercase tracking-wider mb-4">Support</h3>
+                    <ul class="space-y-3">
+                        <li>
+                            <a href="#" class="text-base text-gray-400 hover:text-white transition-colors duration-300">
+                                Centre d'aide
+                            </a>
+                        </li>
+                        <li>
+                            <a href="#" class="text-base text-gray-400 hover:text-white transition-colors duration-300">
+                                Contact
+                            </a>
+                        </li>
+                        <li>
+                            <a href="#" class="text-base text-gray-400 hover:text-white transition-colors duration-300">
+                                Tutoriels
+                            </a>
+                        </li>
+                        <li>
+                            <a href="#" class="text-base text-gray-400 hover:text-white transition-colors duration-300">
+                                Communauté
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+                <div class="animate-slide-up" style="animation-delay: 0.3s;">
+                    <h3 class="text-sm font-semibold text-gray-300 uppercase tracking-wider mb-4">Légal</h3>
+                    <ul class="space-y-3">
+                        <li>
+                            <a href="#" class="text-base text-gray-400 hover:text-white transition-colors duration-300">
+                                Confidentialité
+                            </a>
+                        </li>
+                        <li>
+                            <a href="#" class="text-base text-gray-400 hover:text-white transition-colors duration-300">
+                                Conditions d'utilisation
+                            </a>
+                        </li>
+                        <li>
+                            <a href="#" class="text-base text-gray-400 hover:text-white transition-colors duration-300">
+                                Cookies
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+            <div class="mt-12 border-t border-gray-800 pt-8 md:flex md:items-center md:justify-between">
+                <div class="flex space-x-6 md:order-2">
+                    <a href="#" class="text-gray-400 hover:text-white transition-colors duration-300">
+                        Conditions
+                    </a>
+                    <a href="#" class="text-gray-400 hover:text-white transition-colors duration-300">
+                        Confidentialité
+                    </a>
+                    <a href="#" class="text-gray-400 hover:text-white transition-colors duration-300">
+                        Cookies
+                    </a>
+                </div>
+                <p class="mt-8 text-base text-gray-400 md:mt-0 md:order-1">
+                    &copy; 2023 Lexifever. Tous droits réservés.
+                </p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Tooltip container for translations -->
+    <div id="tooltip-container" class="fixed hidden bg-gray-900 text-white text-sm py-1 px-2 rounded shadow-lg z-50"></div>
+
+    <script>
+        // Mobile menu toggle with animation
+        const mobileMenuButton = document.getElementById('mobile-menu-button');
+        const mobileMenu = document.getElementById('mobile-menu');
+        const menuIcon = document.getElementById('menu-icon');
+
+        mobileMenuButton.addEventListener('click', () => {
+            mobileMenu.classList.toggle('hidden');
+            
+            if (mobileMenu.classList.contains('hidden')) {
+                menuIcon.classList.remove('fa-times');
+                menuIcon.classList.add('fa-bars');
+                menuIcon.style.transform = 'rotate(0deg)';
+            } else {
+                menuIcon.classList.remove('fa-bars');
+                menuIcon.classList.add('fa-times');
+                menuIcon.style.transform = 'rotate(180deg)';
+            }
+        });
+
+        // Navbar background change on scroll
+        const navbar = document.getElementById('navbar');
+        
+        window.addEventListener('scroll', () => {
+            if (window.scrollY > 50) {
+                navbar.classList.add('bg-white/95');
+                navbar.classList.remove('bg-white/80');
+            } else {
+                navbar.classList.add('bg-white/80');
+                navbar.classList.remove('bg-white/95');
+            }
+        });
+
+        // Listen button functionality with enhanced UI
+        const listenButton = document.getElementById('listen-button');
+        let isPlaying = false;
+        let utterance = null;
+
+        listenButton.addEventListener('click', () => {
+            if (!isPlaying) {
+                // Get the English text
+                const englishText = document.querySelector('#english-text').textContent;
+                
+                // Create speech synthesis utterance
+                utterance = new SpeechSynthesisUtterance(englishText);
+                utterance.lang = 'en-US';
+                utterance.rate = 0.9;
+                
+                // Add event listener for when speech ends
+                utterance.onend = () => {
+                    isPlaying = false;
+                    listenButton.innerHTML = '<i class="fas fa-volume-up mr-2"></i> Écouter';
+                    listenButton.classList.remove('from-secondary-600', 'to-secondary-700');
+                    listenButton.classList.add('from-primary-600', 'to-primary-700');
+                };
+                
+                // Start speaking
+                window.speechSynthesis.speak(utterance);
+                isPlaying = true;
+                listenButton.innerHTML = '<i class="fas fa-pause mr-2"></i> Pause';
+                listenButton.classList.remove('from-primary-600', 'to-primary-700');
+                listenButton.classList.add('from-secondary-600', 'to-secondary-700');
+            } else {
+                // Stop speaking
+                window.speechSynthesis.cancel();
+                isPlaying = false;
+                listenButton.innerHTML = '<i class="fas fa-volume-up mr-2"></i> Écouter';
+                listenButton.classList.remove('from-secondary-600', 'to-secondary-700');
+                listenButton.classList.add('from-primary-600', 'to-primary-700');
+            }
+        });
+
+        // Print button functionality with enhanced print styles
+        const printButton = document.getElementById('print-button');
+        
+        printButton.addEventListener('click', () => {
+            // Add print notification
+            const notification = document.createElement('div');
+            notification.className = 'fixed top-4 right-4 bg-primary-600 text-white px-4 py-2 rounded-lg shadow-lg z-50';
+            notification.textContent = 'Préparation de l\'impression...';
+            document.body.appendChild(notification);
+            
+            setTimeout(() => {
+                document.body.removeChild(notification);
+                window.print();
+            }, 500);
+        });
+
+        // Save button functionality with enhanced feedback
+        const saveButton = document.getElementById('save-button');
+        
+        saveButton.addEventListener('click', () => {
+            // Show saving animation
+            saveButton.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i> Sauvegarde...';
+            saveButton.disabled = true;
+            
+            setTimeout(() => {
+                saveButton.innerHTML = '<i class="fas fa-check mr-2"></i> Sauvegardé';
+                
+                setTimeout(() => {
+                    saveButton.innerHTML = '<i class="fas fa-bookmark mr-2"></i> Sauvegarder';
+                    saveButton.disabled = false;
+                }, 2000);
+            }, 1000);
+        });
+
+        // Share button functionality with enhanced sharing options
+        const shareButton = document.getElementById('share-button');
+        
+        shareButton.addEventListener('click', () => {
+            if (navigator.share) {
+                navigator.share({
+                    title: 'Lexifever - Intelligence Artificielle',
+                    text: 'Découvrez ce texte intéressant sur l\'Intelligence Artificielle généré par Lexifever!',
+                    url: window.location.href,
+                })
+                .catch((error) => console.log('Erreur de partage:', error));
+            } else {
+                // Copy to clipboard fallback
+                const dummyInput = document.createElement('input');
+                document.body.appendChild(dummyInput);
+                dummyInput.value = window.location.href;
+                dummyInput.select();
+                document.execCommand('copy');
+                document.body.removeChild(dummyInput);
+                
+                // Show feedback
+                const originalText = shareButton.innerHTML;
+                shareButton.innerHTML = '<i class="fas fa-check mr-2"></i> Lien copié';
+                
+                setTimeout(() => {
+                    shareButton.innerHTML = originalText;
+                }, 2000);
+            }
+        });
+
+        // Toggle translation visibility
+        const toggleTranslationBtn = document.getElementById('toggle-translation');
+        const frenchText = document.getElementById('french-text');
+        let translationVisible = true;
+
+        toggleTranslationBtn.addEventListener('click', () => {
+            translationVisible = !translationVisible;
+            
+            if (translationVisible) {
+                frenchText.style.opacity = '1';
+                toggleTranslationBtn.innerHTML = '<i class="fas fa-eye"></i>';
+            } else {
+                frenchText.style.opacity = '0.1';
+                toggleTranslationBtn.innerHTML = '<i class="fas fa-eye-slash"></i>';
+            }
+        });
+
+        // Interactive vocabulary highlighting
+        const highlightedWords = document.querySelectorAll('.highlight-text');
+        const tooltipContainer = document.getElementById('tooltip-container');
+
+        highlightedWords.forEach(word => {
+            word.addEventListener('mouseover', (e) => {
+                const translation = word.getAttribute('data-translation') || word.getAttribute('data-original');
+                
+                tooltipContainer.textContent = translation;
+                tooltipContainer.style.display = 'block';
+                tooltipContainer.style.left = `${e.pageX + 10}px`;
+                tooltipContainer.style.top = `${e.pageY - 30}px`;
+            });
+            
+            word.addEventListener('mouseout', () => {
+                tooltipContainer.style.display = 'none';
+            });
+            
+            word.addEventListener('mousemove', (e) => {
+                tooltipContainer.style.left = `${e.pageX + 10}px`;
+                tooltipContainer.style.top = `${e.pageY - 30}px`;
+            });
+        });
+
+        // Reading progress tracker
+        const progressBar = document.getElementById('progress-bar');
+        const progressPercentage = document.getElementById('progress-percentage');
+        
+        window.addEventListener('scroll', () => {
+            const scrollTop = window.scrollY;
+            const docHeight = document.body.offsetHeight;
+            const winHeight = window.innerHeight;
+            const scrollPercent = scrollTop / (docHeight - winHeight);
+            const scrollPercentRounded = Math.round(scrollPercent * 100);
+            
+            progressBar.style.width = `${scrollPercentRounded}%`;
+            progressPercentage.textContent = `${scrollPercentRounded}%`;
+        });
+
+        // Intersection Observer for animations
+        const observerOptions = {
+            threshold: 0.1,
+            rootMargin: '0px 0px -50px 0px'
+        };
+
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.style.opacity = '1';
+                    entry.target.style.transform = 'translateY(0)';
+                }
+            });
+        }, observerOptions);
+
+        // Observe all animated elements
+        document.querySelectorAll('.animate-slide-up, .animate-slide-in-left, .animate-slide-in-right, .animate-fade-in').forEach(el => {
+            el.style.opacity = '0';
+            el.style.transform = 'translateY(30px)';
+            observer.observe(el);
+        });
+
+        // Add loading animation
+        window.addEventListener('load', () => {
+            document.body.classList.add('loaded');
+        });
+    </script>
+
+    <!-- Include our app script -->
+    <script src="js/app.js"></script>
+
+
+</body>
+</html>

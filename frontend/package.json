@@ -1,0 +1,25 @@
+{
+  "name": "lexifever-frontend",
+  "version": "1.0.0",
+  "description": "Frontend de l'application Lexifever - Interface utilisateur pour l'enrichissement du vocabulaire anglais",
+  "main": "index.html",
+  "scripts": {
+    "start": "npx http-server . -p 8080 -c-1",
+    "dev": "npx live-server --port=8080 --no-browser",
+    "build": "echo 'Frontend build - aucune compilation nécessaire pour ce projet'",
+    "test": "echo 'Tests frontend à implémenter'"
+  },
+  "keywords": ["frontend", "html", "javascript", "tailwind", "lexifever"],
+  "author": "VOGLOSSOU",
+  "license": "MIT",
+  "devDependencies": {
+    "http-server": "^14.1.1",
+    "live-server": "^1.2.2"
+  },
+  "dependencies": {},
+  "browserslist": [
+    "> 1%",
+    "last 2 versions",
+    "not dead"
+  ]
+}

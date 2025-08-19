@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Customize - Lexifever</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-100 p-8">
+    <div class="max-w-4xl mx-auto">
+        <h1 class="text-3xl font-bold mb-8">🎨 Test Page Personnalisation</h1>
+        
+        <div class="bg-white rounded-lg shadow p-6 mb-6">
+            <h2 class="text-xl font-semibold mb-4">Configurer et tester</h2>
+            
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Domaine:</label>
+                    <select id="domain" class="w-full border border-gray-300 rounded-md px-3 py-2">
+                        <option value="Technologie">Technologie</option>
+                        <option value="Sciences">Sciences</option>
+                        <option value="Business">Business</option>
+                        <option value="Santé">Santé</option>
+                        <option value="Arts">Arts</option>
+                        <option value="Voyage">Voyage</option>
+                        <option value="Sport">Sport</option>
+                        <option value="Histoire">Histoire</option>
+                        <option value="Cuisine">Cuisine</option>
+                    </select>
+                </div>
+                
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Sujet:</label>
+                    <select id="topic" class="w-full border border-gray-300 rounded-md px-3 py-2">
+                        <option value="Intelligence Artificielle">Intelligence Artificielle</option>
+                        <option value="Développement Web">Développement Web</option>
+                        <option value="Cybersécurité">Cybersécurité</option>
+                        <option value="Blockchain">Blockchain</option>
+                    </select>
+                </div>
+            </div>
+            
+            <button id="setup-customize" class="bg-blue-500 text-white px-6 py-2 rounded hover:bg-blue-600 mr-4">
+                Configurer et aller à Customize
+            </button>
+            
+            <button id="setup-result" class="bg-green-500 text-white px-6 py-2 rounded hover:bg-green-600">
+                Configurer et aller à Result
+            </button>
+            
+            <div id="setup-result-div" class="mt-4"></div>
+        </div>
+    </div>
+
+    <script src="js/app.js"></script>
+    <script>
+        document.getElementById('setup-customize').addEventListener('click', () => {
+            const params = {
+                domain: document.getElementById('domain').value,
+                topic: document.getElementById('topic').value
+            };
+            
+            console.log('🎨 Configuration pour customize:', params);
+            SessionManager.saveParams(params);
+            
+            document.getElementById('setup-result-div').innerHTML = `
+                <div class="bg-green-50 border border-green-200 rounded p-4">
+                    <h3 class="font-semibold text-green-800">✅ Paramètres configurés !</h3>
+                    <p class="text-sm text-green-700 mt-2">
+                        Domaine: ${params.domain}<br>
+                        Sujet: ${params.topic}
+                    </p>
+                    <div class="mt-4">
+                        <a href="customize-text.html" class="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600">
+                            🎨 Aller à Customize
+                        </a>
+                    </div>
+                </div>
+            `;
+        });
+        
+        document.getElementById('setup-result').addEventListener('click', () => {
+            const params = {
+                domain: document.getElementById('domain').value,
+                topic: document.getElementById('topic').value,
+                level: 'intermediate',
+                tone: 'conversational',
+                length: 'medium'
+            };
+            
+            console.log('📊 Configuration pour result:', params);
+            SessionManager.saveParams(params);
+            
+            document.getElementById('setup-result-div').innerHTML = `
+                <div class="bg-green-50 border border-green-200 rounded p-4">
+                    <h3 class="font-semibold text-green-800">✅ Paramètres complets configurés !</h3>
+                    <p class="text-sm text-green-700 mt-2">
+                        Domaine: ${params.domain}<br>
+                        Sujet: ${params.topic}<br>
+                        Niveau: ${params.level}<br>
+                        Ton: ${params.tone}
+                    </p>
+                    <div class="mt-4">
+                        <a href="result.html" class="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600">
+                            📊 Aller à Result
+                        </a>
+                    </div>
+                </div>
+            `;
+        });
+    </script>
+</body>
+</html>

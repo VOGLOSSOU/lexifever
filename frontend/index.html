@@ -1,0 +1,1408 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lexifever - Enrichissez votre vocabulaire anglais</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: {
+                            50: '#f0f9ff',
+                            100: '#e0f2fe',
+                            200: '#bae6fd',
+                            300: '#7dd3fc',
+                            400: '#38bdf8',
+                            500: '#0ea5e9',
+                            600: '#0284c7',
+                            700: '#0369a1',
+                            800: '#075985',
+                            900: '#0c4a6e',
+                        },
+                        secondary: {
+                            50: '#fff7ed',
+                            100: '#ffedd5',
+                            200: '#fed7aa',
+                            300: '#fdba74',
+                            400: '#fb923c',
+                            500: '#f97316',
+                            600: '#ea580c',
+                            700: '#c2410c',
+                            800: '#9a3412',
+                            900: '#7c2d12',
+                        },
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                    },
+                    animation: {
+                        'fade-in': 'fadeIn 0.6s ease-out',
+                        'slide-up': 'slideUp 0.6s ease-out',
+                        'slide-in-left': 'slideInLeft 0.6s ease-out',
+                        'slide-in-right': 'slideInRight 0.6s ease-out',
+                        'bounce-gentle': 'bounceGentle 2s ease-in-out infinite',
+                        'pulse-glow': 'pulseGlow 2s ease-in-out infinite',
+                        'float': 'float 3s ease-in-out infinite',
+                    },
+                    backdropBlur: {
+                        xs: '2px',
+                    }
+                },
+            },
+        }
+    </script>
+    <style type="text/tailwindcss">
+        @layer utilities {
+            .text-shadow {
+                text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            }
+            .text-shadow-lg {
+                text-shadow: 0 4px 8px rgba(0, 0, 0, 0.12);
+            }
+            .transition-all {
+                transition: all 0.3s ease;
+            }
+            .glass-effect {
+                background: rgba(255, 255, 255, 0.1);
+                backdrop-filter: blur(10px);
+                border: 1px solid rgba(255, 255, 255, 0.2);
+            }
+            .gradient-border {
+                background: linear-gradient(white, white) padding-box,
+                           linear-gradient(45deg, #0ea5e9, #f97316) border-box;
+                border: 2px solid transparent;
+            }
+            
+            /* Testimonial slider styles */
+            .testimonial-slider {
+                scroll-snap-type: x mandatory;
+                -webkit-overflow-scrolling: touch;
+            }
+            
+            .testimonial-slide {
+                scroll-snap-align: start;
+                flex-shrink: 0;
+            }
+            
+            .hide-scrollbar::-webkit-scrollbar {
+                display: none;
+            }
+            
+            .hide-scrollbar {
+                -ms-overflow-style: none;
+                scrollbar-width: none;
+            }
+            
+            /* Step connector styles */
+            .step-connector {
+                position: relative;
+            }
+            
+            .step-connector::before {
+                content: '';
+                position: absolute;
+                top: 50%;
+                left: 0;
+                right: 0;
+                height: 2px;
+                background: linear-gradient(to right, #0ea5e9, #38bdf8);
+                transform: translateY(-50%);
+                z-index: 0;
+            }
+            
+            .step-item {
+                position: relative;
+                z-index: 1;
+                background-color: white;
+            }
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+        
+        @keyframes slideUp {
+            from { 
+                opacity: 0; 
+                transform: translateY(30px); 
+            }
+            to { 
+                opacity: 1; 
+                transform: translateY(0); 
+            }
+        }
+        
+        @keyframes slideInLeft {
+            from { 
+                opacity: 0; 
+                transform: translateX(-30px); 
+            }
+            to { 
+                opacity: 1; 
+                transform: translateX(0); 
+            }
+        }
+        
+        @keyframes slideInRight {
+            from { 
+                opacity: 0; 
+                transform: translateX(30px); 
+            }
+            to { 
+                opacity: 1; 
+                transform: translateX(0); 
+            }
+        }
+        
+        @keyframes bounceGentle {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-10px); }
+        }
+        
+        @keyframes pulseGlow {
+            0%, 100% { box-shadow: 0 0 20px rgba(14, 165, 233, 0.3); }
+            50% { box-shadow: 0 0 30px rgba(14, 165, 233, 0.6); }
+        }
+        
+        @keyframes float {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-20px); }
+        }
+        
+        .scroll-smooth {
+            scroll-behavior: smooth;
+        }
+        
+        /* Improved hover effects */
+        .hover-lift {
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        
+        .hover-lift:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+        }
+        
+        .feature-card {
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .feature-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(14, 165, 233, 0.1), transparent);
+            transition: left 0.6s;
+        }
+        
+        .feature-card:hover::before {
+            left: 100%;
+        }
+        
+        .feature-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 35px rgba(14, 165, 233, 0.15);
+        }
+        
+        /* Parallax effect */
+        .parallax-bg {
+            background-attachment: fixed;
+            background-position: center;
+            background-repeat: no-repeat;
+            background-size: cover;
+        }
+        
+        /* Custom scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        
+        ::-webkit-scrollbar-track {
+            background: #f1f5f9;
+        }
+        
+        ::-webkit-scrollbar-thumb {
+            background: #0ea5e9;
+            border-radius: 4px;
+        }
+        
+        ::-webkit-scrollbar-thumb:hover {
+            background: #0284c7;
+        }
+    </style>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+</head>
+<body class="font-sans text-gray-800 bg-gray-50 scroll-smooth">
+    <!-- Navigation -->
+    <nav class="bg-white/80 backdrop-blur-md shadow-sm fixed w-full z-50 transition-all duration-300" id="navbar">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between h-16">
+                <div class="flex items-center">
+                    <div class="flex-shrink-0 flex items-center animate-slide-in-left">
+                        <span class="text-primary-600 text-2xl font-bold bg-gradient-to-r from-primary-600 to-secondary-500 bg-clip-text text-transparent">
+                            Lexifever
+                        </span>
+                    </div>
+                    <div class="hidden sm:ml-6 sm:flex sm:space-x-8">
+                        <a href="#features" class="nav-link border-transparent text-gray-500 hover:border-primary-500 hover:text-primary-600 inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium transition-all duration-300">
+                            Fonctionnalités
+                        </a>
+                        <a href="#how-it-works" class="nav-link border-transparent text-gray-500 hover:border-primary-500 hover:text-primary-600 inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium transition-all duration-300">
+                            Comment ça marche
+                        </a>
+                        <a href="#testimonials" class="nav-link border-transparent text-gray-500 hover:border-primary-500 hover:text-primary-600 inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium transition-all duration-300">
+                            Témoignages
+                        </a>
+                        <a href="#faq" class="nav-link border-transparent text-gray-500 hover:border-primary-500 hover:text-primary-600 inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium transition-all duration-300">
+                            FAQ
+                        </a>
+                    </div>
+                </div>
+                <div class="hidden sm:ml-6 sm:flex sm:items-center animate-slide-in-right">
+                    <button onclick="window.location.href='select-domain.html'" class="bg-gradient-to-r from-primary-600 to-primary-700 hover:from-primary-700 hover:to-primary-800 text-white px-6 py-2 rounded-lg text-sm font-medium transition-all duration-300 transform hover:scale-105 hover:shadow-lg animate-pulse-glow">
+                        Commencer gratuitement
+                    </button>
+                </div>
+                <div class="-mr-2 flex items-center sm:hidden">
+                    <button id="mobile-menu-button" type="button" class="inline-flex items-center justify-center p-2 rounded-md text-gray-400 hover:text-gray-500 hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-primary-500 transition-all duration-300" aria-expanded="false">
+                        <span class="sr-only">Ouvrir le menu principal</span>
+                        <i class="fas fa-bars transition-transform duration-300" id="menu-icon"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Mobile menu -->
+        <div id="mobile-menu" class="sm:hidden hidden bg-white/95 backdrop-blur-md border-t border-gray-200">
+            <div class="pt-2 pb-3 space-y-1">
+                <a href="#features" class="mobile-nav-link bg-gray-50 border-primary-500 text-primary-700 block pl-3 pr-4 py-2 border-l-4 text-base font-medium transition-all duration-300">
+                    Fonctionnalités
+                </a>
+                <a href="#how-it-works" class="mobile-nav-link border-transparent text-gray-500 hover:bg-gray-50 hover:border-primary-500 hover:text-primary-700 block pl-3 pr-4 py-2 border-l-4 text-base font-medium transition-all duration-300">
+                    Comment ça marche
+                </a>
+                <a href="#testimonials" class="mobile-nav-link border-transparent text-gray-500 hover:bg-gray-50 hover:border-primary-500 hover:text-primary-700 block pl-3 pr-4 py-2 border-l-4 text-base font-medium transition-all duration-300">
+                    Témoignages
+                </a>
+                <a href="#faq" class="mobile-nav-link border-transparent text-gray-500 hover:bg-gray-50 hover:border-primary-500 hover:text-primary-700 block pl-3 pr-4 py-2 border-l-4 text-base font-medium transition-all duration-300">
+                    FAQ
+                </a>
+                <div class="mt-4 pl-3 pr-4">
+                    <button onclick="window.location.href='select-domain.html'" class="w-full bg-gradient-to-r from-primary-600 to-primary-700 hover:from-primary-700 hover:to-primary-800 text-white px-4 py-2 rounded-lg text-sm font-medium transition-all duration-300">
+                        Commencer gratuitement
+                    </button>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section class="pt-24 pb-16 sm:pt-32 sm:pb-20 bg-gradient-to-br from-primary-50 via-white to-secondary-50 relative overflow-hidden">
+        <!-- Background decorative elements -->
+        <div class="absolute inset-0 overflow-hidden">
+            <div class="absolute -top-40 -right-40 w-80 h-80 bg-primary-200 rounded-full mix-blend-multiply filter blur-xl opacity-30 animate-float"></div>
+            <div class="absolute -bottom-40 -left-40 w-80 h-80 bg-secondary-200 rounded-full mix-blend-multiply filter blur-xl opacity-30 animate-float" style="animation-delay: 1s;"></div>
+        </div>
+        
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative">
+            <div class="lg:grid lg:grid-cols-12 lg:gap-8">
+                <div class="sm:text-center md:max-w-2xl md:mx-auto lg:col-span-6 lg:text-left animate-slide-in-left">
+                    <h1>
+                        <span class="block text-sm font-semibold uppercase tracking-wide text-primary-600 animate-fade-in">
+                            Apprentissage de l'anglais
+                        </span>
+                        <span class="mt-1 block text-4xl tracking-tight font-extrabold sm:text-5xl xl:text-6xl animate-slide-up">
+                            <span class="block text-gray-900 text-shadow-lg">Enrichissez votre</span>
+                            <span class="block bg-gradient-to-r from-primary-600 to-secondary-500 bg-clip-text text-transparent">vocabulaire anglais</span>
+                        </span>
+                    </h1>
+                    <p class="mt-3 text-base text-gray-600 sm:mt-5 sm:text-xl lg:text-lg xl:text-xl animate-slide-up" style="animation-delay: 0.2s;">
+                        Lexifever vous aide à développer votre vocabulaire anglais grâce à des textes personnalisés générés par IA, accompagnés de leur traduction en français.
+                    </p>
+                    <div class="mt-8 sm:max-w-lg sm:mx-auto sm:text-center lg:text-left lg:mx-0 animate-slide-up" style="animation-delay: 0.4s;">
+                        <div class="flex flex-col sm:flex-row gap-4 sm:gap-3 justify-center lg:justify-start">
+                            <button onclick="window.location.href='select-domain.html'" class="group bg-gradient-to-r from-primary-600 to-primary-700 hover:from-primary-700 hover:to-primary-800 text-white px-8 py-4 rounded-lg text-base font-medium transition-all duration-300 transform hover:scale-105 hover:shadow-xl relative overflow-hidden">
+                                <span class="relative z-10">Commencer gratuitement</span>
+                                <div class="absolute inset-0 bg-gradient-to-r from-primary-700 to-primary-800 transform scale-x-0 group-hover:scale-x-100 transition-transform duration-300 origin-left"></div>
+                            </button>
+                        </div>
+                        <p class="mt-3 text-sm text-gray-500 flex items-center justify-center lg:justify-start">
+                            <i class="fas fa-shield-alt text-green-500 mr-2"></i>
+                            Aucune carte de crédit requise
+                        </p>
+                    </div>
+                </div>
+                <div class="mt-12 relative sm:max-w-lg sm:mx-auto lg:mt-0 lg:max-w-none lg:mx-0 lg:col-span-6 lg:flex lg:items-center animate-slide-in-right">
+                    <div class="relative mx-auto w-full rounded-2xl shadow-2xl lg:max-w-md hover-lift">
+                        <div class="relative block w-full bg-white rounded-2xl overflow-hidden gradient-border">
+                            <img class="w-full h-64 object-cover" src="https://images.unsplash.com/photo-1546410531-bb4caa6b424d?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1471&q=80" alt="Apprentissage de l'anglais">
+                            <div class="absolute inset-0 w-full h-full flex items-center justify-center">
+                                <button class="glass-effect rounded-full p-6 text-primary-600 hover:text-primary-700 transition-all duration-300 transform hover:scale-110 animate-bounce-gentle">
+                                    <i class="fas fa-play text-2xl"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Features Section -->
+    <section id="features" class="py-20 bg-white relative">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="lg:text-center animate-slide-up">
+                <h2 class="text-base text-primary-600 font-semibold tracking-wide uppercase">Fonctionnalités</h2>
+                <p class="mt-2 text-3xl leading-8 font-extrabold tracking-tight text-gray-900 sm:text-4xl">
+                    Apprenez l'anglais efficacement
+                </p>
+                <p class="mt-4 max-w-2xl text-xl text-gray-500 lg:mx-auto">
+                    Lexifever offre une approche personnalisée pour enrichir votre vocabulaire anglais.
+                </p>
+            </div>
+
+            <div class="mt-20">
+                <div class="grid grid-cols-1 gap-8 md:grid-cols-2 lg:grid-cols-3">
+                    <div class="feature-card relative p-8 bg-white rounded-2xl shadow-lg border border-gray-100 hover-lift">
+                        <div class="absolute -top-6 -left-6 bg-gradient-to-br from-primary-500 to-primary-600 rounded-2xl p-4 shadow-lg">
+                            <i class="fas fa-book text-white text-2xl"></i>
+                        </div>
+                        <h3 class="mt-6 text-xl font-semibold text-gray-900">Textes personnalisés</h3>
+                        <p class="mt-3 text-base text-gray-600 leading-relaxed">
+                            Choisissez parmi différents domaines, sujets, tonalités et niveaux de langue pour obtenir des textes adaptés à vos intérêts.
+                        </p>
+                    </div>
+
+                    <div class="feature-card relative p-8 bg-white rounded-2xl shadow-lg border border-gray-100 hover-lift">
+                        <div class="absolute -top-6 -left-6 bg-gradient-to-br from-secondary-500 to-secondary-600 rounded-2xl p-4 shadow-lg">
+                            <i class="fas fa-language text-white text-2xl"></i>
+                        </div>
+                        <h3 class="mt-6 text-xl font-semibold text-gray-900">Traduction instantanée</h3>
+                        <p class="mt-3 text-base text-gray-600 leading-relaxed">
+                            Consultez la traduction française en parallèle du texte anglais pour comprendre immédiatement le sens des mots.
+                        </p>
+                    </div>
+
+                    <div class="feature-card relative p-8 bg-white rounded-2xl shadow-lg border border-gray-100 hover-lift">
+                        <div class="absolute -top-6 -left-6 bg-gradient-to-br from-green-500 to-green-600 rounded-2xl p-4 shadow-lg">
+                            <i class="fas fa-headphones text-white text-2xl"></i>
+                        </div>
+                        <h3 class="mt-6 text-xl font-semibold text-gray-900">Lecture audio</h3>
+                        <p class="mt-3 text-base text-gray-600 leading-relaxed">
+                            Écoutez la prononciation correcte des mots grâce à la fonctionnalité de lecture audio des textes.
+                        </p>
+                    </div>
+
+                    <div class="feature-card relative p-8 bg-white rounded-2xl shadow-lg border border-gray-100 hover-lift">
+                        <div class="absolute -top-6 -left-6 bg-gradient-to-br from-purple-500 to-purple-600 rounded-2xl p-4 shadow-lg">
+                            <i class="fas fa-robot text-white text-2xl"></i>
+                        </div>
+                        <h3 class="mt-6 text-xl font-semibold text-gray-900">Génération par IA</h3>
+                        <p class="mt-3 text-base text-gray-600 leading-relaxed">
+                            Profitez de textes générés par intelligence artificielle, toujours pertinents et adaptés à votre niveau.
+                        </p>
+                    </div>
+
+                    <div class="feature-card relative p-8 bg-white rounded-2xl shadow-lg border border-gray-100 hover-lift">
+                        <div class="absolute -top-6 -left-6 bg-gradient-to-br from-indigo-500 to-indigo-600 rounded-2xl p-4 shadow-lg">
+                            <i class="fas fa-sync-alt text-white text-2xl"></i>
+                        </div>
+                        <h3 class="mt-6 text-xl font-semibold text-gray-900">Contenu illimité</h3>
+                        <p class="mt-3 text-base text-gray-600 leading-relaxed">
+                            Générez autant de textes que vous le souhaitez pour pratiquer et enrichir continuellement votre vocabulaire.
+                        </p>
+                    </div>
+
+                    <div class="feature-card relative p-8 bg-white rounded-2xl shadow-lg border border-gray-100 hover-lift">
+                        <div class="absolute -top-6 -left-6 bg-gradient-to-br from-pink-500 to-pink-600 rounded-2xl p-4 shadow-lg">
+                            <i class="fas fa-mobile-alt text-white text-2xl"></i>
+                        </div>
+                        <h3 class="mt-6 text-xl font-semibold text-gray-900">Responsive design</h3>
+                        <p class="mt-3 text-base text-gray-600 leading-relaxed">
+                            Accédez à Lexifever depuis n'importe quel appareil - ordinateur, tablette ou smartphone.
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- How It Works Section - COMPLETELY REDESIGNED -->
+    <section id="how-it-works" class="py-20 bg-gradient-to-br from-gray-50 to-primary-50 relative overflow-hidden">
+        <!-- Background pattern -->
+        <div class="absolute inset-0 opacity-5">
+            <div class="absolute inset-0" style="background-image: radial-gradient(circle at 1px 1px, #0ea5e9 1px, transparent 0); background-size: 20px 20px;"></div>
+        </div>
+        
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative">
+            <div class="lg:text-center animate-slide-up">
+                <h2 class="text-base text-primary-600 font-semibold tracking-wide uppercase">Comment ça marche</h2>
+                <p class="mt-2 text-3xl leading-8 font-extrabold tracking-tight text-gray-900 sm:text-4xl">
+                    Un processus simple en 4 étapes
+                </p>
+                <p class="mt-4 max-w-2xl text-xl text-gray-500 lg:mx-auto">
+                    Lexifever rend l'apprentissage du vocabulaire anglais facile et personnalisé.
+                </p>
+            </div>
+
+            <!-- Desktop Steps (md and larger screens) -->
+            <div class="hidden md:block mt-20">
+                <div class="flex flex-col space-y-16">
+                    <!-- Step 1 and 2 -->
+                    <div class="flex items-center justify-between">
+                        <!-- Step 1 -->
+                        <div class="w-5/12 bg-white p-6 rounded-xl shadow-lg hover-lift animate-slide-up" style="animation-delay: 0.1s;">
+                            <div class="flex items-center mb-4">
+                                <div class="flex-shrink-0">
+                                    <div class="flex h-16 w-16 items-center justify-center rounded-full bg-gradient-to-br from-primary-500 to-primary-600 shadow-lg">
+                                        <span class="text-white font-bold text-xl">1</span>
+                                    </div>
+                                </div>
+                                <div class="ml-4">
+                                    <h3 class="text-xl font-semibold text-gray-900">Choisissez un domaine</h3>
+                                </div>
+                            </div>
+                            <p class="text-gray-600 leading-relaxed">
+                                Sélectionnez parmi une variété de domaines comme la technologie, les sciences, les voyages, la spiritualité et bien d'autres pour personnaliser votre expérience d'apprentissage.
+                            </p>
+                        </div>
+                        
+                        <!-- Connector -->
+                        <div class="w-2/12 flex justify-center">
+                            <div class="w-full h-1 bg-gradient-to-r from-primary-400 to-secondary-400 relative">
+                                <div class="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-8 h-8 bg-white rounded-full border-2 border-primary-500 flex items-center justify-center">
+                                    <i class="fas fa-arrow-right text-primary-500"></i>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Step 2 -->
+                        <div class="w-5/12 bg-white p-6 rounded-xl shadow-lg hover-lift animate-slide-up" style="animation-delay: 0.2s;">
+                            <div class="flex items-center mb-4">
+                                <div class="flex-shrink-0">
+                                    <div class="flex h-16 w-16 items-center justify-center rounded-full bg-gradient-to-br from-secondary-500 to-secondary-600 shadow-lg">
+                                        <span class="text-white font-bold text-xl">2</span>
+                                    </div>
+                                </div>
+                                <div class="ml-4">
+                                    <h3 class="text-xl font-semibold text-gray-900">Sélectionnez un sujet</h3>
+                                </div>
+                            </div>
+                            <p class="text-gray-600 leading-relaxed">
+                                Chaque domaine propose plusieurs sujets spécifiques, tous accompagnés d'une description claire pour vous aider à faire le meilleur choix selon vos intérêts.
+                            </p>
+                        </div>
+                    </div>
+                    
+                    <!-- Vertical connector -->
+                    <div class="flex justify-between px-28">
+                        <div class="w-1 h-16 bg-gradient-to-b from-primary-400 to-green-400 relative">
+                            <div class="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-8 h-8 bg-white rounded-full border-2 border-primary-500 flex items-center justify-center">
+                                <i class="fas fa-arrow-down text-primary-500"></i>
+                            </div>
+                        </div>
+                        <div class="w-1 h-16 bg-gradient-to-b from-secondary-400 to-purple-400 relative">
+                            <div class="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-8 h-8 bg-white rounded-full border-2 border-secondary-500 flex items-center justify-center">
+                                <i class="fas fa-arrow-down text-secondary-500"></i>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Step 4 and 3 (reversed order) -->
+                    <div class="flex items-center justify-between">
+                        <!-- Step 4 -->
+                        <div class="w-5/12 bg-white p-6 rounded-xl shadow-lg hover-lift animate-slide-up" style="animation-delay: 0.4s;">
+                            <div class="flex items-center mb-4">
+                                <div class="flex-shrink-0">
+                                    <div class="flex h-16 w-16 items-center justify-center rounded-full bg-gradient-to-br from-purple-500 to-purple-600 shadow-lg">
+                                        <span class="text-white font-bold text-xl">4</span>
+                                    </div>
+                                </div>
+                                <div class="ml-4">
+                                    <h3 class="text-xl font-semibold text-gray-900">Apprenez efficacement</h3>
+                                </div>
+                            </div>
+                            <p class="text-gray-600 leading-relaxed">
+                                Lisez le texte anglais avec sa traduction française en parallèle et écoutez la prononciation pour une expérience d'apprentissage complète et immersive.
+                            </p>
+                        </div>
+                        
+                        <!-- Connector -->
+                        <div class="w-2/12 flex justify-center">
+                            <div class="w-full h-1 bg-gradient-to-r from-purple-400 to-green-400 relative">
+                                <div class="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-8 h-8 bg-white rounded-full border-2 border-purple-500 flex items-center justify-center">
+                                    <i class="fas fa-arrow-left text-purple-500"></i>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Step 3 -->
+                        <div class="w-5/12 bg-white p-6 rounded-xl shadow-lg hover-lift animate-slide-up" style="animation-delay: 0.3s;">
+                            <div class="flex items-center mb-4">
+                                <div class="flex-shrink-0">
+                                    <div class="flex h-16 w-16 items-center justify-center rounded-full bg-gradient-to-br from-green-500 to-green-600 shadow-lg">
+                                        <span class="text-white font-bold text-xl">3</span>
+                                    </div>
+                                </div>
+                                <div class="ml-4">
+                                    <h3 class="text-xl font-semibold text-gray-900">Personnalisez le texte</h3>
+                                </div>
+                            </div>
+                            <p class="text-gray-600 leading-relaxed">
+                                Définissez la tonalité, le niveau de langue et la longueur du texte pour obtenir un contenu parfaitement adapté à vos besoins et à votre niveau d'anglais actuel.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Mobile Steps (sm and smaller screens) -->
+            <div class="md:hidden mt-12">
+                <div class="space-y-8">
+                    <!-- Step 1 -->
+                    <div class="bg-white p-6 rounded-xl shadow-lg animate-slide-up" style="animation-delay: 0.1s;">
+                        <div class="flex items-center mb-4">
+                            <div class="flex-shrink-0">
+                                <div class="flex h-14 w-14 items-center justify-center rounded-full bg-gradient-to-br from-primary-500 to-primary-600 shadow-lg">
+                                    <span class="text-white font-bold text-lg">1</span>
+                                </div>
+                            </div>
+                            <div class="ml-4">
+                                <h3 class="text-lg font-semibold text-gray-900">Choisissez un domaine</h3>
+                            </div>
+                        </div>
+                        <p class="text-gray-600 text-sm leading-relaxed">
+                            Technologie, sciences, voyages, spiritualité et bien d'autres.
+                        </p>
+                        <!-- Mobile connector -->
+                        <div class="flex justify-center mt-4">
+                            <div class="h-8 w-1 bg-gradient-to-b from-primary-500 to-secondary-500"></div>
+                        </div>
+                    </div>
+                    
+                    <!-- Step 2 -->
+                    <div class="bg-white p-6 rounded-xl shadow-lg animate-slide-up" style="animation-delay: 0.2s;">
+                        <div class="flex items-center mb-4">
+                            <div class="flex-shrink-0">
+                                <div class="flex h-14 w-14 items-center justify-center rounded-full bg-gradient-to-br from-secondary-500 to-secondary-600 shadow-lg">
+                                    <span class="text-white font-bold text-lg">2</span>
+                                </div>
+                            </div>
+                            <div class="ml-4">
+                                <h3 class="text-lg font-semibold text-gray-900">Sélectionnez un sujet</h3>
+                            </div>
+                        </div>
+                        <p class="text-gray-600 text-sm leading-relaxed">
+                            Chaque sujet est accompagné d'une description claire.
+                        </p>
+                        <!-- Mobile connector -->
+                        <div class="flex justify-center mt-4">
+                            <div class="h-8 w-1 bg-gradient-to-b from-secondary-500 to-green-500"></div>
+                        </div>
+                    </div>
+                    
+                    <!-- Step 3 -->
+                    <div class="bg-white p-6 rounded-xl shadow-lg animate-slide-up" style="animation-delay: 0.3s;">
+                        <div class="flex items-center mb-4">
+                            <div class="flex-shrink-0">
+                                <div class="flex h-14 w-14 items-center justify-center rounded-full bg-gradient-to-br from-green-500 to-green-600 shadow-lg">
+                                    <span class="text-white font-bold text-lg">3</span>
+                                </div>
+                            </div>
+                            <div class="ml-4">
+                                <h3 class="text-lg font-semibold text-gray-900">Personnalisez le texte</h3>
+                            </div>
+                        </div>
+                        <p class="text-gray-600 text-sm leading-relaxed">
+                            Définissez la tonalité, le niveau de langue et la longueur.
+                        </p>
+                        <!-- Mobile connector -->
+                        <div class="flex justify-center mt-4">
+                            <div class="h-8 w-1 bg-gradient-to-b from-green-500 to-purple-500"></div>
+                        </div>
+                    </div>
+                    
+                    <!-- Step 4 -->
+                    <div class="bg-white p-6 rounded-xl shadow-lg animate-slide-up" style="animation-delay: 0.4s;">
+                        <div class="flex items-center mb-4">
+                            <div class="flex-shrink-0">
+                                <div class="flex h-14 w-14 items-center justify-center rounded-full bg-gradient-to-br from-purple-500 to-purple-600 shadow-lg">
+                                    <span class="text-white font-bold text-lg">4</span>
+                                </div>
+                            </div>
+                            <div class="ml-4">
+                                <h3 class="text-lg font-semibold text-gray-900">Apprenez efficacement</h3>
+                            </div>
+                        </div>
+                        <p class="text-gray-600 text-sm leading-relaxed">
+                            Lisez le texte anglais avec sa traduction française et écoutez la prononciation.
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Demo -->
+            <div class="mt-20 bg-white rounded-2xl shadow-2xl overflow-hidden hover-lift animate-slide-up" style="animation-delay: 0.5s;">
+                <div class="md:flex">
+                    <div class="md:flex-1 p-8 lg:p-10">
+                        <div class="uppercase tracking-wide text-sm text-primary-600 font-semibold flex items-center">
+                            <i class="fas fa-magic mr-2"></i>
+                            Exemple de texte généré
+                        </div>
+                        <h3 class="mt-2 text-2xl font-bold text-gray-900">The Future of Artificial Intelligence</h3>
+                        <p class="mt-4 text-gray-700 leading-relaxed">
+                            Artificial intelligence has made remarkable progress in recent years. From self-driving cars to virtual assistants, AI technologies are becoming increasingly integrated into our daily lives. Researchers continue to push the boundaries of what machines can do, developing systems that can learn, reason, and make decisions with minimal human intervention.
+                        </p>
+                        <div class="mt-6">
+                            <button class="text-primary-600 hover:text-primary-700 inline-flex items-center font-medium transition-all duration-300 transform hover:scale-105">
+                                <i class="fas fa-volume-up mr-2 text-lg"></i> 
+                                Écouter la prononciation
+                            </button>
+                        </div>
+                    </div>
+                    <div class="md:flex-1 p-8 lg:p-10 bg-gradient-to-br from-gray-50 to-secondary-50">
+                        <div class="uppercase tracking-wide text-sm text-secondary-600 font-semibold flex items-center">
+                            <i class="fas fa-language mr-2"></i>
+                            Traduction française
+                        </div>
+                        <h3 class="mt-2 text-2xl font-bold text-gray-900">L'avenir de l'intelligence artificielle</h3>
+                        <p class="mt-4 text-gray-700 leading-relaxed">
+                            L'intelligence artificielle a fait des progrès remarquables ces dernières années. Des voitures autonomes aux assistants virtuels, les technologies d'IA sont de plus en plus intégrées dans notre quotidien. Les chercheurs continuent de repousser les limites de ce que les machines peuvent faire, en développant des systèmes capables d'apprendre, de raisonner et de prendre des décisions avec une intervention humaine minimale.
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Testimonials Section - COMPLETELY REDESIGNED WITH CAROUSEL -->
+    <section id="testimonials" class="py-20 bg-white">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="lg:text-center animate-slide-up">
+                <h2 class="text-base text-primary-600 font-semibold tracking-wide uppercase">Témoignages</h2>
+                <p class="mt-2 text-3xl leading-8 font-extrabold tracking-tight text-gray-900 sm:text-4xl">
+                    Ce que nos utilisateurs disent
+                </p>
+                <p class="mt-4 max-w-2xl text-xl text-gray-500 lg:mx-auto">
+                    Découvrez comment Lexifever aide des milliers d'apprenants à améliorer leur anglais.
+                </p>
+            </div>
+
+            <!-- Testimonial Slider Controls -->
+            <div class="flex justify-center mt-12 mb-6 md:mb-8">
+                <button id="prev-testimonial" class="mx-2 p-3 rounded-full bg-gray-100 hover:bg-primary-100 text-primary-600 transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-primary-500">
+                    <i class="fas fa-chevron-left"></i>
+                </button>
+                <div id="testimonial-indicators" class="flex items-center space-x-2">
+                    <!-- Indicators will be added by JS -->
+                </div>
+                <button id="next-testimonial" class="mx-2 p-3 rounded-full bg-gray-100 hover:bg-primary-100 text-primary-600 transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-primary-500">
+                    <i class="fas fa-chevron-right"></i>
+                </button>
+            </div>
+
+            <!-- Testimonial Slider Container -->
+            <div class="relative overflow-hidden">
+                <div id="testimonial-slider" class="flex overflow-x-auto hide-scrollbar testimonial-slider snap-x snap-mandatory">
+                    <!-- Testimonial 1 -->
+                    <div class="testimonial-slide w-full md:w-1/2 lg:w-1/3 flex-shrink-0 px-4">
+                        <div class="bg-gradient-to-br from-gray-50 to-primary-50 rounded-2xl p-8 shadow-lg h-full">
+                            <div class="flex items-center mb-6">
+                                <div class="flex-shrink-0">
+                                    <img class="h-14 w-14 rounded-full ring-4 ring-white shadow-lg" src="https://randomuser.me/api/portraits/women/32.jpg" alt="Sophie Martin">
+                                </div>
+                                <div class="ml-4">
+                                    <h3 class="text-lg font-semibold text-gray-900">Sophie Martin</h3>
+                                    <div class="flex text-yellow-400">
+                                        <i class="fas fa-star"></i>
+                                        <i class="fas fa-star"></i>
+                                        <i class="fas fa-star"></i>
+                                        <i class="fas fa-star"></i>
+                                        <i class="fas fa-star"></i>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="text-gray-700 leading-relaxed">
+                                <p>
+                                    "Lexifever a complètement transformé ma façon d'apprendre l'anglais. J'adore pouvoir choisir des sujets qui m'intéressent et voir la traduction en parallèle. Mon vocabulaire s'est considérablement enrichi en seulement quelques semaines !"
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Testimonial 2 -->
+                    <div class="testimonial-slide w-full md:w-1/2 lg:w-1/3 flex-shrink-0 px-4">
+                        <div class="bg-gradient-to-br from-gray-50 to-secondary-50 rounded-2xl p-8 shadow-lg h-full">
+                            <div class="flex items-center mb-6">
+                                <div class="flex-shrink-0">
+                                    <img class="h-14 w-14 rounded-full ring-4 ring-white shadow-lg" src="https://randomuser.me/api/portraits/men/45.jpg" alt="Thomas Dubois">
+                                </div>
+                                <div class="ml-4">
+                                    <h3 class="text-lg font-semibold text-gray-900">Thomas Dubois</h3>
+                                    <div class="flex text-yellow-400">
+                                        <i class="fas fa-star"></i>
+                                        <i class="fas fa-star"></i>
+                                        <i class="fas fa-star"></i>
+                                        <i class="fas fa-star"></i>
+                                        <i class="fas fa-star-half-alt"></i>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="text-gray-700 leading-relaxed">
+                                <p>
+                                    "En tant que professionnel, j'avais besoin d'améliorer mon anglais technique. Lexifever me permet de générer des textes spécifiques à mon domaine et d'apprendre le vocabulaire pertinent. La fonction audio est particulièrement utile pour la prononciation."
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Testimonial 3 -->
+                    <div class="testimonial-slide w-full md:w-1/2 lg:w-1/3 flex-shrink-0 px-4">
+                        <div class="bg-gradient-to-br from-gray-50 to-green-50 rounded-2xl p-8 shadow-lg h-full">
+                            <div class="flex items-center mb-6">
+                                <div class="flex-shrink-0">
+                                    <img class="h-14 w-14 rounded-full ring-4 ring-white shadow-lg" src="https://randomuser.me/api/portraits/women/68.jpg" alt="Émilie Leclerc">
+                                </div>
+                                <div class="ml-4">
+                                    <h3 class="text-lg font-semibold text-gray-900">Émilie Leclerc</h3>
+                                    <div class="flex text-yellow-400">
+                                        <i class="fas fa-star"></i>
+                                        <i class="fas fa-star"></i>
+                                        <i class="fas fa-star"></i>
+                                        <i class="fas fa-star"></i>
+                                        <i class="fas fa-star"></i>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="text-gray-700 leading-relaxed">
+                                <p>
+                                    "Je prépare un voyage aux États-Unis et Lexifever m'aide à me familiariser avec le vocabulaire du voyage. J'apprécie particulièrement la possibilité de choisir différents niveaux de langue. Une application indispensable pour tous les apprenants !"
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Testimonial 4 -->
+                    <div class="testimonial-slide w-full md:w-1/2 lg:w-1/3 flex-shrink-0 px-4">
+                        <div class="bg-gradient-to-br from-gray-50 to-purple-50 rounded-2xl p-8 shadow-lg h-full">
+                            <div class="flex items-center mb-6">
+                                <div class="flex-shrink-0">
+                                    <img class="h-14 w-14 rounded-full ring-4 ring-white shadow-lg" src="https://randomuser.me/api/portraits/men/22.jpg" alt="Lucas Moreau">
+                                </div>
+                                <div class="ml-4">
+                                    <h3 class="text-lg font-semibold text-gray-900">Lucas Moreau</h3>
+                                    <div class="flex text-yellow-400">
+                                        <i class="fas fa-star"></i>
+                                        <i class="fas fa-star"></i>
+                                        <i class="fas fa-star"></i>
+                                        <i class="fas fa-star"></i>
+                                        <i class="fas fa-star"></i>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="text-gray-700 leading-relaxed">
+                                <p>
+                                    "Étudiant en informatique, j'utilise Lexifever pour améliorer mon anglais technique. Les textes générés sont d'une qualité impressionnante et la traduction est très précise. Je recommande vivement cette application à tous les étudiants !"
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Testimonial 5 -->
+                    <div class="testimonial-slide w-full md:w-1/2 lg:w-1/3 flex-shrink-0 px-4">
+                        <div class="bg-gradient-to-br from-gray-50 to-pink-50 rounded-2xl p-8 shadow-lg h-full">
+                            <div class="flex items-center mb-6">
+                                <div class="flex-shrink-0">
+                                    <img class="h-14 w-14 rounded-full ring-4 ring-white shadow-lg" src="https://randomuser.me/api/portraits/women/42.jpg" alt="Camille Dupont">
+                                </div>
+                                <div class="ml-4">
+                                    <h3 class="text-lg font-semibold text-gray-900">Camille Dupont</h3>
+                                    <div class="flex text-yellow-400">
+                                        <i class="fas fa-star"></i>
+                                        <i class="fas fa-star"></i>
+                                        <i class="fas fa-star"></i>
+                                        <i class="fas fa-star"></i>
+                                        <i class="fas fa-star-half-alt"></i>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="text-gray-700 leading-relaxed">
+                                <p>
+                                    "J'ai essayé plusieurs applications d'apprentissage de langues, mais Lexifever est de loin la meilleure pour enrichir son vocabulaire. La possibilité de choisir des sujets qui me passionnent rend l'apprentissage beaucoup plus agréable et efficace."
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Testimonial 6 -->
+                    <div class="testimonial-slide w-full md:w-1/2 lg:w-1/3 flex-shrink-0 px-4">
+                        <div class="bg-gradient-to-br from-gray-50 to-indigo-50 rounded-2xl p-8 shadow-lg h-full">
+                            <div class="flex items-center mb-6">
+                                <div class="flex-shrink-0">
+                                    <img class="h-14 w-14 rounded-full ring-4 ring-white shadow-lg" src="https://randomuser.me/api/portraits/men/36.jpg" alt="Antoine Bernard">
+                                </div>
+                                <div class="ml-4">
+                                    <h3 class="text-lg font-semibold text-gray-900">Antoine Bernard</h3>
+                                    <div class="flex text-yellow-400">
+                                        <i class="fas fa-star"></i>
+                                        <i class="fas fa-star"></i>
+                                        <i class="fas fa-star"></i>
+                                        <i class="fas fa-star"></i>
+                                        <i class="fas fa-star"></i>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="text-gray-700 leading-relaxed">
+                                <p>
+                                    "En tant que professeur de langues, je recommande Lexifever à tous mes élèves. L'approche par textes personnalisés est extrêmement efficace pour l'acquisition de vocabulaire. Un outil pédagogique remarquable !"
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Mobile Scroll Indicator -->
+            <div class="mt-6 text-center text-gray-500 md:hidden">
+                <p class="text-sm flex items-center justify-center">
+                    <i class="fas fa-hand-point-right mr-2"></i>
+                    Faites défiler horizontalement pour voir plus de témoignages
+                </p>
+            </div>
+        </div>
+    </section>
+
+    <!-- CTA Section -->
+    <section class="py-20 bg-gradient-to-r from-primary-600 via-primary-700 to-secondary-600 relative overflow-hidden">
+        <!-- Background pattern -->
+        <div class="absolute inset-0 opacity-10">
+            <div class="absolute inset-0" style="background-image: url('data:image/svg+xml,<svg width="60" height="60" viewBox="0 0 60 60" xmlns="http://www.w3.org/2000/svg"><g fill="none" fill-rule="evenodd"><g fill="%23ffffff" fill-opacity="0.4"><circle cx="30" cy="30" r="2"/></g></svg>');"></div>
+        </div>
+        
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative">
+            <div class="lg:flex lg:items-center lg:justify-between animate-slide-up">
+                <h2 class="text-3xl font-extrabold tracking-tight text-white sm:text-4xl lg:text-5xl">
+                    <span class="block">Prêt à enrichir votre vocabulaire anglais ?</span>
+                    <span class="block text-primary-200 mt-2">Commencez dès aujourd'hui avec Lexifever.</span>
+                </h2>
+                <div class="mt-8 flex lg:mt-0 lg:flex-shrink-0">
+                    <div class="inline-flex rounded-lg shadow-2xl">
+                        <a href="select-domain.html" class="group inline-flex items-center justify-center px-8 py-4 border border-transparent text-lg font-semibold rounded-lg text-primary-600 bg-white hover:bg-gray-50 transition-all duration-300 transform hover:scale-105 relative overflow-hidden">
+                            <span class="relative z-10 flex items-center">
+                                <i class="fas fa-rocket mr-3"></i>
+                                Commencer gratuitement
+                            </span>
+                            <div class="absolute inset-0 bg-gradient-to-r from-primary-50 to-secondary-50 transform scale-x-0 group-hover:scale-x-100 transition-transform duration-300 origin-left"></div>
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- FAQ Section -->
+    <section id="faq" class="py-20 bg-white">
+        <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="lg:text-center animate-slide-up">
+                <h2 class="text-base text-primary-600 font-semibold tracking-wide uppercase">FAQ</h2>
+                <p class="mt-2 text-3xl leading-8 font-extrabold tracking-tight text-gray-900 sm:text-4xl">
+                    Questions fréquemment posées
+                </p>
+                <p class="mt-4 max-w-2xl text-xl text-gray-500 lg:mx-auto">
+                    Tout ce que vous devez savoir sur Lexifever.
+                </p>
+            </div>
+
+            <div class="mt-16">
+                <dl class="space-y-6">
+                    <div class="faq-item bg-gray-50 rounded-2xl p-6 hover:bg-gray-100 transition-all duration-300 animate-slide-up" style="animation-delay: 0.1s;">
+                        <dt class="text-lg">
+                            <button id="faq-1-button" class="text-left w-full flex justify-between items-start text-gray-900 focus:outline-none focus:ring-2 focus:ring-primary-500 rounded-lg p-2" aria-expanded="false">
+                                <span class="font-semibold text-gray-900 text-lg">Lexifever est-il gratuit ?</span>
+                                <span class="ml-6 h-7 flex items-center">
+                                    <i id="faq-1-icon" class="fas fa-plus text-primary-600 text-xl transition-transform duration-300"></i>
+                                </span>
+                            </button>
+                        </dt>
+                        <dd id="faq-1-panel" class="mt-4 hidden">
+                            <p class="text-base text-gray-600 leading-relaxed pl-2">
+                                Lexifever propose une version gratuite avec un nombre limité de textes générés par jour. Pour un accès illimité et des fonctionnalités avancées, nous proposons également des abonnements premium à des tarifs très abordables.
+                            </p>
+                        </dd>
+                    </div>
+
+                    <div class="faq-item bg-gray-50 rounded-2xl p-6 hover:bg-gray-100 transition-all duration-300 animate-slide-up" style="animation-delay: 0.2s;">
+                        <dt class="text-lg">
+                            <button id="faq-2-button" class="text-left w-full flex justify-between items-start text-gray-900 focus:outline-none focus:ring-2 focus:ring-primary-500 rounded-lg p-2" aria-expanded="false">
+                                <span class="font-semibold text-gray-900 text-lg">Quel niveau d'anglais faut-il avoir pour utiliser Lexifever ?</span>
+                                <span class="ml-6 h-7 flex items-center">
+                                    <i id="faq-2-icon" class="fas fa-plus text-primary-600 text-xl transition-transform duration-300"></i>
+                                </span>
+                            </button>
+                        </dt>
+                        <dd id="faq-2-panel" class="mt-4 hidden">
+                            <p class="text-base text-gray-600 leading-relaxed pl-2">
+                                Lexifever s'adapte à tous les niveaux, du débutant à l'avancé. Vous pouvez choisir le niveau de langue qui vous convient pour chaque texte généré.
+                            </p>
+                        </dd>
+                    </div>
+
+                    <div class="faq-item bg-gray-50 rounded-2xl p-6 hover:bg-gray-100 transition-all duration-300 animate-slide-up" style="animation-delay: 0.3s;">
+                        <dt class="text-lg">
+                            <button id="faq-3-button" class="text-left w-full flex justify-between items-start text-gray-900 focus:outline-none focus:ring-2 focus:ring-primary-500 rounded-lg p-2" aria-expanded="false">
+                                <span class="font-semibold text-gray-900 text-lg">Comment les textes sont-ils générés ?</span>
+                                <span class="ml-6 h-7 flex items-center">
+                                    <i id="faq-3-icon" class="fas fa-plus text-primary-600 text-xl transition-transform duration-300"></i>
+                                </span>
+                            </button>
+                        </dt>
+                        <dd id="faq-3-panel" class="mt-4 hidden">
+                            <p class="text-base text-gray-600 leading-relaxed pl-2">
+                                Lexifever utilise des modèles d'intelligence artificielle avancés pour générer des textes pertinents et de qualité, adaptés à vos choix de domaine, sujet, tonalité et niveau de langue.
+                            </p>
+                        </dd>
+                    </div>
+
+                    <div class="faq-item bg-gray-50 rounded-2xl p-6 hover:bg-gray-100 transition-all duration-300 animate-slide-up" style="animation-delay: 0.4s;">
+                        <dt class="text-lg">
+                            <button id="faq-4-button" class="text-left w-full flex justify-between items-start text-gray-900 focus:outline-none focus:ring-2 focus:ring-primary-500 rounded-lg p-2" aria-expanded="false">
+                                <span class="font-semibold text-gray-900 text-lg">Puis-je utiliser Lexifever sur mon téléphone ?</span>
+                                <span class="ml-6 h-7 flex items-center">
+                                    <i id="faq-4-icon" class="fas fa-plus text-primary-600 text-xl transition-transform duration-300"></i>
+                                </span>
+                            </button>
+                        </dt>
+                        <dd id="faq-4-panel" class="mt-4 hidden">
+                            <p class="text-base text-gray-600 leading-relaxed pl-2">
+                                Absolument ! Lexifever est entièrement responsive et fonctionne parfaitement sur tous les appareils : ordinateurs, tablettes et smartphones.
+                            </p>
+                        </dd>
+                    </div>
+
+                    <div class="faq-item bg-gray-50 rounded-2xl p-6 hover:bg-gray-100 transition-all duration-300 animate-slide-up" style="animation-delay: 0.5s;">
+                        <dt class="text-lg">
+                            <button id="faq-5-button" class="text-left w-full flex justify-between items-start text-gray-900 focus:outline-none focus:ring-2 focus:ring-primary-500 rounded-lg p-2" aria-expanded="false">
+                                <span class="font-semibold text-gray-900 text-lg">Les traductions sont-elles fiables ?</span>
+                                <span class="ml-6 h-7 flex items-center">
+                                    <i id="faq-5-icon" class="fas fa-plus text-primary-600 text-xl transition-transform duration-300"></i>
+                                </span>
+                            </button>
+                        </dt>
+                        <dd id="faq-5-panel" class="mt-4 hidden">
+                            <p class="text-base text-gray-600 leading-relaxed pl-2">
+                                Oui, nos traductions sont générées par des modèles d'IA de pointe et sont régulièrement vérifiées pour garantir leur précision et leur qualité.
+                            </p>
+                        </dd>
+                    </div>
+                </dl>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="bg-gray-900 text-white relative overflow-hidden">
+        <!-- Background pattern -->
+        <div class="absolute inset-0 opacity-5">
+            <div class="absolute inset-0" style="background-image: linear-gradient(45deg, #0ea5e9 25%, transparent 25%), linear-gradient(-45deg, #0ea5e9 25%, transparent 25%), linear-gradient(45deg, transparent 75%, #0ea5e9 75%), linear-gradient(-45deg, transparent 75%, #0ea5e9 75%); background-size: 20px 20px; background-position: 0 0, 0 10px, 10px -10px, -10px 0px;"></div>
+        </div>
+        
+        <div class="max-w-7xl mx-auto py-16 px-4 sm:px-6 lg:px-8 relative">
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-8">
+                <div class="md:col-span-1 animate-slide-up">
+                    <div class="flex items-center mb-4">
+                        <span class="text-3xl font-bold bg-gradient-to-r from-primary-400 to-secondary-400 bg-clip-text text-transparent">Lexifever</span>
+                    </div>
+                    <p class="text-gray-400 leading-relaxed mb-6">
+                        Enrichissez votre vocabulaire anglais avec des textes personnalisés et des traductions instantanées.
+                    </p>
+                    <div class="flex space-x-4">
+                        <a href="#" class="text-gray-400 hover:text-white transition-all duration-300 transform hover:scale-110">
+                            <i class="fab fa-facebook-f text-xl"></i>
+                        </a>
+                        <a href="#" class="text-gray-400 hover:text-white transition-all duration-300 transform hover:scale-110">
+                            <i class="fab fa-twitter text-xl"></i>
+                        </a>
+                        <a href="#" class="text-gray-400 hover:text-white transition-all duration-300 transform hover:scale-110">
+                            <i class="fab fa-instagram text-xl"></i>
+                        </a>
+                        <a href="#" class="text-gray-400 hover:text-white transition-all duration-300 transform hover:scale-110">
+                            <i class="fab fa-linkedin-in text-xl"></i>
+                        </a>
+                    </div>
+                </div>
+                <div class="animate-slide-up" style="animation-delay: 0.1s;">
+                    <h3 class="text-sm font-semibold text-gray-300 uppercase tracking-wider mb-4">Produit</h3>
+                    <ul class="space-y-3">
+                        <li>
+                            <a href="#features" class="text-base text-gray-400 hover:text-white transition-colors duration-300">
+                                Fonctionnalités
+                            </a>
+                        </li>
+                        <li>
+                            <a href="#" class="text-base text-gray-400 hover:text-white transition-colors duration-300">
+                                Tarifs
+                            </a>
+                        </li>
+                        <li>
+                            <a href="#faq" class="text-base text-gray-400 hover:text-white transition-colors duration-300">
+                                FAQ
+                            </a>
+                        </li>
+                        <li>
+                            <a href="#testimonials" class="text-base text-gray-400 hover:text-white transition-colors duration-300">
+                                Témoignages
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+                <div class="animate-slide-up" style="animation-delay: 0.2s;">
+                    <h3 class="text-sm font-semibold text-gray-300 uppercase tracking-wider mb-4">Support</h3>
+                    <ul class="space-y-3">
+                        <li>
+                            <a href="#" class="text-base text-gray-400 hover:text-white transition-colors duration-300">
+                                Centre d'aide
+                            </a>
+                        </li>
+                        <li>
+                            <a href="#" class="text-base text-gray-400 hover:text-white transition-colors duration-300">
+                                Contact
+                            </a>
+                        </li>
+                        <li>
+                            <a href="#" class="text-base text-gray-400 hover:text-white transition-colors duration-300">
+                                Tutoriels
+                            </a>
+                        </li>
+                        <li>
+                            <a href="#" class="text-base text-gray-400 hover:text-white transition-colors duration-300">
+                                Communauté
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+                <div class="animate-slide-up" style="animation-delay: 0.3s;">
+                    <h3 class="text-sm font-semibold text-gray-300 uppercase tracking-wider mb-4">Légal</h3>
+                    <ul class="space-y-3">
+                        <li>
+                            <a href="#" class="text-base text-gray-400 hover:text-white transition-colors duration-300">
+                                Confidentialité
+                            </a>
+                        </li>
+                        <li>
+                            <a href="#" class="text-base text-gray-400 hover:text-white transition-colors duration-300">
+                                Conditions d'utilisation
+                            </a>
+                        </li>
+                        <li>
+                            <a href="#" class="text-base text-gray-400 hover:text-white transition-colors duration-300">
+                                Cookies
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+            <div class="mt-12 border-t border-gray-800 pt-8 md:flex md:items-center md:justify-between">
+                <div class="flex space-x-6 md:order-2">
+                    <a href="#" class="text-gray-400 hover:text-white transition-colors duration-300">
+                        Conditions
+                    </a>
+                    <a href="#" class="text-gray-400 hover:text-white transition-colors duration-300">
+                        Confidentialité
+                    </a>
+                    <a href="#" class="text-gray-400 hover:text-white transition-colors duration-300">
+                        Cookies
+                    </a>
+                </div>
+                <p class="mt-8 text-base text-gray-400 md:mt-0 md:order-1">
+                    &copy; 2023 Lexifever. Tous droits réservés.
+                </p>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        // Enhanced mobile menu toggle with animation
+        const mobileMenuButton = document.getElementById('mobile-menu-button');
+        const mobileMenu = document.getElementById('mobile-menu');
+        const menuIcon = document.getElementById('menu-icon');
+
+        mobileMenuButton.addEventListener('click', () => {
+            mobileMenu.classList.toggle('hidden');
+            
+            if (mobileMenu.classList.contains('hidden')) {
+                menuIcon.classList.remove('fa-times');
+                menuIcon.classList.add('fa-bars');
+                menuIcon.style.transform = 'rotate(0deg)';
+            } else {
+                menuIcon.classList.remove('fa-bars');
+                menuIcon.classList.add('fa-times');
+                menuIcon.style.transform = 'rotate(180deg)';
+            }
+        });
+
+        // Enhanced FAQ accordion with smooth animations
+        const faqButtons = document.querySelectorAll('[id^="faq-"][id$="-button"]');
+        
+        faqButtons.forEach(button => {
+            button.addEventListener('click', () => {
+                const id = button.id.split('-')[1];
+                const panel = document.getElementById(`faq-${id}-panel`);
+                const icon = document.getElementById(`faq-${id}-icon`);
+                
+                // Close other panels
+                faqButtons.forEach(otherButton => {
+                    if (otherButton !== button) {
+                        const otherId = otherButton.id.split('-')[1];
+                        const otherPanel = document.getElementById(`faq-${otherId}-panel`);
+                        const otherIcon = document.getElementById(`faq-${otherId}-icon`);
+                        
+                        otherPanel.classList.add('hidden');
+                        otherIcon.classList.remove('fa-minus');
+                        otherIcon.classList.add('fa-plus');
+                        otherIcon.style.transform = 'rotate(0deg)';
+                    }
+                });
+                
+                // Toggle current panel
+                panel.classList.toggle('hidden');
+                
+                if (panel.classList.contains('hidden')) {
+                    icon.classList.remove('fa-minus');
+                    icon.classList.add('fa-plus');
+                    icon.style.transform = 'rotate(0deg)';
+                } else {
+                    icon.classList.remove('fa-plus');
+                    icon.classList.add('fa-minus');
+                    icon.style.transform = 'rotate(180deg)';
+                }
+            });
+        });
+
+        // Enhanced smooth scrolling with offset for fixed navbar
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                
+                const targetId = this.getAttribute('href');
+                if (targetId === '#') return;
+                
+                const targetElement = document.querySelector(targetId);
+                if (targetElement) {
+                    const offsetTop = targetElement.offsetTop - 80;
+                    
+                    window.scrollTo({
+                        top: offsetTop,
+                        behavior: 'smooth'
+                    });
+                    
+                    // Close mobile menu if open
+                    if (!mobileMenu.classList.contains('hidden')) {
+                        mobileMenu.classList.add('hidden');
+                        menuIcon.classList.remove('fa-times');
+                        menuIcon.classList.add('fa-bars');
+                        menuIcon.style.transform = 'rotate(0deg)';
+                    }
+                }
+            });
+        });
+
+        // Navbar background change on scroll
+        const navbar = document.getElementById('navbar');
+        
+        window.addEventListener('scroll', () => {
+            if (window.scrollY > 50) {
+                navbar.classList.add('bg-white/95');
+                navbar.classList.remove('bg-white/80');
+            } else {
+                navbar.classList.add('bg-white/80');
+                navbar.classList.remove('bg-white/95');
+            }
+        });
+
+        // Intersection Observer for animations
+        const observerOptions = {
+            threshold: 0.1,
+            rootMargin: '0px 0px -50px 0px'
+        };
+
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.style.opacity = '1';
+                    entry.target.style.transform = 'translateY(0)';
+                }
+            });
+        }, observerOptions);
+
+        // Observe all animated elements
+        document.querySelectorAll('.animate-slide-up, .animate-slide-in-left, .animate-slide-in-right, .animate-fade-in').forEach(el => {
+            el.style.opacity = '0';
+            el.style.transform = 'translateY(30px)';
+            observer.observe(el);
+        });
+
+        // Add loading animation
+        window.addEventListener('load', () => {
+            document.body.classList.add('loaded');
+        });
+
+        // Enhanced hover effects for feature cards
+        document.querySelectorAll('.feature-card').forEach(card => {
+            card.addEventListener('mouseenter', () => {
+                card.style.transform = 'translateY(-8px) scale(1.02)';
+            });
+            
+            card.addEventListener('mouseleave', () => {
+                card.style.transform = 'translateY(0) scale(1)';
+            });
+        });
+
+        // Parallax effect for hero section
+        window.addEventListener('scroll', () => {
+            const scrolled = window.pageYOffset;
+            const parallaxElements = document.querySelectorAll('.animate-float');
+            
+            parallaxElements.forEach(element => {
+                const speed = 0.5;
+                element.style.transform = `translateY(${scrolled * speed}px)`;
+            });
+        });
+
+        // Testimonial Slider
+        const testimonialSlider = document.getElementById('testimonial-slider');
+        const prevButton = document.getElementById('prev-testimonial');
+        const nextButton = document.getElementById('next-testimonial');
+        const indicatorsContainer = document.getElementById('testimonial-indicators');
+        
+        // Get all slides
+        const slides = testimonialSlider.querySelectorAll('.testimonial-slide');
+        let currentSlide = 0;
+        let slideWidth = 0;
+        let slidesPerView = 1;
+        
+        // Create indicators
+        slides.forEach((_, index) => {
+            const indicator = document.createElement('button');
+            indicator.classList.add('w-3', 'h-3', 'rounded-full', 'bg-gray-300', 'transition-all', 'duration-300');
+            indicator.setAttribute('aria-label', `Go to testimonial ${index + 1}`);
+            
+            indicator.addEventListener('click', () => {
+                goToSlide(index);
+            });
+            
+            indicatorsContainer.appendChild(indicator);
+        });
+        
+        const indicators = indicatorsContainer.querySelectorAll('button');
+        
+        // Function to update slide width and slides per view based on screen size
+        function updateSlideWidth() {
+            if (window.innerWidth >= 1024) {
+                slidesPerView = 3;
+            } else if (window.innerWidth >= 768) {
+                slidesPerView = 2;
+            } else {
+                slidesPerView = 1;
+            }
+            
+            slideWidth = testimonialSlider.clientWidth / slidesPerView;
+            
+            // Update slide widths
+            slides.forEach(slide => {
+                slide.style.width = `${slideWidth}px`;
+            });
+            
+            // Go to current slide without animation
+            testimonialSlider.scrollLeft = currentSlide * slideWidth;
+        }
+        
+        // Initialize slide width
+        updateSlideWidth();
+        
+        // Update on window resize
+        window.addEventListener('resize', updateSlideWidth);
+        
+        // Function to go to a specific slide
+        function goToSlide(index) {
+            // Ensure index is within bounds
+            if (index < 0) {
+                index = 0;
+            } else if (index > slides.length - slidesPerView) {
+                index = slides.length - slidesPerView;
+            }
+            
+            currentSlide = index;
+            testimonialSlider.scrollTo({
+                left: index * slideWidth,
+                behavior: 'smooth'
+            });
+            
+            // Update indicators
+            indicators.forEach((indicator, i) => {
+                if (i === index) {
+                    indicator.classList.remove('bg-gray-300');
+                    indicator.classList.add('bg-primary-500', 'w-6');
+                } else {
+                    indicator.classList.remove('bg-primary-500', 'w-6');
+                    indicator.classList.add('bg-gray-300');
+                }
+            });
+        }
+        
+        // Set first indicator as active
+        if (indicators.length > 0) {
+            indicators[0].classList.remove('bg-gray-300');
+            indicators[0].classList.add('bg-primary-500', 'w-6');
+        }
+        
+        // Previous button
+        prevButton.addEventListener('click', () => {
+            goToSlide(currentSlide - 1);
+        });
+        
+        // Next button
+        nextButton.addEventListener('click', () => {
+            goToSlide(currentSlide + 1);
+        });
+        
+        // Handle manual scroll
+        testimonialSlider.addEventListener('scroll', () => {
+            const scrollPosition = testimonialSlider.scrollLeft;
+            const newIndex = Math.round(scrollPosition / slideWidth);
+            
+            if (newIndex !== currentSlide) {
+                currentSlide = newIndex;
+                
+                // Update indicators
+                indicators.forEach((indicator, i) => {
+                    if (i === newIndex) {
+                        indicator.classList.remove('bg-gray-300');
+                        indicator.classList.add('bg-primary-500', 'w-6');
+                    } else {
+                        indicator.classList.remove('bg-primary-500', 'w-6');
+                        indicator.classList.add('bg-gray-300');
+                    }
+                });
+            }
+        });
+        
+        // Auto-advance slides every 5 seconds
+        setInterval(() => {
+            const nextSlide = (currentSlide + 1) % (slides.length - slidesPerView + 1);
+            goToSlide(nextSlide);
+        }, 5000);
+    </script>
+</body>
+</html>

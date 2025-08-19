@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Diagnostic Lexifever</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-100 p-8">
+    <div class="max-w-6xl mx-auto">
+        <h1 class="text-3xl font-bold mb-8">🔧 Diagnostic Lexifever</h1>
+        
+        <!-- Test API -->
+        <div class="bg-white rounded-lg shadow p-6 mb-6">
+            <h2 class="text-xl font-semibold mb-4">🌐 Test API</h2>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <button id="test-health" class="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600">
+                    Test Health Check
+                </button>
+                <button id="test-generate" class="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600">
+                    Test Génération
+                </button>
+                <button id="test-translate" class="bg-purple-500 text-white px-4 py-2 rounded hover:bg-purple-600">
+                    Test Traduction
+                </button>
+                <button id="test-full-flow" class="bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600">
+                    Test Flux Complet
+                </button>
+            </div>
+            <div id="api-results" class="mt-4"></div>
+        </div>
+        
+        <!-- Test Session -->
+        <div class="bg-white rounded-lg shadow p-6 mb-6">
+            <h2 class="text-xl font-semibold mb-4">💾 Test Session</h2>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <button id="save-session" class="bg-indigo-500 text-white px-4 py-2 rounded hover:bg-indigo-600">
+                    Sauvegarder Session
+                </button>
+                <button id="load-session" class="bg-teal-500 text-white px-4 py-2 rounded hover:bg-teal-600">
+                    Charger Session
+                </button>
+                <button id="clear-session" class="bg-gray-500 text-white px-4 py-2 rounded hover:bg-gray-600">
+                    Vider Session
+                </button>
+            </div>
+            <div id="session-results" class="mt-4"></div>
+        </div>
+        
+        <!-- Navigation Test -->
+        <div class="bg-white rounded-lg shadow p-6 mb-6">
+            <h2 class="text-xl font-semibold mb-4">🧭 Test Navigation</h2>
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+                <a href="select-domain.html" class="bg-yellow-500 text-white px-4 py-2 rounded hover:bg-yellow-600 text-center">
+                    Sélection Domaine
+                </a>
+                <a href="select-topic.html?domain=Technologie" class="bg-orange-500 text-white px-4 py-2 rounded hover:bg-orange-600 text-center">
+                    Sélection Sujet
+                </a>
+                <a href="customize-text.html" class="bg-pink-500 text-white px-4 py-2 rounded hover:bg-pink-600 text-center">
+                    Personnalisation
+                </a>
+                <a href="result.html" class="bg-cyan-500 text-white px-4 py-2 rounded hover:bg-cyan-600 text-center">
+                    Résultat
+                </a>
+            </div>
+        </div>
+        
+        <!-- Status -->
+        <div class="bg-white rounded-lg shadow p-6">
+            <h2 class="text-xl font-semibold mb-4">📊 Status</h2>
+            <div id="status-info" class="space-y-2"></div>
+        </div>
+    </div>
+
+    <script src="js/app.js"></script>
+    <script>
+        // Test Health Check
+        document.getElementById('test-health').addEventListener('click', async () => {
+            const results = document.getElementById('api-results');
+            results.innerHTML = '<div class="text-blue-600">Test health check...</div>';
+            
+            try {
+                const response = await ApiClient.healthCheck();
+                results.innerHTML = '<div class="text-green-600">✅ API Health: OK</div>';
+            } catch (error) {
+                results.innerHTML = `<div class="text-red-600">❌ API Health: ${error.message}</div>`;
+            }
+        });
+        
+        // Test Génération
+        document.getElementById('test-generate').addEventListener('click', async () => {
+            const results = document.getElementById('api-results');
+            results.innerHTML = '<div class="text-blue-600">Test génération...</div>';
+            
+            try {
+                const params = {
+                    domain: 'Technologie',
+                    topic: 'Intelligence Artificielle',
+                    level: 'intermediate',
+                    tone: 'conversational'
+                };
+                const response = await ApiClient.generateText(params);
+                results.innerHTML = `<div class="text-green-600">✅ Génération: OK (${response.data.englishText.length} caractères)</div>`;
+            } catch (error) {
+                results.innerHTML = `<div class="text-red-600">❌ Génération: ${error.message}</div>`;
+            }
+        });
+        
+        // Test Traduction
+        document.getElementById('test-translate').addEventListener('click', async () => {
+            const results = document.getElementById('api-results');
+            results.innerHTML = '<div class="text-blue-600">Test traduction...</div>';
+            
+            try {
+                const response = await ApiClient.translateText('Hello world');
+                results.innerHTML = `<div class="text-green-600">✅ Traduction: OK ("${response.data.translatedText}")</div>`;
+            } catch (error) {
+                results.innerHTML = `<div class="text-red-600">❌ Traduction: ${error.message}</div>`;
+            }
+        });
+        
+        // Test Flux Complet
+        document.getElementById('test-full-flow').addEventListener('click', async () => {
+            const results = document.getElementById('api-results');
+            results.innerHTML = '<div class="text-blue-600">Test flux complet...</div>';
+            
+            try {
+                const params = {
+                    domain: 'Technologie',
+                    topic: 'Intelligence Artificielle',
+                    level: 'intermediate',
+                    tone: 'conversational'
+                };
+                
+                // Sauvegarder en session
+                SessionManager.saveParams(params);
+                
+                // Générer
+                const textResponse = await ApiClient.generateText(params);
+                
+                // Traduire
+                const translationResponse = await ApiClient.translateText(textResponse.data.englishText);
+                
+                results.innerHTML = `
+                    <div class="text-green-600">
+                        ✅ Flux complet: OK<br>
+                        📝 Texte: ${textResponse.data.englishText.substring(0, 100)}...<br>
+                        🌍 Traduction: ${translationResponse.data.translatedText.substring(0, 100)}...
+                    </div>
+                `;
+                
+                // Rediriger vers result.html
+                setTimeout(() => {
+                    window.location.href = 'result.html';
+                }, 2000);
+                
+            } catch (error) {
+                results.innerHTML = `<div class="text-red-600">❌ Flux complet: ${error.message}</div>`;
+            }
+        });
+        
+        // Session Management
+        document.getElementById('save-session').addEventListener('click', () => {
+            const testParams = {
+                domain: 'Technologie',
+                topic: 'Intelligence Artificielle',
+                level: 'intermediate',
+                tone: 'conversational',
+                length: 'medium'
+            };
+            SessionManager.saveParams(testParams);
+            document.getElementById('session-results').innerHTML = '<div class="text-green-600">✅ Session sauvegardée</div>';
+        });
+        
+        document.getElementById('load-session').addEventListener('click', () => {
+            const params = SessionManager.getParams();
+            document.getElementById('session-results').innerHTML = `
+                <div class="text-blue-600">
+                    📋 Session chargée:<br>
+                    ${JSON.stringify(params, null, 2)}
+                </div>
+            `;
+        });
+        
+        document.getElementById('clear-session').addEventListener('click', () => {
+            SessionManager.clearParams();
+            document.getElementById('session-results').innerHTML = '<div class="text-gray-600">🗑️ Session vidée</div>';
+        });
+        
+        // Status Info
+        function updateStatus() {
+            const statusDiv = document.getElementById('status-info');
+            const currentParams = SessionManager.getParams();
+            
+            statusDiv.innerHTML = `
+                <div><strong>URL actuelle:</strong> ${window.location.href}</div>
+                <div><strong>API Base URL:</strong> ${API_BASE_URL}</div>
+                <div><strong>Paramètres en session:</strong> ${Object.keys(currentParams).length > 0 ? 'Oui' : 'Non'}</div>
+                <div><strong>Domaines configurés:</strong> ${Object.keys(DOMAINS_CONFIG).length}</div>
+            `;
+        }
+        
+        // Mettre à jour le status au chargement
+        updateStatus();
+        
+        // Mettre à jour le status toutes les 5 secondes
+        setInterval(updateStatus, 5000);
+    </script>
+</body>
+</html>
