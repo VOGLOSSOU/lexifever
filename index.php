@@ -252,6 +252,13 @@ function serveFrontendFiles($path) {
                 header("Last-Modified: " . gmdate('D, d M Y H:i:s', $lastModified) . ' GMT');
                 header("Cache-Control: public, max-age=3600"); // Cache 1 heure
             }
+        
+            // Pas de cache pour les pages HTML principales
+            if ($extension === 'html' && in_array($fileName, ['customize-text.html', 'select-domain.html', 'select-topic.html'])) {
+                header("Cache-Control: no-cache, no-store, must-revalidate");
+                header("Pragma: no-cache");
+                header("Expires: 0");
+            }
 
             readfile($filePath);
             return;

@@ -4,12 +4,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Lexifever - Texte généré</title>
-    <!-- Override API base URL for this page -->
-    <script>
-        // Définir l'API_BASE_URL avant le chargement d'app.js
-        window.API_BASE_URL = window.location.origin + '/lexifever/api';
-        console.log('🔧 API Base URL définie:', window.API_BASE_URL);
-    </script>
 
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
@@ -436,52 +430,6 @@
             </div>
         </div>
 
-        <!-- Vocabulary Section -->
-        <div class="mt-12 animate-slide-up" style="animation-delay: 0.5s;">
-            <h2 class="text-2xl font-bold text-gray-900 mb-6 flex items-center">
-                <i class="fas fa-book text-primary-500 mr-3"></i>
-                Vocabulaire clé
-            </h2>
-            <div class="bg-white rounded-xl shadow-lg overflow-hidden border border-gray-100 hover-lift">
-                <div class="p-6">
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        <div class="border-b border-gray-100 pb-3 md:pb-0 md:border-b-0 md:border-r transition-all hover:bg-gray-50 p-3 rounded-lg">
-                            <div class="font-medium text-primary-600">Artificial Intelligence (AI)</div>
-                            <div class="text-gray-600">Intelligence Artificielle (IA)</div>
-                        </div>
-                        <div class="border-b border-gray-100 pb-3 md:pb-0 md:border-b-0 transition-all hover:bg-gray-50 p-3 rounded-lg">
-                            <div class="font-medium text-primary-600">Machine Learning</div>
-                            <div class="text-gray-600">Apprentissage Automatique</div>
-                        </div>
-                        <div class="border-b border-gray-100 pb-3 md:pb-0 md:border-b-0 md:border-r transition-all hover:bg-gray-50 p-3 rounded-lg">
-                            <div class="font-medium text-primary-600">Deep Learning</div>
-                            <div class="text-gray-600">Apprentissage Profond</div>
-                        </div>
-                        <div class="border-b border-gray-100 pb-3 md:pb-0 md:border-b-0 transition-all hover:bg-gray-50 p-3 rounded-lg">
-                            <div class="font-medium text-primary-600">Neural Networks</div>
-                            <div class="text-gray-600">Réseaux de Neurones</div>
-                        </div>
-                        <div class="border-b border-gray-100 pb-3 md:pb-0 md:border-b-0 md:border-r transition-all hover:bg-gray-50 p-3 rounded-lg">
-                            <div class="font-medium text-primary-600">Natural Language Processing</div>
-                            <div class="text-gray-600">Traitement du Langage Naturel</div>
-                        </div>
-                        <div class="border-b border-gray-100 pb-3 md:pb-0 md:border-b-0 transition-all hover:bg-gray-50 p-3 rounded-lg">
-                            <div class="font-medium text-primary-600">Autonomous Vehicles</div>
-                            <div class="text-gray-600">Véhicules Autonomes</div>
-                        </div>
-                        <div class="md:border-r transition-all hover:bg-gray-50 p-3 rounded-lg">
-                            <div class="font-medium text-primary-600">Recommendation Systems</div>
-                            <div class="text-gray-600">Systèmes de Recommandation</div>
-                        </div>
-                        <div class="transition-all hover:bg-gray-50 p-3 rounded-lg">
-                            <div class="font-medium text-primary-600">Ethical Concerns</div>
-                            <div class="text-gray-600">Préoccupations Éthiques</div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-
         <!-- Learning Tips -->
         <div class="mt-12 animate-slide-up" style="animation-delay: 0.6s;">
             <h2 class="text-2xl font-bold text-gray-900 mb-6 flex items-center">
@@ -553,9 +501,9 @@
             <a href="customize-text.html" class="inline-flex items-center justify-center px-6 py-3 border border-transparent text-base font-medium rounded-lg shadow-sm text-primary-600 bg-white hover:bg-primary-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500 transition-all duration-300 transform hover:scale-105">
                 <i class="fas fa-sliders-h mr-2"></i> Modifier les paramètres
             </a>
-            <a href="select-topic.html" class="inline-flex items-center justify-center px-6 py-3 border border-transparent text-base font-medium rounded-lg shadow-sm text-white bg-gradient-to-r from-primary-600 to-primary-700 hover:from-primary-700 hover:to-primary-800 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500 transition-all duration-300 transform hover:scale-105">
+            <button id="regenerate-button" class="inline-flex items-center justify-center px-6 py-3 border border-transparent text-base font-medium rounded-lg shadow-sm text-white bg-gradient-to-r from-primary-600 to-primary-700 hover:from-primary-700 hover:to-primary-800 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500 transition-all duration-300 transform hover:scale-105">
                 <i class="fas fa-sync-alt mr-2"></i> Générer un nouveau texte
-            </a>
+            </button>
         </div>
     </main>
 
@@ -908,311 +856,15 @@
 
     <!-- Page-specific script for result generation -->
     <script>
-        // Forcer la mise à jour de l'API_BASE_URL
-        if (typeof API_BASE_URL !== 'undefined') {
-            API_BASE_URL = window.location.origin + '/lexifever/api';
-            console.log('⚡ API_BASE_URL forcée dans result.html:', API_BASE_URL);
-        }
-
-        // Initialize result page when DOM is loaded
-        document.addEventListener('DOMContentLoaded', async function() {
-            console.log('🔄 Initialisation de la page result.html');
-
-            // Get parameters from session storage
-            const params = SessionManager.getParams();
-            console.log('📋 Paramètres récupérés:', params);
-
-            // Check if we have required parameters
-            if (!params.domain || !params.topic) {
-                console.error('❌ Paramètres manquants, redirection vers select-domain.html');
-                showError('Paramètres manquants. Veuillez recommencer le processus.');
-                setTimeout(() => {
-                    window.location.href = 'select-domain.html';
-                }, 2000);
-                return;
-            }
-
-            // Update page elements with parameters
-            updatePageWithParams(params);
-
-            // Generate text
-            await generateText(params);
-        });
-
-        // Update page elements with parameters
-        function updatePageWithParams(params) {
-            // Update breadcrumb
-            const domainElement = document.getElementById('selected-domain');
-            const topicElement = document.getElementById('selected-topic');
-            const pageTitleElement = document.getElementById('page-title');
-
-            if (domainElement) domainElement.textContent = params.domain;
-            if (topicElement) topicElement.textContent = params.topic;
-            if (pageTitleElement) pageTitleElement.textContent = params.topic;
-
-            // Update parameter badges
-            const levelElement = document.getElementById('selected-level');
-            const toneElement = document.getElementById('selected-tone');
-            const lengthElement = document.getElementById('selected-length');
-
-            if (levelElement) levelElement.textContent = capitalizeFirst(params.level || 'intermediate');
-            if (toneElement) toneElement.textContent = capitalizeFirst(params.tone || 'informative');
-            if (lengthElement) lengthElement.textContent = capitalizeFirst(params.length || 'medium');
-        }
-
-        // Generate text using API
-        async function generateText(params) {
-            const englishContainer = document.getElementById('english-text');
-            const frenchContainer = document.getElementById('french-text');
-
-            if (!englishContainer || !frenchContainer) {
-                console.error('❌ Conteneurs de texte non trouvés');
-                showError('Erreur d\'initialisation de la page');
-                return;
-            }
-
-            try {
-                console.log('🚀 Génération du texte avec paramètres:', params);
-
-                // Generate English text
-                const textResponse = await ApiClient.generateText(params);
-                console.log('✅ Texte généré:', textResponse);
-
-                const englishText = textResponse.data.englishText;
-
-                // Display English text
-                englishContainer.innerHTML = formatText(englishText, 'english');
-
-                // Generate French translation
-                console.log('🌐 Traduction en français...');
-                const translationResponse = await ApiClient.translateText(englishText);
-                console.log('✅ Traduction générée:', translationResponse);
-
-                const frenchText = translationResponse.data.translatedText;
-
-                // Display French text
-                frenchContainer.innerHTML = formatText(frenchText, 'french');
-
-                // Save to history
-                const textId = HistoryManager.saveText({
-                    parameters: params,
-                    englishText: englishText,
-                    frenchText: frenchText
-                });
-                console.log('💾 Texte sauvegardé avec ID:', textId);
-
-                // Store current text ID for actions
-                window.currentTextId = textId;
-
-            } catch (error) {
-                console.error('❌ Erreur lors de la génération:', error);
-                showError(`Erreur lors de la génération du texte: ${error.message}`);
-            }
-        }
-
-        // Format text with proper HTML structure
-        function formatText(text, language) {
-            // Split into paragraphs
-            const paragraphs = text.split('\n\n').filter(p => p.trim());
-
-            if (paragraphs.length === 0) {
-                return `<p class="text-gray-800 leading-relaxed">${text}</p>`;
-            }
-
-            // Check if first paragraph looks like a title
-            let title = '';
-            let content = paragraphs;
-
-            if (paragraphs[0].length < 100 && !paragraphs[0].includes('.') && paragraphs.length > 1) {
-                title = paragraphs[0];
-                content = paragraphs.slice(1);
-            }
-
-            let html = '';
-            if (title) {
-                html += `<h3 class="text-xl font-semibold text-gray-800 mb-4">${title}</h3>`;
-            }
-
-            html += content.map(paragraph => {
-                // Simple highlighting for common terms (you can expand this)
-                let processedParagraph = paragraph;
-
-                // Add highlighting for some common terms based on language
-                if (language === 'english') {
-                    const englishTerms = ['machine learning', 'deep learning', 'neural networks', 'natural language processing', 'autonomous vehicles', 'recommendation systems', 'ethical concerns'];
-                    englishTerms.forEach(term => {
-                        const regex = new RegExp(`\\b${term}\\b`, 'gi');
-                        processedParagraph = processedParagraph.replace(regex, `<span class="highlight-text" data-translation="${getTranslation(term)}">${term}</span>`);
-                    });
-                } else if (language === 'french') {
-                    const frenchTerms = ['apprentissage automatique', 'apprentissage profond', 'réseaux de neurones', 'traitement du langage naturel', 'véhicules autonomes', 'systèmes de recommandation', 'préoccupations éthiques'];
-                    frenchTerms.forEach(term => {
-                        const regex = new RegExp(`\\b${term}\\b`, 'gi');
-                        processedParagraph = processedParagraph.replace(regex, `<span class="highlight-text" data-original="${getOriginal(term)}">${term}</span>`);
-                    });
-                }
-
-                return `<p class="text-gray-800 leading-relaxed mb-4">${processedParagraph}</p>`;
-            }).join('');
-
-            return html;
-        }
-
-        // Get translation for English terms
-        function getTranslation(term) {
-            const translations = {
-                'machine learning': 'apprentissage automatique',
-                'deep learning': 'apprentissage profond',
-                'neural networks': 'réseaux de neurones',
-                'natural language processing': 'traitement du langage naturel',
-                'autonomous vehicles': 'véhicules autonomes',
-                'recommendation systems': 'systèmes de recommandation',
-                'ethical concerns': 'préoccupations éthiques'
-            };
-            return translations[term.toLowerCase()] || term;
-        }
-
-        // Get original for French terms
-        function getOriginal(term) {
-            const originals = {
-                'apprentissage automatique': 'machine learning',
-                'apprentissage profond': 'deep learning',
-                'réseaux de neurones': 'neural networks',
-                'traitement du langage naturel': 'natural language processing',
-                'véhicules autonomes': 'autonomous vehicles',
-                'systèmes de recommandation': 'recommendation systems',
-                'préoccupations éthiques': 'ethical concerns'
-            };
-            return originals[term.toLowerCase()] || term;
-        }
-
-        // Capitalize first letter
-        function capitalizeFirst(str) {
-            return str.charAt(0).toUpperCase() + str.slice(1);
-        }
-
-        // Show error message
-        function showError(message) {
-            const englishContainer = document.getElementById('english-text');
-            const frenchContainer = document.getElementById('french-text');
-
-            const errorHtml = `
-                <div class="bg-red-50 border border-red-200 rounded-lg p-4 mb-4">
-                    <div class="flex">
-                        <div class="flex-shrink-0">
-                            <i class="fas fa-exclamation-triangle text-red-400"></i>
-                        </div>
-                        <div class="ml-3">
-                            <h3 class="text-sm font-medium text-red-800">Erreur</h3>
-                            <div class="mt-2 text-sm text-red-700">${message}</div>
-                        </div>
-                    </div>
-                </div>
-            `;
-
-            if (englishContainer) englishContainer.innerHTML = errorHtml;
-            if (frenchContainer) frenchContainer.innerHTML = errorHtml;
-        }
-
-        // Setup event listeners for buttons
+        // Initialisation simplifiée - le ResultPageHandler de js/app.js s'occupe du reste
         document.addEventListener('DOMContentLoaded', function() {
-            // This will be called after the main DOMContentLoaded above
-            setTimeout(() => {
-                setupEventListeners();
-            }, 100);
+            console.log('🔄 Initialisation de la page result.html');
+            console.log('📍 URL actuelle:', window.location.href);
+            console.log('🔧 API Base URL:', API_BASE_URL);
+
+            // Le ResultPageHandler dans js/app.js va gérer l'initialisation automatiquement
+            console.log('✅ Délégation à ResultPageHandler dans js/app.js');
         });
-
-        function setupEventListeners() {
-            // Save button
-            const saveButton = document.getElementById('save-button');
-            if (saveButton) {
-                saveButton.addEventListener('click', () => {
-                    if (window.currentTextId) {
-                        // Show success feedback
-                        const originalContent = saveButton.innerHTML;
-                        saveButton.innerHTML = '<i class="fas fa-check mr-2"></i> Sauvegardé !';
-                        saveButton.classList.add('bg-green-500', 'hover:bg-green-600');
-                        saveButton.classList.remove('bg-white', 'hover:bg-primary-50', 'text-primary-600');
-                        saveButton.classList.add('text-white');
-
-                        setTimeout(() => {
-                            saveButton.innerHTML = originalContent;
-                            saveButton.classList.remove('bg-green-500', 'hover:bg-green-600', 'text-white');
-                            saveButton.classList.add('bg-white', 'hover:bg-primary-50', 'text-primary-600');
-                        }, 2000);
-                    }
-                });
-            }
-
-            // Share button
-            const shareButton = document.getElementById('share-button');
-            if (shareButton) {
-                shareButton.addEventListener('click', () => {
-                    const params = SessionManager.getParams();
-                    const shareData = {
-                        title: `Lexifever - ${params.topic}`,
-                        text: `Découvrez ce texte sur "${params.topic}" généré par Lexifever !`,
-                        url: window.location.href
-                    };
-
-                    if (navigator.share) {
-                        navigator.share(shareData).catch(console.error);
-                    } else {
-                        // Copy to clipboard fallback
-                        navigator.clipboard.writeText(window.location.href).then(() => {
-                            const originalContent = shareButton.innerHTML;
-                            shareButton.innerHTML = '<i class="fas fa-check mr-2"></i> Lien copié !';
-                            setTimeout(() => {
-                                shareButton.innerHTML = originalContent;
-                            }, 2000);
-                        });
-                    }
-                });
-            }
-
-            // Print button
-            const printButton = document.getElementById('print-button');
-            if (printButton) {
-                printButton.addEventListener('click', () => {
-                    window.print();
-                });
-            }
-
-            // Listen button
-            const listenButton = document.getElementById('listen-button');
-            if (listenButton) {
-                let isPlaying = false;
-                let utterance = null;
-
-                listenButton.addEventListener('click', () => {
-                    if (!isPlaying) {
-                        const englishText = document.querySelector('#english-text').textContent;
-                        utterance = new SpeechSynthesisUtterance(englishText);
-                        utterance.lang = 'en-US';
-                        utterance.rate = 0.9;
-
-                        utterance.onend = () => {
-                            isPlaying = false;
-                            listenButton.innerHTML = '<i class="fas fa-volume-up mr-2"></i> Écouter';
-                            listenButton.classList.remove('from-secondary-600', 'to-secondary-700');
-                            listenButton.classList.add('from-primary-600', 'to-primary-700');
-                        };
-
-                        window.speechSynthesis.speak(utterance);
-                        isPlaying = true;
-                        listenButton.innerHTML = '<i class="fas fa-pause mr-2"></i> Pause';
-                        listenButton.classList.remove('from-primary-600', 'to-primary-700');
-                        listenButton.classList.add('from-secondary-600', 'to-secondary-700');
-                    } else {
-                        window.speechSynthesis.cancel();
-                        isPlaying = false;
-                        listenButton.innerHTML = '<i class="fas fa-volume-up mr-2"></i> Écouter';
-                        listenButton.classList.remove('from-secondary-600', 'to-secondary-700');
-                        listenButton.classList.add('from-primary-600', 'to-primary-700');
-                    }
-                });
-            }
-        }
     </script>
 
 

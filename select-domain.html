@@ -4,6 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Lexifever - Choisissez un domaine</title>
+
+
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script>
@@ -279,205 +281,17 @@
             <div id="search-results" class="mt-2 text-sm text-gray-500"></div>
         </div>
 
+        <!-- Loading State -->
+        <div id="loading-domains" class="flex items-center justify-center py-12 animate-slide-up" style="animation-delay: 0.3s;">
+            <div class="text-center">
+                <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-primary-600 mx-auto mb-4"></div>
+                <p class="text-gray-600">Chargement des domaines...</p>
+            </div>
+        </div>
+
         <!-- Domains Grid -->
-        <div id="domains-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 animate-slide-up" style="animation-delay: 0.3s;">
-            <!-- Technology Domain -->
-            <a href="select-topic.html?domain=Technologie" class="group domain-item" data-domain="technologie intelligence artificielle développement web cybersécurité blockchain">
-                <div class="domain-card bg-white rounded-xl shadow-sm overflow-hidden hover:shadow-md transition-all border border-gray-100 h-full">
-                    <div class="aspect-w-16 aspect-h-9 bg-primary-100 relative overflow-hidden">
-                        <img src="https://images.unsplash.com/photo-1518770660439-4636190af475?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1470&q=80" alt="Technologie" class="w-full h-48 object-cover domain-image">
-                        <div class="absolute inset-0 bg-gradient-to-t from-black/70 to-transparent"></div>
-                        <div class="absolute bottom-0 left-0 p-4">
-                            <h3 class="text-xl font-bold text-white text-shadow-lg">Technologie</h3>
-                        </div>
-                    </div>
-                    <div class="p-5">
-                        <p class="text-gray-600">
-                            Intelligence artificielle, développement web, cybersécurité, blockchain et plus encore.
-                        </p>
-                        <div class="mt-4 flex items-center text-primary-600 group-hover:text-primary-700">
-                            <span class="font-medium">Explorer</span>
-                            <i class="fas fa-arrow-right ml-2 transition-transform group-hover:translate-x-2"></i>
-                        </div>
-                    </div>
-                </div>
-            </a>
-
-            <!-- Science Domain -->
-            <a href="select-topic.html?domain=Sciences" class="group domain-item" data-domain="sciences physique biologie astronomie chimie mathématiques découvertes scientifiques">
-                <div class="domain-card bg-white rounded-xl shadow-sm overflow-hidden hover:shadow-md transition-all border border-gray-100 h-full">
-                    <div class="aspect-w-16 aspect-h-9 bg-primary-100 relative overflow-hidden">
-                        <img src="https://images.unsplash.com/photo-1532094349884-543bc11b234d?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1470&q=80" alt="Sciences" class="w-full h-48 object-cover domain-image">
-                        <div class="absolute inset-0 bg-gradient-to-t from-black/70 to-transparent"></div>
-                        <div class="absolute bottom-0 left-0 p-4">
-                            <h3 class="text-xl font-bold text-white text-shadow-lg">Sciences</h3>
-                        </div>
-                    </div>
-                    <div class="p-5">
-                        <p class="text-gray-600">
-                            Physique, biologie, astronomie, chimie, mathématiques et découvertes scientifiques.
-                        </p>
-                        <div class="mt-4 flex items-center text-primary-600 group-hover:text-primary-700">
-                            <span class="font-medium">Explorer</span>
-                            <i class="fas fa-arrow-right ml-2 transition-transform group-hover:translate-x-2"></i>
-                        </div>
-                    </div>
-                </div>
-            </a>
-
-            <!-- Travel Domain -->
-            <a href="select-topic.html" class="group domain-item" data-domain="voyages destinations cultures conseils voyage aventures expériences monde">
-                <div class="domain-card bg-white rounded-xl shadow-sm overflow-hidden hover:shadow-md transition-all border border-gray-100 h-full">
-                    <div class="aspect-w-16 aspect-h-9 bg-primary-100 relative overflow-hidden">
-                        <img src="https://images.unsplash.com/photo-1488085061387-422e29b40080?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1631&q=80" alt="Voyages" class="w-full h-48 object-cover domain-image">
-                        <div class="absolute inset-0 bg-gradient-to-t from-black/70 to-transparent"></div>
-                        <div class="absolute bottom-0 left-0 p-4">
-                            <h3 class="text-xl font-bold text-white text-shadow-lg">Voyages</h3>
-                        </div>
-                    </div>
-                    <div class="p-5">
-                        <p class="text-gray-600">
-                            Destinations, cultures, conseils de voyage, aventures et expériences autour du monde.
-                        </p>
-                        <div class="mt-4 flex items-center text-primary-600 group-hover:text-primary-700">
-                            <span class="font-medium">Explorer</span>
-                            <i class="fas fa-arrow-right ml-2 transition-transform group-hover:translate-x-2"></i>
-                        </div>
-                    </div>
-                </div>
-            </a>
-
-            <!-- Business Domain -->
-            <a href="select-topic.html" class="group domain-item" data-domain="business entrepreneuriat marketing finance management stratégie économie">
-                <div class="domain-card bg-white rounded-xl shadow-sm overflow-hidden hover:shadow-md transition-all border border-gray-100 h-full">
-                    <div class="aspect-w-16 aspect-h-9 bg-primary-100 relative overflow-hidden">
-                        <img src="https://images.unsplash.com/photo-1664575599736-c5197c684128?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1470&q=80" alt="Business" class="w-full h-48 object-cover domain-image">
-                        <div class="absolute inset-0 bg-gradient-to-t from-black/70 to-transparent"></div>
-                        <div class="absolute bottom-0 left-0 p-4">
-                            <h3 class="text-xl font-bold text-white text-shadow-lg">Business</h3>
-                        </div>
-                    </div>
-                    <div class="p-5">
-                        <p class="text-gray-600">
-                            Entrepreneuriat, marketing, finance, management, stratégie et économie.
-                        </p>
-                        <div class="mt-4 flex items-center text-primary-600 group-hover:text-primary-700">
-                            <span class="font-medium">Explorer</span>
-                            <i class="fas fa-arrow-right ml-2 transition-transform group-hover:translate-x-2"></i>
-                        </div>
-                    </div>
-                </div>
-            </a>
-
-            <!-- Health Domain -->
-            <a href="select-topic.html" class="group domain-item" data-domain="santé bien-être nutrition fitness médecine santé mentale mode de vie sain">
-                <div class="domain-card bg-white rounded-xl shadow-sm overflow-hidden hover:shadow-md transition-all border border-gray-100 h-full">
-                    <div class="aspect-w-16 aspect-h-9 bg-primary-100 relative overflow-hidden">
-                        <img src="https://images.unsplash.com/photo-1505576399279-565b52d4ac71?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1470&q=80" alt="Santé" class="w-full h-48 object-cover domain-image">
-                        <div class="absolute inset-0 bg-gradient-to-t from-black/70 to-transparent"></div>
-                        <div class="absolute bottom-0 left-0 p-4">
-                            <h3 class="text-xl font-bold text-white text-shadow-lg">Santé</h3>
-                        </div>
-                    </div>
-                    <div class="p-5">
-                        <p class="text-gray-600">
-                            Bien-être, nutrition, fitness, médecine, santé mentale et mode de vie sain.
-                        </p>
-                        <div class="mt-4 flex items-center text-primary-600 group-hover:text-primary-700">
-                            <span class="font-medium">Explorer</span>
-                            <i class="fas fa-arrow-right ml-2 transition-transform group-hover:translate-x-2"></i>
-                        </div>
-                    </div>
-                </div>
-            </a>
-
-            <!-- Spirituality Domain -->
-            <a href="select-topic.html" class="group domain-item" data-domain="spiritualité philosophie méditation développement personnel religions pratiques spirituelles">
-                <div class="domain-card bg-white rounded-xl shadow-sm overflow-hidden hover:shadow-md transition-all border border-gray-100 h-full">
-                    <div class="aspect-w-16 aspect-h-9 bg-primary-100 relative overflow-hidden">
-                        <img src="https://images.unsplash.com/photo-1507692049790-de58290a4334?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1470&q=80" alt="Spiritualité" class="w-full h-48 object-cover domain-image">
-                        <div class="absolute inset-0 bg-gradient-to-t from-black/70 to-transparent"></div>
-                        <div class="absolute bottom-0 left-0 p-4">
-                            <h3 class="text-xl font-bold text-white text-shadow-lg">Spiritualité</h3>
-                        </div>
-                    </div>
-                    <div class="p-5">
-                        <p class="text-gray-600">
-                            Philosophie, méditation, développement personnel, religions et pratiques spirituelles.
-                        </p>
-                        <div class="mt-4 flex items-center text-primary-600 group-hover:text-primary-700">
-                            <span class="font-medium">Explorer</span>
-                            <i class="fas fa-arrow-right ml-2 transition-transform group-hover:translate-x-2"></i>
-                        </div>
-                    </div>
-                </div>
-            </a>
-
-            <!-- Arts Domain -->
-            <a href="select-topic.html" class="group domain-item" data-domain="arts peinture musique littérature cinéma théâtre expressions artistiques">
-                <div class="domain-card bg-white rounded-xl shadow-sm overflow-hidden hover:shadow-md transition-all border border-gray-100 h-full">
-                    <div class="aspect-w-16 aspect-h-9 bg-primary-100 relative overflow-hidden">
-                        <img src="https://images.unsplash.com/photo-1513364776144-60967b0f800f?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1471&q=80" alt="Arts" class="w-full h-48 object-cover domain-image">
-                        <div class="absolute inset-0 bg-gradient-to-t from-black/70 to-transparent"></div>
-                        <div class="absolute bottom-0 left-0 p-4">
-                            <h3 class="text-xl font-bold text-white text-shadow-lg">Arts</h3>
-                        </div>
-                    </div>
-                    <div class="p-5">
-                        <p class="text-gray-600">
-                            Peinture, musique, littérature, cinéma, théâtre et expressions artistiques.
-                        </p>
-                        <div class="mt-4 flex items-center text-primary-600 group-hover:text-primary-700">
-                            <span class="font-medium">Explorer</span>
-                            <i class="fas fa-arrow-right ml-2 transition-transform group-hover:translate-x-2"></i>
-                        </div>
-                    </div>
-                </div>
-            </a>
-
-            <!-- Environment Domain -->
-            <a href="select-topic.html" class="group domain-item" data-domain="environnement écologie développement durable changement climatique conservation énergies renouvelables">
-                <div class="domain-card bg-white rounded-xl shadow-sm overflow-hidden hover:shadow-md transition-all border border-gray-100 h-full">
-                    <div class="aspect-w-16 aspect-h-9 bg-primary-100 relative overflow-hidden">
-                        <img src="https://images.unsplash.com/photo-1623645481161-0d8160281cbf?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1470&q=80" alt="Environnement" class="w-full h-48 object-cover domain-image">
-                        <div class="absolute inset-0 bg-gradient-to-t from-black/70 to-transparent"></div>
-                        <div class="absolute bottom-0 left-0 p-4">
-                            <h3 class="text-xl font-bold text-white text-shadow-lg">Environnement</h3>
-                        </div>
-                    </div>
-                    <div class="p-5">
-                        <p class="text-gray-600">
-                            Écologie, développement durable, changement climatique, conservation et énergies renouvelables.
-                        </p>
-                        <div class="mt-4 flex items-center text-primary-600 group-hover:text-primary-700">
-                            <span class="font-medium">Explorer</span>
-                            <i class="fas fa-arrow-right ml-2 transition-transform group-hover:translate-x-2"></i>
-                        </div>
-                    </div>
-                </div>
-            </a>
-
-            <!-- Sports Domain -->
-            <a href="select-topic.html" class="group domain-item" data-domain="sports football basketball tennis athlétisme compétitions événements sportifs">
-                <div class="domain-card bg-white rounded-xl shadow-sm overflow-hidden hover:shadow-md transition-all border border-gray-100 h-full">
-                    <div class="aspect-w-16 aspect-h-9 bg-primary-100 relative overflow-hidden">
-                        <img src="https://images.unsplash.com/photo-1461896836934-ffe607ba8211?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1470&q=80" alt="Sports" class="w-full h-48 object-cover domain-image">
-                        <div class="absolute inset-0 bg-gradient-to-t from-black/70 to-transparent"></div>
-                        <div class="absolute bottom-0 left-0 p-4">
-                            <h3 class="text-xl font-bold text-white text-shadow-lg">Sports</h3>
-                        </div>
-                    </div>
-                    <div class="p-5">
-                        <p class="text-gray-600">
-                            Football, basketball, tennis, athlétisme, compétitions et événements sportifs.
-                        </p>
-                        <div class="mt-4 flex items-center text-primary-600 group-hover:text-primary-700">
-                            <span class="font-medium">Explorer</span>
-                            <i class="fas fa-arrow-right ml-2 transition-transform group-hover:translate-x-2"></i>
-                        </div>
-                    </div>
-                </div>
-            </a>
+        <div id="domains-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 animate-slide-up hidden" style="animation-delay: 0.3s;">
+            <!-- Les domaines seront chargés dynamiquement ici -->
         </div>
 
         <!-- No Results Message -->
@@ -612,28 +426,285 @@
     </footer>
 
     <script>
+        // =========================================
+        // CONFIGURATION ET UTILITAIRES
+        // =========================================
+
+        // Configuration de l'API (même logique que js/app.js)
+        let API_BASE_URL = window.location.origin + '/api';
+
+        // Fonction pour déterminer l'URL de l'API
+        function getApiBaseUrl() {
+            // Override si défini globalement (priorité haute)
+            if (window.API_BASE_URL && window.API_BASE_URL !== API_BASE_URL) {
+                console.log('🔧 Utilisation de window.API_BASE_URL:', window.API_BASE_URL);
+                return window.API_BASE_URL;
+            }
+
+            // Détection automatique du chemin correct pour le développement local
+            if (window.location.pathname.includes('/lexifever/')) {
+                const detectedUrl = window.location.origin + '/lexifever/api';
+                console.log('🔍 Chemin /lexifever/ détecté, URL API:', detectedUrl);
+                return detectedUrl;
+            }
+
+            // Par défaut
+            const defaultUrl = window.location.origin + '/api';
+            console.log('📍 URL API par défaut:', defaultUrl);
+            return defaultUrl;
+        }
+
+        // Initialisation de l'API_BASE_URL
+        API_BASE_URL = getApiBaseUrl();
+        console.log('🚀 API_BASE_URL initialisée dans select-domain.html:', API_BASE_URL);
+
+        // Images par défaut pour les domaines
+        const domainImages = {
+            'Technologie': 'https://images.unsplash.com/photo-1518770660439-4636190af475?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1470&q=80',
+            'Sciences': 'https://images.unsplash.com/photo-1532094349884-543bc11b234d?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1470&q=80',
+            'Business': 'https://images.unsplash.com/photo-1664575599736-c5197c684128?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1470&q=80',
+            'Santé': 'https://images.unsplash.com/photo-1505576399279-565b52d4ac71?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1470&q=80',
+            'Arts': 'https://images.unsplash.com/photo-1513364776144-60967b0f800f?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1471&q=80',
+            'Voyage': 'https://images.unsplash.com/photo-1488085061387-422e29b40080?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1631&q=80',
+            'Sport': 'https://images.unsplash.com/photo-1461896836934-ffe607ba8211?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1470&q=80',
+            'Histoire': 'https://images.unsplash.com/photo-1481627834876-b7833e8f5570?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1470&q=80',
+            'Cuisine': 'https://images.unsplash.com/photo-1556909114-f6e7ad7d3136?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1470&q=80'
+        };
+
+        // =========================================
+        // CHARGEMENT DES DOMAINES
+        // =========================================
+
+        // Charger les domaines depuis l'API
+        async function loadDomains() {
+            const loadingElement = document.getElementById('loading-domains');
+            const domainsGrid = document.getElementById('domains-grid');
+
+            try {
+                console.log('🔄 Chargement des domaines depuis l\'API...');
+
+                // Faire l'appel API
+                const response = await fetch(API_BASE_URL.replace('/api', '') + '/api/domains');
+                const data = await response.json();
+
+                console.log('✅ Domaines reçus:', data);
+
+                if (data.success && data.data) {
+                    // Masquer le loading
+                    loadingElement.classList.add('hidden');
+
+                    // Générer les cartes de domaine
+                    const domainsHtml = data.data.map(domain => generateDomainCard(domain)).join('');
+
+                    // Afficher les domaines
+                    domainsGrid.innerHTML = domainsHtml;
+                    domainsGrid.classList.remove('hidden');
+
+                    // Initialiser la recherche après le chargement
+                    initializeSearch();
+
+                    console.log(`✅ ${data.data.length} domaines chargés avec succès`);
+                } else {
+                    throw new Error('Format de réponse invalide');
+                }
+
+            } catch (error) {
+                console.error('❌ Erreur lors du chargement des domaines:', error);
+
+                // Afficher un message d'erreur
+                loadingElement.innerHTML = `
+                    <div class="text-center">
+                        <div class="text-red-500 mb-4">
+                            <i class="fas fa-exclamation-triangle text-4xl"></i>
+                        </div>
+                        <h3 class="text-lg font-semibold text-gray-700 mb-2">Erreur de chargement</h3>
+                        <p class="text-gray-500 mb-4">Impossible de charger les domaines.</p>
+                        <button onclick="loadDomains()" class="bg-primary-600 text-white px-4 py-2 rounded-lg hover:bg-primary-700 transition-colors">
+                            <i class="fas fa-redo mr-2"></i>Réessayer
+                        </button>
+                    </div>
+                `;
+            }
+        }
+
+        // Générer le HTML d'une carte de domaine
+        function generateDomainCard(domain) {
+            const imageUrl = domain.image_url || domainImages[domain.name] || 'https://images.unsplash.com/photo-1557804506-669a67965ba0?ixlib=rb-4.0.3&auto=format&fit=crop&w=1470&q=80';
+            const topicsCount = domain.topics_count || 0;
+
+            return `
+                <a href="select-topic.html?domain=${encodeURIComponent(domain.name)}" class="group domain-item" data-domain="${domain.name.toLowerCase()} ${domain.description.toLowerCase()}">
+                    <div class="domain-card bg-white rounded-xl shadow-sm overflow-hidden hover:shadow-md transition-all border border-gray-100 h-full">
+                        <div class="aspect-w-16 aspect-h-9 bg-primary-100 relative overflow-hidden">
+                            <img src="${imageUrl}" alt="${domain.name}" class="w-full h-48 object-cover domain-image" onerror="this.src='https://images.unsplash.com/photo-1557804506-669a67965ba0?ixlib=rb-4.0.3&auto=format&fit=crop&w=1470&q=80'">
+                            <div class="absolute inset-0 bg-gradient-to-t from-black/70 to-transparent"></div>
+                            <div class="absolute top-4 right-4 bg-primary-600 text-white px-2 py-1 rounded-full text-xs font-medium">
+                                ${topicsCount} sujet${topicsCount > 1 ? 's' : ''}
+                            </div>
+                            <div class="absolute bottom-0 left-0 p-4">
+                                <h3 class="text-xl font-bold text-white text-shadow-lg">${domain.name}</h3>
+                            </div>
+                        </div>
+                        <div class="p-5">
+                            <p class="text-gray-600 leading-relaxed">
+                                ${domain.description}
+                            </p>
+                            <div class="mt-4 flex items-center text-primary-600 group-hover:text-primary-700">
+                                <span class="font-medium">Explorer</span>
+                                <i class="fas fa-arrow-right ml-2 transition-transform group-hover:translate-x-2"></i>
+                            </div>
+                        </div>
+                    </div>
+                </a>
+            `;
+        }
+
+        // =========================================
+        // FONCTIONNALITÉS DE RECHERCHE
+        // =========================================
+
+        // Initialiser la recherche
+        function initializeSearch() {
+            const searchInput = document.getElementById('domain-search');
+            const searchClear = document.getElementById('search-clear');
+            const searchResults = document.getElementById('search-results');
+            const domainsGrid = document.getElementById('domains-grid');
+            const noResults = document.getElementById('no-results');
+            const domainItems = document.querySelectorAll('.domain-item');
+
+            // Stocker les textes originaux
+            domainItems.forEach(item => {
+                const description = item.querySelector('p');
+                if (description) {
+                    description.setAttribute('data-original-text', description.textContent);
+                }
+            });
+
+            // Fonction de filtrage
+            function filterDomains() {
+                const searchTerm = searchInput.value.toLowerCase().trim();
+                let matchCount = 0;
+
+                // Afficher/masquer le bouton clear
+                if (searchTerm.length > 0) {
+                    searchClear.classList.remove('hidden');
+                } else {
+                    searchClear.classList.add('hidden');
+                }
+
+                // Filtrer les domaines
+                domainItems.forEach(item => {
+                    const domainText = item.getAttribute('data-domain').toLowerCase();
+                    const domainTitle = item.querySelector('h3').textContent.toLowerCase();
+                    const domainDescription = item.querySelector('p').textContent.toLowerCase();
+
+                    if (searchTerm === '' ||
+                        domainText.includes(searchTerm) ||
+                        domainTitle.includes(searchTerm) ||
+                        domainDescription.includes(searchTerm)) {
+                        item.classList.remove('hidden');
+                        matchCount++;
+
+                        // Mettre en surbrillance le texte correspondant
+                        if (searchTerm !== '') {
+                            highlightText(item, searchTerm);
+                        } else {
+                            resetHighlight(item);
+                        }
+                    } else {
+                        item.classList.add('hidden');
+                        resetHighlight(item);
+                    }
+                });
+
+                // Mettre à jour le message de résultats
+                if (searchTerm !== '') {
+                    searchResults.textContent = `${matchCount} domaine(s) trouvé(s) pour "${searchTerm}"`;
+                    searchResults.classList.remove('hidden');
+                } else {
+                    searchResults.classList.add('hidden');
+                }
+
+                // Afficher/masquer le message "aucun résultat"
+                if (matchCount === 0 && searchTerm !== '') {
+                    noResults.classList.remove('hidden');
+                    domainsGrid.classList.add('hidden');
+                } else {
+                    noResults.classList.add('hidden');
+                    domainsGrid.classList.remove('hidden');
+                }
+            }
+
+            // Fonction pour mettre en surbrillance
+            function highlightText(item, searchTerm) {
+                const description = item.querySelector('p');
+                if (description) {
+                    const originalText = description.getAttribute('data-original-text');
+                    if (originalText) {
+                        const regex = new RegExp(`(${searchTerm})`, 'gi');
+                        description.innerHTML = originalText.replace(regex, '<span class="highlight">$1</span>');
+                    }
+                }
+            }
+
+            // Fonction pour réinitialiser la surbrillance
+            function resetHighlight(item) {
+                const description = item.querySelector('p');
+                if (description) {
+                    const originalText = description.getAttribute('data-original-text');
+                    if (originalText) {
+                        description.textContent = originalText;
+                    }
+                }
+            }
+
+            // Événements
+            searchInput.addEventListener('input', filterDomains);
+            searchClear.addEventListener('click', () => {
+                searchInput.value = '';
+                filterDomains();
+                searchInput.focus();
+            });
+        }
+
+        // =========================================
+        // INITIALISATION
+        // =========================================
+
+        // Charger les domaines au chargement de la page
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('🚀 Initialisation de select-domain.html');
+            loadDomains();
+        });
+
+        // =========================================
+        // AUTRES FONCTIONNALITÉS
+        // =========================================
+
         // Mobile menu toggle with animation
         const mobileMenuButton = document.getElementById('mobile-menu-button');
         const mobileMenu = document.getElementById('mobile-menu');
         const menuIcon = document.getElementById('menu-icon');
 
-        mobileMenuButton.addEventListener('click', () => {
-            mobileMenu.classList.toggle('hidden');
-            
-            if (mobileMenu.classList.contains('hidden')) {
-                menuIcon.classList.remove('fa-times');
-                menuIcon.classList.add('fa-bars');
-                menuIcon.style.transform = 'rotate(0deg)';
-            } else {
-                menuIcon.classList.remove('fa-bars');
-                menuIcon.classList.add('fa-times');
-                menuIcon.style.transform = 'rotate(180deg)';
-            }
-        });
+        if (mobileMenuButton) {
+            mobileMenuButton.addEventListener('click', () => {
+                mobileMenu.classList.toggle('hidden');
+
+                if (mobileMenu.classList.contains('hidden')) {
+                    menuIcon.classList.remove('fa-times');
+                    menuIcon.classList.add('fa-bars');
+                    menuIcon.style.transform = 'rotate(0deg)';
+                } else {
+                    menuIcon.classList.remove('fa-bars');
+                    menuIcon.classList.add('fa-times');
+                    menuIcon.style.transform = 'rotate(180deg)';
+                }
+            });
+        }
 
         // Navbar background change on scroll
         const navbar = document.getElementById('navbar');
-        
+
         window.addEventListener('scroll', () => {
             if (window.scrollY > 50) {
                 navbar.classList.add('bg-white/95');
@@ -642,100 +713,6 @@
                 navbar.classList.add('bg-white/80');
                 navbar.classList.remove('bg-white/95');
             }
-        });
-
-        // Domain search functionality
-        const searchInput = document.getElementById('domain-search');
-        const searchClear = document.getElementById('search-clear');
-        const searchResults = document.getElementById('search-results');
-        const domainsGrid = document.getElementById('domains-grid');
-        const noResults = document.getElementById('no-results');
-        const domainItems = document.querySelectorAll('.domain-item');
-
-        // Function to filter domains based on search input
-        function filterDomains() {
-            const searchTerm = searchInput.value.toLowerCase().trim();
-            let matchCount = 0;
-            
-            // Show/hide clear button
-            if (searchTerm.length > 0) {
-                searchClear.classList.remove('hidden');
-            } else {
-                searchClear.classList.add('hidden');
-            }
-            
-            // Filter domains
-            domainItems.forEach(item => {
-                const domainText = item.getAttribute('data-domain').toLowerCase();
-                const domainTitle = item.querySelector('h3').textContent.toLowerCase();
-                const domainDescription = item.querySelector('p').textContent.toLowerCase();
-                
-                if (searchTerm === '' || 
-                    domainText.includes(searchTerm) || 
-                    domainTitle.includes(searchTerm) || 
-                    domainDescription.includes(searchTerm)) {
-                    item.classList.remove('hidden');
-                    matchCount++;
-                    
-                    // Highlight matching text if there's a search term
-                    if (searchTerm !== '') {
-                        const description = item.querySelector('p');
-                        const originalText = description.textContent;
-                        
-                        // Create a regex to find the search term with word boundaries
-                        const regex = new RegExp(`(${searchTerm})`, 'gi');
-                        
-                        // Replace matching text with highlighted version
-                        description.innerHTML = originalText.replace(regex, '<span class="highlight">$1</span>');
-                    }
-                } else {
-                    item.classList.add('hidden');
-                }
-            });
-            
-            // Update search results message
-            if (searchTerm !== '') {
-                searchResults.textContent = `${matchCount} domaine(s) trouvé(s) pour "${searchTerm}"`;
-                searchResults.classList.remove('hidden');
-            } else {
-                searchResults.classList.add('hidden');
-            }
-            
-            // Show/hide no results message
-            if (matchCount === 0) {
-                noResults.classList.remove('hidden');
-                domainsGrid.classList.add('hidden');
-            } else {
-                noResults.classList.add('hidden');
-                domainsGrid.classList.remove('hidden');
-            }
-        }
-
-        // Search input event listeners
-        searchInput.addEventListener('input', filterDomains);
-        
-        // Clear search button
-        searchClear.addEventListener('click', () => {
-            searchInput.value = '';
-            filterDomains();
-            searchInput.focus();
-        });
-        
-        // Reset descriptions when clearing search
-        function resetDescriptions() {
-            domainItems.forEach(item => {
-                const description = item.querySelector('p');
-                const originalText = description.getAttribute('data-original-text');
-                if (originalText) {
-                    description.textContent = originalText;
-                }
-            });
-        }
-        
-        // Store original description texts
-        domainItems.forEach(item => {
-            const description = item.querySelector('p');
-            description.setAttribute('data-original-text', description.textContent);
         });
 
         // Intersection Observer for animations

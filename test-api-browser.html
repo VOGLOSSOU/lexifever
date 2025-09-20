@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test API Browser</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; }
+        .test-section { margin: 20px 0; padding: 15px; border: 1px solid #ccc; border-radius: 5px; }
+        .success { background-color: #d4edda; border-color: #c3e6cb; }
+        .error { background-color: #f8d7da; border-color: #f5c6cb; }
+        .info { background-color: #d1ecf1; border-color: #bee5eb; }
+        button { padding: 10px 15px; margin: 5px; cursor: pointer; }
+        pre { background: #f4f4f4; padding: 10px; border-radius: 3px; overflow-x: auto; }
+    </style>
+</head>
+<body>
+    <h1>🧪 Test API Browser - Lexifever</h1>
+
+    <div class="test-section info">
+        <h2>🔧 Configuration</h2>
+        <p><strong>API Base URL:</strong> <span id="api-url"></span></p>
+        <p><strong>Origin:</strong> <span id="origin"></span></p>
+    </div>
+
+    <div class="test-section">
+        <h2>🏥 Test API Health</h2>
+        <button onclick="testHealth()">Tester /api/health</button>
+        <div id="health-result"></div>
+    </div>
+
+    <div class="test-section">
+        <h2>📂 Test API Domains</h2>
+        <button onclick="testDomains()">Tester /api/domains</button>
+        <div id="domains-result"></div>
+    </div>
+
+    <div class="test-section">
+        <h2>📝 Test API Topics</h2>
+        <label>Domain ID: <input type="number" id="domain-id" value="1"></label>
+        <button onclick="testTopics()">Tester /api/domains/{id}/topics</button>
+        <div id="topics-result"></div>
+    </div>
+
+    <div class="test-section">
+        <h2>🔍 Test URL Parameters</h2>
+        <button onclick="testURLParams()">Tester les paramètres URL</button>
+        <div id="url-params-result"></div>
+    </div>
+
+    <script>
+        // Configuration
+        const API_BASE_URL = window.location.origin + '/lexifever/api';
+        document.getElementById('api-url').textContent = API_BASE_URL;
+        document.getElementById('origin').textContent = window.location.origin;
+
+        // Fonction utilitaire pour afficher les résultats
+        function showResult(elementId, result, isSuccess = null) {
+            const element = document.getElementById(elementId);
+            let className = 'info';
+
+            if (isSuccess === true) className = 'success';
+            else if (isSuccess === false) className = 'error';
+
+            element.className = `test-section ${className}`;
+            element.innerHTML = result;
+        }
+
+        // Test de l'API health
+        async function testHealth() {
+            try {
+                console.log('🩺 Testing health endpoint...');
+                const response = await fetch(API_BASE_URL + '/health');
+
+                console.log('📊 Health response status:', response.status);
+                console.log('📄 Health response headers:', Object.fromEntries(response.headers.entries()));
+
+                const data = await response.json();
+                console.log('📋 Health response data:', data);
+
+                const result = `
+                    <h3>Résultat du test /api/health</h3>
+                    <p><strong>Status HTTP:</strong> ${response.status}</p>
+                    <p><strong>Success:</strong> ${data.success ? '✅' : '❌'}</p>
+                    <p><strong>Message:</strong> ${data.message || 'N/A'}</p>
+                    <p><strong>Version:</strong> ${data.version || 'N/A'}</p>
+                    <pre>${JSON.stringify(data, null, 2)}</pre>
+                `;
+
+                showResult('health-result', result, response.ok && data.success);
+
+            } catch (error) {
+                console.error('❌ Health test error:', error);
+                const result = `
+                    <h3>Erreur lors du test /api/health</h3>
+                    <p><strong>Erreur:</strong> ${error.message}</p>
+                    <pre>${error.stack}</pre>
+                `;
+                showResult('health-result', result, false);
+            }
+        }
+
+        // Test de l'API domains
+        async function testDomains() {
+            try {
+                console.log('📂 Testing domains endpoint...');
+                const response = await fetch(API_BASE_URL + '/domains');
+
+                console.log('📊 Domains response status:', response.status);
+                const data = await response.json();
+                console.log('📋 Domains response data:', data);
+
+                const result = `
+                    <h3>Résultat du test /api/domains</h3>
+                    <p><strong>Status HTTP:</strong> ${response.status}</p>
+                    <p><strong>Success:</strong> ${data.success ? '✅' : '❌'}</p>
+                    <p><strong>Nombre de domaines:</strong> ${data.data ? data.data.length : 0}</p>
+                    <div style="max-height: 300px; overflow-y: auto;">
+                        <pre>${JSON.stringify(data, null, 2)}</pre>
+                    </div>
+                `;
+
+                showResult('domains-result', result, response.ok && data.success);
+
+            } catch (error) {
+                console.error('❌ Domains test error:', error);
+                const result = `
+                    <h3>Erreur lors du test /api/domains</h3>
+                    <p><strong>Erreur:</strong> ${error.message}</p>
+                    <pre>${error.stack}</pre>
+                `;
+                showResult('domains-result', result, false);
+            }
+        }
+
+        // Test de l'API topics
+        async function testTopics() {
+            try {
+                const domainId = document.getElementById('domain-id').value;
+                console.log('📝 Testing topics endpoint for domain:', domainId);
+
+                const response = await fetch(API_BASE_URL + `/domains/${domainId}/topics`);
+                console.log('📊 Topics response status:', response.status);
+
+                const data = await response.json();
+                console.log('📋 Topics response data:', data);
+
+                const result = `
+                    <h3>Résultat du test /api/domains/${domainId}/topics</h3>
+                    <p><strong>Status HTTP:</strong> ${response.status}</p>
+                    <p><strong>Success:</strong> ${data.success ? '✅' : '❌'}</p>
+                    <p><strong>Nombre de sujets:</strong> ${data.data ? data.data.length : 0}</p>
+                    <div style="max-height: 300px; overflow-y: auto;">
+                        <pre>${JSON.stringify(data, null, 2)}</pre>
+                    </div>
+                `;
+
+                showResult('topics-result', result, response.ok && data.success);
+
+            } catch (error) {
+                console.error('❌ Topics test error:', error);
+                const result = `
+                    <h3>Erreur lors du test /api/domains/{id}/topics</h3>
+                    <p><strong>Erreur:</strong> ${error.message}</p>
+                    <pre>${error.stack}</pre>
+                `;
+                showResult('topics-result', result, false);
+            }
+        }
+
+        // Test des paramètres URL
+        function testURLParams() {
+            const url = new URL(window.location.href);
+            const params = new URLSearchParams(url.search);
+
+            const result = `
+                <h3>Test des paramètres URL</h3>
+                <p><strong>URL complète:</strong> ${window.location.href}</p>
+                <p><strong>Origin:</strong> ${window.location.origin}</p>
+                <p><strong>Pathname:</strong> ${window.location.pathname}</p>
+                <p><strong>Search:</strong> ${window.location.search}</p>
+                <h4>Paramètres extraits:</h4>
+                <ul>
+                    ${Array.from(params.entries()).map(([key, value]) =>
+                        `<li><strong>${key}:</strong> "${value}" (décodé: "${decodeURIComponent(value)}")</li>`
+                    ).join('')}
+                </ul>
+                <h4>Test d'encodage/décodage:</h4>
+                <p><strong>Technologie encodé:</strong> "${encodeURIComponent('Technologie')}"</p>
+                <p><strong>Intelligence Artificielle encodé:</strong> "${encodeURIComponent('Intelligence Artificielle')}"</p>
+            `;
+
+            showResult('url-params-result', result, true);
+        }
+
+        // Test automatique au chargement
+        window.addEventListener('load', function() {
+            console.log('🚀 Test API Browser loaded');
+            console.log('🔧 API Base URL:', API_BASE_URL);
+        });
+    </script>
+</body>
+</html>

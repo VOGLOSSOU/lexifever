@@ -83,6 +83,18 @@ class ApiController {
                 $data['session_id'] = $this->generateSessionId();
             }
 
+            // Convertir le niveau numérique en chaîne si nécessaire
+            if (isset($data['level']) && is_numeric($data['level'])) {
+                $levelMap = [
+                    1 => 'beginner',
+                    2 => 'beginner',
+                    3 => 'intermediate',
+                    4 => 'advanced',
+                    5 => 'advanced'
+                ];
+                $data['level'] = $levelMap[(int)$data['level']] ?? 'intermediate';
+            }
+
             // Mesurer le temps de réponse
             $startTime = microtime(true);
 

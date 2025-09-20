@@ -500,14 +500,43 @@ const TopicPageHandler = {
 // Gestionnaire pour la page de personnalisation
 const CustomizePageHandler = {
     init() {
-        // Récupérer les paramètres de session
-        const params = SessionManager.getParams();
+        console.log('🎯 CustomizePageHandler.init() appelé');
 
+        // Récupérer les paramètres depuis l'URL d'abord
+        const urlParams = new URLSearchParams(window.location.search);
+        const domainFromUrl = urlParams.get('domain');
+        const topicFromUrl = urlParams.get('topic');
+
+        console.log('🔍 Paramètres URL:', { domainFromUrl, topicFromUrl });
+
+        // Récupérer les paramètres de session
+        let params = SessionManager.getParams();
+        console.log('📋 Paramètres session:', params);
+
+        // Si les paramètres URL sont présents, les utiliser et les sauvegarder
+        if (domainFromUrl && topicFromUrl) {
+            params = {
+                ...params,
+                domain: domainFromUrl,
+                topic: topicFromUrl
+            };
+            SessionManager.saveParams(params);
+            console.log('💾 Paramètres sauvegardés depuis URL:', params);
+        }
+
+        // Vérifier que nous avons les paramètres nécessaires
         if (!params.domain || !params.topic) {
-            // Rediriger vers la sélection de domaine si les paramètres sont manquants
-            window.location.href = 'select-domain.html';
+            console.error('❌ Paramètres manquants:', { domain: params.domain, topic: params.topic });
+            console.error('🔍 URL complète:', window.location.href);
+            console.error('🔍 Search string:', window.location.search);
+
+            // Afficher un message d'erreur au lieu de rediriger automatiquement
+            this.showError('Paramètres manquants dans l\'URL. Veuillez revenir à la sélection des sujets.');
+            console.log('⚠️ Erreur affichée, mais pas de redirection automatique');
             return;
         }
+
+        console.log('✅ Paramètres valides, mise à jour de l\'interface...');
 
         // Mettre à jour l'interface avec les paramètres
         this.updateBreadcrumb(params);
@@ -520,6 +549,8 @@ const CustomizePageHandler = {
 
         // Pré-remplir avec les paramètres existants
         this.loadSavedParams();
+
+        console.log('🎉 Page de personnalisation initialisée avec succès');
     },
 
     updateBreadcrumb(params) {
@@ -571,22 +602,48 @@ const CustomizePageHandler = {
 
     async handleSubmit(event) {
         event.preventDefault();
-        
+
         const formData = new FormData(event.target);
         const params = SessionManager.getParams();
-        
+
         // Récupérer tous les paramètres du formulaire
         params.level = formData.get('level');
         params.tone = formData.get('tone');
         params.length = formData.get('length');
         params.includeExamples = formData.has('include-examples');
         params.includeQuestions = formData.has('include-questions');
-        
+
         // Sauvegarder les paramètres
         SessionManager.saveParams(params);
-        
+
         // Rediriger vers la page de résultat
         window.location.href = 'result.html';
+    },
+
+    showError(message) {
+        // Afficher un message d'erreur dans la page au lieu de rediriger
+        const mainContent = document.querySelector('main');
+        if (mainContent) {
+            mainContent.innerHTML = `
+                <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-28 pb-12">
+                    <div class="text-center">
+                        <div class="text-red-500 mb-4">
+                            <i class="fas fa-exclamation-triangle text-4xl"></i>
+                        </div>
+                        <h1 class="text-2xl font-bold text-gray-900 mb-4">Erreur de chargement</h1>
+                        <p class="text-gray-600 mb-6">${message}</p>
+                        <div class="space-x-4">
+                            <a href="select-domain.html" class="bg-primary-600 text-white px-6 py-3 rounded-lg hover:bg-primary-700 transition-colors">
+                                <i class="fas fa-arrow-left mr-2"></i>Retour aux domaines
+                            </a>
+                            <button onclick="window.location.reload()" class="bg-gray-600 text-white px-6 py-3 rounded-lg hover:bg-gray-700 transition-colors">
+                                <i class="fas fa-refresh mr-2"></i>Réessayer
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
     }
 };
 
@@ -633,193 +690,390 @@ const HistoryManager = {
 // Gestionnaire pour la page de résultat
 const ResultPageHandler = {
     async init() {
-        const params = SessionManager.getParams();
+        console.log('📊 ResultPageHandler.init() appelé');
 
-        // Vérifier que nous avons tous les paramètres nécessaires
-        if (!params.domain || !params.topic || !params.level) {
+        // Récupérer les paramètres depuis l'URL d'abord
+        const urlParams = new URLSearchParams(window.location.search);
+        const domainFromUrl = urlParams.get('domain');
+        const topicFromUrl = urlParams.get('topic');
+
+        console.log('🔍 Paramètres URL:', { domainFromUrl, topicFromUrl });
+
+        // Récupérer les paramètres de session
+        let params = SessionManager.getParams();
+        console.log('📋 Paramètres session:', params);
+
+        // Si les paramètres URL sont présents, récupérer TOUS les paramètres de l'URL
+        if (domainFromUrl && topicFromUrl) {
+            // Récupérer tous les paramètres de l'URL
+            const allUrlParams = {};
+            for (let [key, value] of urlParams.entries()) {
+                // Convertir les noms de paramètres avec tirets vers camelCase pour l'API
+                let apiKey = key;
+                if (key === 'include-examples') apiKey = 'includeExamples';
+                if (key === 'include-definitions') apiKey = 'includeExamples'; // Map to includeExamples
+                if (key === 'include-history') apiKey = 'includeQuestions'; // Map to includeQuestions
+
+                // Convertir les valeurs spéciales
+                if (value === 'on') value = true;
+                if (value === 'off' || value === 'false') value = false;
+                if (value === 'true') value = true;
+
+                // Convertir le niveau numérique en chaîne
+                if (apiKey === 'level' && !isNaN(value)) {
+                    const levelMap = {
+                        '1': 'beginner',
+                        '2': 'beginner',
+                        '3': 'intermediate',
+                        '4': 'advanced',
+                        '5': 'advanced'
+                    };
+                    value = levelMap[value] || 'intermediate';
+                }
+
+                allUrlParams[apiKey] = value;
+            }
+
+            params = {
+                ...params,
+                ...allUrlParams
+            };
+
+            SessionManager.saveParams(params);
+            console.log('💾 Tous les paramètres sauvegardés depuis URL:', params);
+        }
+
+        // Vérifier que nous avons les paramètres nécessaires
+        if (!params.domain || !params.topic) {
+            console.error('❌ Paramètres manquants:', { domain: params.domain, topic: params.topic });
+            console.error('🔍 URL complète:', window.location.href);
+            console.error('🔍 Search string:', window.location.search);
+
+            // Afficher un message d'erreur au lieu de rediriger automatiquement
             this.showError('Paramètres manquants. Veuillez recommencer le processus.');
+            console.log('⚠️ Erreur affichée, mais pas de redirection automatique');
             return;
         }
 
-        // Afficher les paramètres dans l'interface
-        this.displayParameters(params);
+        console.log('✅ Paramètres valides, mise à jour de l\'interface...');
+
+        // Mettre à jour l'interface avec les paramètres
+        this.updatePageWithParams(params);
 
         // Générer le texte
         await this.generateText(params);
 
         // Ajouter les gestionnaires d'événements pour les boutons
         this.setupEventListeners();
+
+        console.log('🎉 Page de résultats initialisée avec succès');
     },
 
-    displayParameters(params) {
-        // Afficher les paramètres sélectionnés dans l'interface
-        const paramElements = {
-            domain: document.getElementById('selected-domain'),
-            topic: document.getElementById('selected-topic'),
-            level: document.getElementById('selected-level'),
-            tone: document.getElementById('selected-tone'),
-            length: document.getElementById('selected-length')
-        };
-        
-        Object.keys(paramElements).forEach(key => {
-            const element = paramElements[key];
-            if (element && params[key]) {
-                element.textContent = params[key];
-            }
-        });
+    updatePageWithParams(params) {
+        // Mettre à jour le breadcrumb
+        const domainElement = document.getElementById('selected-domain');
+        const topicElement = document.getElementById('selected-topic');
+        const pageTitleElement = document.getElementById('page-title');
+
+        if (domainElement) domainElement.textContent = params.domain;
+        if (topicElement) topicElement.textContent = params.topic;
+        if (pageTitleElement) pageTitleElement.textContent = params.topic;
+
+        // Mettre à jour les badges de paramètres
+        const levelElement = document.getElementById('selected-level');
+        const toneElement = document.getElementById('selected-tone');
+        const lengthElement = document.getElementById('selected-length');
+
+        if (levelElement) levelElement.textContent = this.capitalizeFirst(params.level || 'intermediate');
+        if (toneElement) toneElement.textContent = this.capitalizeFirst(params.tone || 'informative');
+        if (lengthElement) lengthElement.textContent = this.capitalizeFirst(params.length || 'medium');
     },
 
     async generateText(params) {
         const englishContainer = document.getElementById('english-text');
         const frenchContainer = document.getElementById('french-text');
-        
+
         if (!englishContainer || !frenchContainer) {
-            console.error('Conteneurs de texte non trouvés');
+            console.error('❌ Conteneurs de texte non trouvés');
+            this.showError('Erreur d\'initialisation de la page');
             return;
         }
-        
+
         try {
+            console.log('🚀 Génération du texte avec paramètres:', params);
+
             // Afficher le chargement
             UI.showLoading(englishContainer, 'Génération du texte en cours...');
             UI.showLoading(frenchContainer, 'En attente...');
-            
+
             // Générer le texte anglais
             const textResponse = await ApiClient.generateText(params);
+            console.log('✅ Texte généré:', textResponse);
+
             const englishText = textResponse.data.englishText;
-            
+
             // Afficher le texte anglais
-            englishContainer.innerHTML = `<p class="text-gray-800 leading-relaxed">${englishText}</p>`;
-            
-            // Traduire en français
+            englishContainer.innerHTML = this.formatText(englishText, 'english');
+
+            // Générer la traduction française
+            console.log('🌐 Traduction en français...');
             UI.showLoading(frenchContainer, 'Traduction en cours...');
             const translationResponse = await ApiClient.translateText(englishText);
-            const frenchText = translationResponse.data.translatedText;
-            
-            // Afficher la traduction française
-            frenchContainer.innerHTML = `<p class="text-gray-800 leading-relaxed">${frenchText}</p>`;
+            console.log('✅ Traduction générée:', translationResponse);
 
-            // Sauvegarder le texte dans l'historique
+            const frenchText = translationResponse.data.translatedText;
+
+            // Afficher la traduction française
+            frenchContainer.innerHTML = this.formatText(frenchText, 'french');
+
+            // Sauvegarder dans l'historique
             const textId = HistoryManager.saveText({
                 parameters: params,
                 englishText: englishText,
                 frenchText: frenchText
             });
+            console.log('💾 Texte sauvegardé avec ID:', textId);
 
-            // Stocker l'ID du texte actuel pour les actions (sauvegarde, partage)
+            // Stocker l'ID du texte actuel pour les actions
             this.currentTextId = textId;
 
         } catch (error) {
-            console.error('Erreur lors de la génération:', error);
+            console.error('❌ Erreur lors de la génération:', error);
             this.showError(`Erreur lors de la génération du texte: ${error.message}`);
-            UI.showError(englishContainer, `Erreur lors de la génération du texte: ${error.message}`);
-            UI.showError(frenchContainer, 'Impossible de générer la traduction');
         }
     },
 
+    formatText(text, language) {
+        // Diviser en paragraphes
+        const paragraphs = text.split('\n\n').filter(p => p.trim());
+
+        if (paragraphs.length === 0) {
+            return `<p class="text-gray-800 leading-relaxed">${text}</p>`;
+        }
+
+        // Vérifier si le premier paragraphe ressemble à un titre
+        let title = '';
+        let content = paragraphs;
+
+        if (paragraphs[0].length < 100 && !paragraphs[0].includes('.') && paragraphs.length > 1) {
+            title = paragraphs[0];
+            content = paragraphs.slice(1);
+        }
+
+        let html = '';
+        if (title) {
+            html += `<h3 class="text-xl font-semibold text-gray-800 mb-4">${title}</h3>`;
+        }
+
+        html += content.map(paragraph => {
+            let processedParagraph = paragraph;
+
+            // Ajouter la mise en évidence pour certains termes courants selon la langue
+            if (language === 'english') {
+                const englishTerms = ['machine learning', 'deep learning', 'neural networks', 'natural language processing', 'autonomous vehicles', 'recommendation systems', 'ethical concerns'];
+                englishTerms.forEach(term => {
+                    const regex = new RegExp(`\\b${term}\\b`, 'gi');
+                    processedParagraph = processedParagraph.replace(regex, `<span class="highlight-text" data-translation="${this.getTranslation(term)}">${term}</span>`);
+                });
+            } else if (language === 'french') {
+                const frenchTerms = ['apprentissage automatique', 'apprentissage profond', 'réseaux de neurones', 'traitement du langage naturel', 'véhicules autonomes', 'systèmes de recommandation', 'préoccupations éthiques'];
+                frenchTerms.forEach(term => {
+                    const regex = new RegExp(`\\b${term}\\b`, 'gi');
+                    processedParagraph = processedParagraph.replace(regex, `<span class="highlight-text" data-original="${this.getOriginal(term)}">${term}</span>`);
+                });
+            }
+
+            return `<p class="text-gray-800 leading-relaxed mb-4">${processedParagraph}</p>`;
+        }).join('');
+
+        return html;
+    },
+
+    getTranslation(term) {
+        const translations = {
+            'machine learning': 'apprentissage automatique',
+            'deep learning': 'apprentissage profond',
+            'neural networks': 'réseaux de neurones',
+            'natural language processing': 'traitement du langage naturel',
+            'autonomous vehicles': 'véhicules autonomes',
+            'recommendation systems': 'systèmes de recommandation',
+            'ethical concerns': 'préoccupations éthiques'
+        };
+        return translations[term.toLowerCase()] || term;
+    },
+
+    getOriginal(term) {
+        const originals = {
+            'apprentissage automatique': 'machine learning',
+            'apprentissage profond': 'deep learning',
+            'réseaux de neurones': 'neural networks',
+            'traitement du langage naturel': 'natural language processing',
+            'véhicules autonomes': 'autonomous vehicles',
+            'systèmes de recommandation': 'recommendation systems',
+            'préoccupations éthiques': 'ethical concerns'
+        };
+        return originals[term.toLowerCase()] || term;
+    },
+
+    capitalizeFirst(str) {
+        return str.charAt(0).toUpperCase() + str.slice(1);
+    },
+
     showError(message) {
-        // Afficher une notification d'erreur
-        const errorDiv = document.createElement('div');
-        errorDiv.className = 'fixed top-4 right-4 bg-red-500 text-white px-6 py-3 rounded-lg shadow-lg z-50';
-        errorDiv.innerHTML = `
-            <div class="flex items-center">
-                <i class="fas fa-exclamation-triangle mr-2"></i>
-                <span>${message}</span>
-                <button onclick="this.parentElement.parentElement.remove()" class="ml-4 text-white hover:text-gray-200">
-                    <i class="fas fa-times"></i>
-                </button>
+        const englishContainer = document.getElementById('english-text');
+        const frenchContainer = document.getElementById('french-text');
+
+        const errorHtml = `
+            <div class="bg-red-50 border border-red-200 rounded-lg p-4 mb-4">
+                <div class="flex">
+                    <div class="flex-shrink-0">
+                        <i class="fas fa-exclamation-triangle text-red-400"></i>
+                    </div>
+                    <div class="ml-3">
+                        <h3 class="text-sm font-medium text-red-800">Erreur</h3>
+                        <div class="mt-2 text-sm text-red-700">${message}</div>
+                    </div>
+                </div>
             </div>
         `;
-        document.body.appendChild(errorDiv);
 
-        // Supprimer automatiquement après 5 secondes
-        setTimeout(() => {
-            if (errorDiv.parentElement) {
-                errorDiv.remove();
-            }
-        }, 5000);
+        if (englishContainer) englishContainer.innerHTML = errorHtml;
+        if (frenchContainer) frenchContainer.innerHTML = errorHtml;
+    },
+
+    regenerateText() {
+        console.log('🔄 Régénération du texte avec les mêmes paramètres...');
+
+        // Récupérer les paramètres actuels
+        const params = SessionManager.getParams();
+        console.log('📋 Paramètres utilisés pour la régénération:', params);
+
+        // Vérifier que nous avons les paramètres nécessaires
+        if (!params.domain || !params.topic) {
+            console.error('❌ Paramètres manquants pour la régénération');
+            this.showError('Paramètres manquants. Impossible de régénérer le texte.');
+            return;
+        }
+
+        // Changer l'apparence du bouton pendant la régénération
+        const regenerateButton = document.getElementById('regenerate-button');
+        if (regenerateButton) {
+            const originalContent = regenerateButton.innerHTML;
+            regenerateButton.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i> Génération...';
+            regenerateButton.disabled = true;
+
+            // Remettre le bouton à l'état normal après
+            setTimeout(() => {
+                regenerateButton.innerHTML = originalContent;
+                regenerateButton.disabled = false;
+            }, 2000);
+        }
+
+        // Régénérer le texte
+        this.generateText(params);
     },
 
     setupEventListeners() {
-        // Bouton de sauvegarde
+        // Bouton Régénérer
+        const regenerateButton = document.getElementById('regenerate-button');
+        if (regenerateButton) {
+            regenerateButton.addEventListener('click', () => {
+                this.regenerateText();
+            });
+        }
+
+        // Bouton Sauvegarder
         const saveButton = document.getElementById('save-button');
         if (saveButton) {
             saveButton.addEventListener('click', () => {
                 if (this.currentTextId) {
-                    this.showSaveConfirmation();
+                    // Afficher le feedback de succès
+                    const originalContent = saveButton.innerHTML;
+                    saveButton.innerHTML = '<i class="fas fa-check mr-2"></i> Sauvegardé !';
+                    saveButton.classList.add('bg-green-500', 'hover:bg-green-600');
+                    saveButton.classList.remove('bg-white', 'hover:bg-primary-50', 'text-primary-600');
+                    saveButton.classList.add('text-white');
+
+                    setTimeout(() => {
+                        saveButton.innerHTML = originalContent;
+                        saveButton.classList.remove('bg-green-500', 'hover:bg-green-600', 'text-white');
+                        saveButton.classList.add('bg-white', 'hover:bg-primary-50', 'text-primary-600');
+                    }, 2000);
                 }
             });
         }
 
-        // Bouton de partage
+        // Bouton Partager
         const shareButton = document.getElementById('share-button');
         if (shareButton) {
             shareButton.addEventListener('click', () => {
-                this.shareText();
-            });
-        }
+                const params = SessionManager.getParams();
+                const shareData = {
+                    title: `Lexifever - ${params.topic}`,
+                    text: `Découvrez ce texte sur "${params.topic}" généré par Lexifever !`,
+                    url: window.location.href
+                };
 
-        // Bouton pour générer un nouveau texte
-        const newTextButton = document.getElementById('new-text-button');
-        if (newTextButton) {
-            newTextButton.addEventListener('click', () => {
-                window.location.href = 'select-domain.html';
-            });
-        }
-    },
-
-    showSaveConfirmation() {
-        // Afficher une confirmation que le texte a été sauvegardé
-        const saveButton = document.getElementById('save-button');
-        if (saveButton) {
-            const originalContent = saveButton.innerHTML;
-            saveButton.innerHTML = '<i class="fas fa-check mr-2"></i> Sauvegardé !';
-            saveButton.classList.add('bg-green-500', 'hover:bg-green-600');
-            saveButton.classList.remove('bg-white', 'hover:bg-primary-50', 'text-primary-600');
-            saveButton.classList.add('text-white');
-
-            setTimeout(() => {
-                saveButton.innerHTML = originalContent;
-                saveButton.classList.remove('bg-green-500', 'hover:bg-green-600', 'text-white');
-                saveButton.classList.add('bg-white', 'hover:bg-primary-50', 'text-primary-600');
-            }, 2000);
-        }
-    },
-
-    async shareText() {
-        const params = SessionManager.getParams();
-        const shareData = {
-            title: `Lexifever - ${params.topic}`,
-            text: `J'ai généré un texte sur "${params.topic}" avec Lexifever !`,
-            url: window.location.href
-        };
-
-        try {
-            if (navigator.share) {
-                await navigator.share(shareData);
-            } else {
-                // Fallback: copier l'URL dans le presse-papiers
-                await navigator.clipboard.writeText(window.location.href);
-
-                const shareButton = document.getElementById('share-button');
-                if (shareButton) {
-                    const originalContent = shareButton.innerHTML;
-                    shareButton.innerHTML = '<i class="fas fa-check mr-2"></i> Lien copié !';
-
-                    setTimeout(() => {
-                        shareButton.innerHTML = originalContent;
-                    }, 2000);
+                if (navigator.share) {
+                    navigator.share(shareData).catch(console.error);
+                } else {
+                    // Fallback: copier dans le presse-papiers
+                    navigator.clipboard.writeText(window.location.href).then(() => {
+                        const originalContent = shareButton.innerHTML;
+                        shareButton.innerHTML = '<i class="fas fa-check mr-2"></i> Lien copié !';
+                        setTimeout(() => {
+                            shareButton.innerHTML = originalContent;
+                        }, 2000);
+                    });
                 }
-            }
-        } catch (error) {
-            console.error('Erreur lors du partage:', error);
+            });
         }
-    },
 
-    showError(message) {
-        const container = document.getElementById('main-content') || document.body;
-        UI.showError(container, message);
+        // Bouton Imprimer
+        const printButton = document.getElementById('print-button');
+        if (printButton) {
+            printButton.addEventListener('click', () => {
+                window.print();
+            });
+        }
+
+        // Bouton Écouter
+        const listenButton = document.getElementById('listen-button');
+        if (listenButton) {
+            let isPlaying = false;
+            let utterance = null;
+
+            listenButton.addEventListener('click', () => {
+                if (!isPlaying) {
+                    const englishText = document.querySelector('#english-text').textContent;
+                    utterance = new SpeechSynthesisUtterance(englishText);
+                    utterance.lang = 'en-US';
+                    utterance.rate = 0.9;
+
+                    utterance.onend = () => {
+                        isPlaying = false;
+                        listenButton.innerHTML = '<i class="fas fa-volume-up mr-2"></i> Écouter';
+                        listenButton.classList.remove('from-secondary-600', 'to-secondary-700');
+                        listenButton.classList.add('from-primary-600', 'to-primary-700');
+                    };
+
+                    window.speechSynthesis.speak(utterance);
+                    isPlaying = true;
+                    listenButton.innerHTML = '<i class="fas fa-pause mr-2"></i> Pause';
+                    listenButton.classList.remove('from-primary-600', 'to-primary-700');
+                    listenButton.classList.add('from-secondary-600', 'to-secondary-700');
+                } else {
+                    window.speechSynthesis.cancel();
+                    isPlaying = false;
+                    listenButton.innerHTML = '<i class="fas fa-volume-up mr-2"></i> Écouter';
+                    listenButton.classList.remove('from-secondary-600', 'to-secondary-700');
+                    listenButton.classList.add('from-primary-600', 'to-primary-700');
+                }
+            });
+        }
     }
 };
+
 
 // Initialisation automatique selon la page
 document.addEventListener('DOMContentLoaded', () => {

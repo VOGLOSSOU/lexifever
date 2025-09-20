@@ -1,0 +1,430 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Debug Customize Page</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; }
+        .debug-section { margin: 20px 0; padding: 15px; border: 1px solid #ccc; border-radius: 5px; }
+        .success { background-color: #d4edda; border-color: #c3e6cb; }
+        .error { background-color: #f8d7da; border-color: #f5c6cb; }
+        .info { background-color: #d1ecf1; border-color: #bee5eb; }
+        .warning { background-color: #fff3cd; border-color: #ffeaa7; }
+        pre { background: #f4f4f4; padding: 10px; border-radius: 3px; overflow-x: auto; max-height: 300px; overflow-y: auto; }
+        button { padding: 10px 15px; margin: 5px; cursor: pointer; }
+        .test-result { margin: 10px 0; padding: 10px; border-radius: 3px; }
+    </style>
+</head>
+<body>
+    <h1>🔍 Debug Customize Page</h1>
+
+    <div class="debug-section info">
+        <h2>📍 Informations sur l'URL actuelle</h2>
+        <p><strong>URL complète:</strong> <span id="current-url"></span></p>
+        <p><strong>Origin:</strong> <span id="origin"></span></p>
+        <p><strong>Pathname:</strong> <span id="pathname"></span></p>
+        <p><strong>Search:</strong> <span id="search"></span></p>
+    </div>
+
+    <div class="debug-section">
+        <h2>🔧 Test de détection d'API</h2>
+        <button onclick="testApiDetection()">Tester la détection d'API</button>
+        <div id="api-detection-result"></div>
+    </div>
+
+    <div class="debug-section">
+        <h2>📋 Test d'extraction des paramètres</h2>
+        <button onclick="testParamExtraction()">Tester l'extraction des paramètres</button>
+        <div id="param-extraction-result"></div>
+    </div>
+
+    <div class="debug-section">
+        <h2>🌐 Test des appels API</h2>
+        <button onclick="testApiCalls()">Tester les appels API</button>
+        <div id="api-calls-result"></div>
+    </div>
+
+    <div class="debug-section">
+        <h2>🔍 Test de recherche de domaine/sujet</h2>
+        <button onclick="testDomainTopicSearch()">Tester la recherche domaine/sujet</button>
+        <div id="domain-topic-search-result"></div>
+    </div>
+
+    <div class="debug-section">
+        <h2>🚀 Simulation complète</h2>
+        <button onclick="simulateFullProcess()">Simuler le processus complet</button>
+        <div id="full-process-result"></div>
+    </div>
+
+    <script>
+        // Informations sur l'URL actuelle
+        document.getElementById('current-url').textContent = window.location.href;
+        document.getElementById('origin').textContent = window.location.origin;
+        document.getElementById('pathname').textContent = window.location.pathname;
+        document.getElementById('search').textContent = window.location.search;
+
+        // Fonction utilitaire pour afficher les résultats
+        function showResult(elementId, result, type = 'info') {
+            const element = document.getElementById(elementId);
+            element.className = `debug-section ${type}`;
+            element.innerHTML = result;
+        }
+
+        // Test de détection d'API
+        function testApiDetection() {
+            try {
+                // Simuler la fonction detectApiBaseUrl
+                function detectApiBaseUrl() {
+                    const currentPath = window.location.pathname;
+                    const pathParts = currentPath.split('/').filter(p => p);
+
+                    // Si on est dans un sous-répertoire (comme /lexifever/)
+                    if (pathParts.length > 0 && pathParts[0] !== '') {
+                        // Prendre le premier segment du chemin comme base
+                        const basePath = '/' + pathParts[0];
+                        return window.location.origin + basePath + '/api';
+                    }
+
+                    // Sinon, API à la racine
+                    return window.location.origin + '/api';
+                }
+
+                const apiUrl = detectApiBaseUrl();
+
+                const result = `
+                    <h3>Résultat de la détection d'API</h3>
+                    <p><strong>Path actuel:</strong> ${window.location.pathname}</p>
+                    <p><strong>Segments du path:</strong> ${JSON.stringify(window.location.pathname.split('/').filter(p => p))}</p>
+                    <p><strong>URL API détectée:</strong> ${apiUrl}</p>
+                    <p><strong>Origin:</strong> ${window.location.origin}</p>
+                `;
+
+                showResult('api-detection-result', result, 'success');
+
+            } catch (error) {
+                const result = `
+                    <h3>Erreur lors de la détection d'API</h3>
+                    <p><strong>Erreur:</strong> ${error.message}</p>
+                    <pre>${error.stack}</pre>
+                `;
+                showResult('api-detection-result', result, 'error');
+            }
+        }
+
+        // Test d'extraction des paramètres
+        function testParamExtraction() {
+            try {
+                // Simuler la fonction getParamsFromURL
+                function getParamsFromURL() {
+                    const urlParams = new URLSearchParams(window.location.search);
+                    const domain = urlParams.get('domain');
+                    const topic = urlParams.get('topic');
+
+                    console.log('🔍 Paramètres bruts:', { domain, topic });
+
+                    // Décoder les paramètres s'ils sont encodés
+                    const decodedDomain = domain ? decodeURIComponent(domain) : null;
+                    const decodedTopic = topic ? decodeURIComponent(topic) : null;
+
+                    console.log('🔍 Paramètres décodés:', { decodedDomain, decodedTopic });
+
+                    return {
+                        domain: decodedDomain,
+                        topic: decodedTopic
+                    };
+                }
+
+                const params = getParamsFromURL();
+
+                const result = `
+                    <h3>Résultat de l'extraction des paramètres</h3>
+                    <p><strong>Search string:</strong> ${window.location.search}</p>
+                    <p><strong>Domaine extrait:</strong> ${params.domain || 'null'}</p>
+                    <p><strong>Sujet extrait:</strong> ${params.topic || 'null'}</p>
+                    <p><strong>Paramètres valides:</strong> ${params.domain && params.topic ? 'OUI' : 'NON'}</p>
+                `;
+
+                const type = params.domain && params.topic ? 'success' : 'warning';
+                showResult('param-extraction-result', result, type);
+
+            } catch (error) {
+                const result = `
+                    <h3>Erreur lors de l'extraction des paramètres</h3>
+                    <p><strong>Erreur:</strong> ${error.message}</p>
+                    <pre>${error.stack}</pre>
+                `;
+                showResult('param-extraction-result', result, 'error');
+            }
+        }
+
+        // Test des appels API
+        async function testApiCalls() {
+            try {
+                // Détecter l'URL de l'API
+                function detectApiBaseUrl() {
+                    const currentPath = window.location.pathname;
+                    const pathParts = currentPath.split('/').filter(p => p);
+                    if (pathParts.length > 0 && pathParts[0] !== '') {
+                        const basePath = '/' + pathParts[0];
+                        return window.location.origin + basePath + '/api';
+                    }
+                    return window.location.origin + '/api';
+                }
+
+                const apiBaseUrl = detectApiBaseUrl();
+                const domainsUrl = apiBaseUrl.replace('/api', '') + '/api/domains';
+
+                let result = `
+                    <h3>Test des appels API</h3>
+                    <p><strong>URL API de base:</strong> ${apiBaseUrl}</p>
+                    <p><strong>URL domains:</strong> ${domainsUrl}</p>
+                `;
+
+                // Test de l'API health
+                try {
+                    const healthResponse = await fetch(apiBaseUrl.replace('/api', '') + '/api/health');
+                    result += `<p><strong>API Health - Status:</strong> ${healthResponse.status}</p>`;
+                    if (healthResponse.ok) {
+                        const healthData = await healthResponse.json();
+                        result += `<pre>Health Response: ${JSON.stringify(healthData, null, 2)}</pre>`;
+                    }
+                } catch (e) {
+                    result += `<p><strong>API Health - Erreur:</strong> ${e.message}</p>`;
+                }
+
+                // Test de l'API domains
+                try {
+                    const domainsResponse = await fetch(domainsUrl);
+                    result += `<p><strong>API Domains - Status:</strong> ${domainsResponse.status}</p>`;
+                    if (domainsResponse.ok) {
+                        const domainsData = await domainsResponse.json();
+                        result += `<p><strong>Nombre de domaines:</strong> ${domainsData.data ? domainsData.data.length : 'N/A'}</p>`;
+                        result += `<pre>Premier domaine: ${JSON.stringify(domainsData.data ? domainsData.data[0] : null, null, 2)}</pre>`;
+                    }
+                } catch (e) {
+                    result += `<p><strong>API Domains - Erreur:</strong> ${e.message}</p>`;
+                }
+
+                showResult('api-calls-result', result, 'info');
+
+            } catch (error) {
+                const result = `
+                    <h3>Erreur lors des tests API</h3>
+                    <p><strong>Erreur:</strong> ${error.message}</p>
+                    <pre>${error.stack}</pre>
+                `;
+                showResult('api-calls-result', result, 'error');
+            }
+        }
+
+        // Test de recherche de domaine/sujet
+        async function testDomainTopicSearch() {
+            try {
+                // Extraire les paramètres
+                const urlParams = new URLSearchParams(window.location.search);
+                const domainName = urlParams.get('domain') ? decodeURIComponent(urlParams.get('domain')) : null;
+                const topicName = urlParams.get('topic') ? decodeURIComponent(urlParams.get('topic')) : null;
+
+                if (!domainName || !topicName) {
+                    const result = `
+                        <h3>Test de recherche domaine/sujet</h3>
+                        <p><strong>Erreur:</strong> Paramètres manquants</p>
+                        <p><strong>Domaine:</strong> ${domainName || 'null'}</p>
+                        <p><strong>Sujet:</strong> ${topicName || 'null'}</p>
+                    `;
+                    showResult('domain-topic-search-result', result, 'warning');
+                    return;
+                }
+
+                // Détecter l'URL de l'API
+                function detectApiBaseUrl() {
+                    const currentPath = window.location.pathname;
+                    const pathParts = currentPath.split('/').filter(p => p);
+                    if (pathParts.length > 0 && pathParts[0] !== '') {
+                        const basePath = '/' + pathParts[0];
+                        return window.location.origin + basePath + '/api';
+                    }
+                    return window.location.origin + '/api';
+                }
+
+                const apiBaseUrl = detectApiBaseUrl();
+
+                let result = `
+                    <h3>Test de recherche domaine/sujet</h3>
+                    <p><strong>Domaine recherché:</strong> ${domainName}</p>
+                    <p><strong>Sujet recherché:</strong> ${topicName}</p>
+                `;
+
+                // Charger les domaines
+                const domainsUrl = apiBaseUrl.replace('/api', '') + '/api/domains';
+                const domainsResponse = await fetch(domainsUrl);
+
+                if (!domainsResponse.ok) {
+                    throw new Error(`Erreur HTTP domains: ${domainsResponse.status}`);
+                }
+
+                const domainsData = await domainsResponse.json();
+                const domain = domainsData.data.find(d => d.name.toLowerCase() === domainName.toLowerCase());
+
+                if (!domain) {
+                    result += `<p><strong>Domaine trouvé:</strong> NON</p>`;
+                    result += `<p><strong>Domaines disponibles:</strong></p>`;
+                    result += `<pre>${domainsData.data.map(d => d.name).join(', ')}</pre>`;
+                    showResult('domain-topic-search-result', result, 'error');
+                    return;
+                }
+
+                result += `<p><strong>Domaine trouvé:</strong> OUI (ID: ${domain.id})</p>`;
+
+                // Charger les sujets du domaine
+                const topicsUrl = apiBaseUrl.replace('/api', '') + `/api/domains/${domain.id}/topics`;
+                const topicsResponse = await fetch(topicsUrl);
+
+                if (!topicsResponse.ok) {
+                    throw new Error(`Erreur HTTP topics: ${topicsResponse.status}`);
+                }
+
+                const topicsData = await topicsResponse.json();
+                const topic = topicsData.data.find(t => t.name.toLowerCase() === topicName.toLowerCase());
+
+                if (!topic) {
+                    result += `<p><strong>Sujet trouvé:</strong> NON</p>`;
+                    result += `<p><strong>Sujets disponibles:</strong></p>`;
+                    result += `<pre>${topicsData.data.map(t => t.name).join(', ')}</pre>`;
+                    showResult('domain-topic-search-result', result, 'error');
+                    return;
+                }
+
+                result += `<p><strong>Sujet trouvé:</strong> OUI (ID: ${topic.id})</p>`;
+                result += `<p><strong>Description du sujet:</strong> ${topic.description}</p>`;
+
+                showResult('domain-topic-search-result', result, 'success');
+
+            } catch (error) {
+                const result = `
+                    <h3>Erreur lors de la recherche domaine/sujet</h3>
+                    <p><strong>Erreur:</strong> ${error.message}</p>
+                    <pre>${error.stack}</pre>
+                `;
+                showResult('domain-topic-search-result', result, 'error');
+            }
+        }
+
+        // Simulation complète du processus
+        async function simulateFullProcess() {
+            try {
+                let result = `<h3>Simulation du processus complet</h3>`;
+
+                // Étape 1: Détection d'API
+                result += `<h4>Étape 1: Détection d'API</h4>`;
+                function detectApiBaseUrl() {
+                    const currentPath = window.location.pathname;
+                    const pathParts = currentPath.split('/').filter(p => p);
+                    if (pathParts.length > 0 && pathParts[0] !== '') {
+                        const basePath = '/' + pathParts[0];
+                        return window.location.origin + basePath + '/api';
+                    }
+                    return window.location.origin + '/api';
+                }
+                const apiBaseUrl = detectApiBaseUrl();
+                result += `<p>✅ URL API détectée: ${apiBaseUrl}</p>`;
+
+                // Étape 2: Extraction des paramètres
+                result += `<h4>Étape 2: Extraction des paramètres</h4>`;
+                const urlParams = new URLSearchParams(window.location.search);
+                const domainName = urlParams.get('domain') ? decodeURIComponent(urlParams.get('domain')) : null;
+                const topicName = urlParams.get('topic') ? decodeURIComponent(urlParams.get('topic')) : null;
+
+                if (!domainName || !topicName) {
+                    result += `<p>❌ Paramètres manquants: domaine=${domainName}, sujet=${topicName}</p>`;
+                    showResult('full-process-result', result, 'error');
+                    return;
+                }
+
+                result += `<p>✅ Paramètres extraits: domaine="${domainName}", sujet="${topicName}"</p>`;
+
+                // Étape 3: Test API
+                result += `<h4>Étape 3: Test de l'API</h4>`;
+                const healthUrl = apiBaseUrl.replace('/api', '') + '/api/health';
+                const healthResponse = await fetch(healthUrl);
+
+                if (!healthResponse.ok) {
+                    result += `<p>❌ API non accessible: ${healthResponse.status}</p>`;
+                    showResult('full-process-result', result, 'error');
+                    return;
+                }
+
+                result += `<p>✅ API accessible</p>`;
+
+                // Étape 4: Recherche du domaine
+                result += `<h4>Étape 4: Recherche du domaine</h4>`;
+                const domainsUrl = apiBaseUrl.replace('/api', '') + '/api/domains';
+                const domainsResponse = await fetch(domainsUrl);
+
+                if (!domainsResponse.ok) {
+                    result += `<p>❌ Erreur chargement domaines: ${domainsResponse.status}</p>`;
+                    showResult('full-process-result', result, 'error');
+                    return;
+                }
+
+                const domainsData = await domainsResponse.json();
+                const domain = domainsData.data.find(d => d.name.toLowerCase() === domainName.toLowerCase());
+
+                if (!domain) {
+                    result += `<p>❌ Domaine non trouvé: "${domainName}"</p>`;
+                    result += `<p>Domaines disponibles: ${domainsData.data.map(d => d.name).join(', ')}</p>`;
+                    showResult('full-process-result', result, 'error');
+                    return;
+                }
+
+                result += `<p>✅ Domaine trouvé: ${domain.name} (ID: ${domain.id})</p>`;
+
+                // Étape 5: Recherche du sujet
+                result += `<h4>Étape 5: Recherche du sujet</h4>`;
+                const topicsUrl = apiBaseUrl.replace('/api', '') + `/api/domains/${domain.id}/topics`;
+                const topicsResponse = await fetch(topicsUrl);
+
+                if (!topicsResponse.ok) {
+                    result += `<p>❌ Erreur chargement sujets: ${topicsResponse.status}</p>`;
+                    showResult('full-process-result', result, 'error');
+                    return;
+                }
+
+                const topicsData = await topicsResponse.json();
+                const topic = topicsData.data.find(t => t.name.toLowerCase() === topicName.toLowerCase());
+
+                if (!topic) {
+                    result += `<p>❌ Sujet non trouvé: "${topicName}"</p>`;
+                    result += `<p>Sujets disponibles: ${topicsData.data.map(t => t.name).join(', ')}</p>`;
+                    showResult('full-process-result', result, 'error');
+                    return;
+                }
+
+                result += `<p>✅ Sujet trouvé: ${topic.name} (ID: ${topic.id})</p>`;
+
+                // Conclusion
+                result += `<h4>🎉 Conclusion</h4>`;
+                result += `<p>✅ Le processus complet fonctionne correctement !</p>`;
+                result += `<p>Si customize-text.html ne fonctionne pas, le problème est probablement dans le JavaScript de cette page.</p>`;
+
+                showResult('full-process-result', result, 'success');
+
+            } catch (error) {
+                const result = `
+                    <h3>Erreur lors de la simulation</h3>
+                    <p><strong>Erreur:</strong> ${error.message}</p>
+                    <pre>${error.stack}</pre>
+                `;
+                showResult('full-process-result', result, 'error');
+            }
+        }
+
+        // Test automatique au chargement
+        window.addEventListener('load', function() {
+            console.log('🚀 Debug page loaded');
+            // Ne pas lancer automatiquement pour éviter les conflits
+        });
+    </script>
+</body>
+</html>

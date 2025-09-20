@@ -1,0 +1,297 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Redirection</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; }
+        .test-section { margin: 20px 0; padding: 15px; border: 1px solid #ccc; border-radius: 5px; }
+        .success { background-color: #d4edda; border-color: #c3e6cb; }
+        .error { background-color: #f8d7da; border-color: #f5c6cb; }
+        .info { background-color: #d1ecf1; border-color: #bee5eb; }
+        .warning { background-color: #fff3cd; border-color: #ffeaa7; }
+        pre { background: #f4f4f4; padding: 10px; border-radius: 3px; overflow-x: auto; max-height: 200px; overflow-y: auto; }
+        button { padding: 10px 15px; margin: 5px; cursor: pointer; }
+    </style>
+</head>
+<body>
+    <h1>🧪 Test de Redirection</h1>
+
+    <div class="test-section info">
+        <h2>📍 Informations actuelles</h2>
+        <p><strong>URL actuelle:</strong> <span id="current-url"></span></p>
+        <p><strong>Origin:</strong> <span id="origin"></span></p>
+        <p><strong>Pathname:</strong> <span id="pathname"></span></p>
+        <p><strong>Search:</strong> <span id="search"></span></p>
+        <p><strong>Timestamp:</strong> <span id="timestamp"></span></p>
+    </div>
+
+    <div class="test-section">
+        <h2>🔗 Tests de redirection</h2>
+        <button onclick="testDirectAccess()">Tester accès direct à customize-text.html</button>
+        <button onclick="testWithParams()">Tester avec paramètres</button>
+        <button onclick="testWithoutParams()">Tester sans paramètres</button>
+        <div id="redirect-test-result"></div>
+    </div>
+
+    <div class="test-section">
+        <h2>🌐 Test API directe</h2>
+        <button onclick="testApiDirect()">Tester API /health</button>
+        <button onclick="testApiDomains()">Tester API /domains</button>
+        <div id="api-test-result"></div>
+    </div>
+
+    <div class="test-section">
+        <h2>📊 Test de chargement de customize-text.html</h2>
+        <button onclick="testLoadCustomize()">Charger customize-text.html dans iframe</button>
+        <div id="load-test-result"></div>
+        <iframe id="test-iframe" style="width: 100%; height: 400px; border: 1px solid #ccc; display: none;"></iframe>
+    </div>
+
+    <script>
+        // Informations actuelles
+        document.getElementById('current-url').textContent = window.location.href;
+        document.getElementById('origin').textContent = window.location.origin;
+        document.getElementById('pathname').textContent = window.location.pathname;
+        document.getElementById('search').textContent = window.location.search;
+        document.getElementById('timestamp').textContent = new Date().toISOString();
+
+        // Fonction utilitaire pour afficher les résultats
+        function showResult(elementId, result, type = 'info') {
+            const element = document.getElementById(elementId);
+            element.className = `test-section ${type}`;
+            element.innerHTML = result;
+        }
+
+        // Test d'accès direct
+        async function testDirectAccess() {
+            try {
+                const url = window.location.origin + window.location.pathname.replace('test-redirect.html', 'customize-text.html');
+                console.log('Testing direct access to:', url);
+
+                const response = await fetch(url, {
+                    method: 'GET',
+                    cache: 'no-cache'
+                });
+
+                const result = `
+                    <h3>Test d'accès direct</h3>
+                    <p><strong>URL testée:</strong> ${url}</p>
+                    <p><strong>Status:</strong> ${response.status}</p>
+                    <p><strong>Redirected:</strong> ${response.redirected ? 'OUI' : 'NON'}</p>
+                    ${response.redirected ? `<p><strong>URL finale:</strong> ${response.url}</p>` : ''}
+                    <p><strong>Content-Type:</strong> ${response.headers.get('content-type')}</p>
+                    <p><strong>Content-Length:</strong> ${response.headers.get('content-length')}</p>
+                `;
+
+                const resultType = response.status === 200 && !response.redirected ? 'success' : 'warning';
+                showResult('redirect-test-result', result, resultType);
+
+            } catch (error) {
+                const result = `
+                    <h3>Erreur lors du test d'accès direct</h3>
+                    <p><strong>Erreur:</strong> ${error.message}</p>
+                    <pre>${error.stack}</pre>
+                `;
+                showResult('redirect-test-result', result, 'error');
+            }
+        }
+
+        // Test avec paramètres
+        async function testWithParams() {
+            try {
+                const url = window.location.origin + window.location.pathname.replace('test-redirect.html', 'customize-text.html?domain=Technologie&topic=Intelligence+Artificielle');
+                console.log('Testing with params:', url);
+
+                const response = await fetch(url, {
+                    method: 'GET',
+                    cache: 'no-cache',
+                    redirect: 'manual' // Ne pas suivre automatiquement les redirections
+                });
+
+                const result = `
+                    <h3>Test avec paramètres</h3>
+                    <p><strong>URL testée:</strong> ${url}</p>
+                    <p><strong>Status:</strong> ${response.status}</p>
+                    <p><strong>Redirected:</strong> ${response.redirected ? 'OUI' : 'NON'}</p>
+                    ${response.redirected ? `<p><strong>URL finale:</strong> ${response.url}</p>` : ''}
+                    <p><strong>Location header:</strong> ${response.headers.get('location') || 'Aucun'}</p>
+                `;
+
+                const resultType = response.status === 200 && !response.redirected ? 'success' : 'warning';
+                showResult('redirect-test-result', result, resultType);
+
+            } catch (error) {
+                const result = `
+                    <h3>Erreur lors du test avec paramètres</h3>
+                    <p><strong>Erreur:</strong> ${error.message}</p>
+                    <pre>${error.stack}</pre>
+                `;
+                showResult('redirect-test-result', result, 'error');
+            }
+        }
+
+        // Test sans paramètres
+        async function testWithoutParams() {
+            try {
+                const url = window.location.origin + window.location.pathname.replace('test-redirect.html', 'customize-text.html');
+                console.log('Testing without params:', url);
+
+                const response = await fetch(url, {
+                    method: 'GET',
+                    cache: 'no-cache',
+                    redirect: 'manual'
+                });
+
+                const result = `
+                    <h3>Test sans paramètres</h3>
+                    <p><strong>URL testée:</strong> ${url}</p>
+                    <p><strong>Status:</strong> ${response.status}</p>
+                    <p><strong>Redirected:</strong> ${response.redirected ? 'OUI' : 'NON'}</p>
+                    ${response.redirected ? `<p><strong>URL finale:</strong> ${response.url}</p>` : ''}
+                    <p><strong>Location header:</strong> ${response.headers.get('location') || 'Aucun'}</p>
+                `;
+
+                const resultType = response.status === 200 && !response.redirected ? 'success' : 'warning';
+                showResult('redirect-test-result', result, resultType);
+
+            } catch (error) {
+                const result = `
+                    <h3>Erreur lors du test sans paramètres</h3>
+                    <p><strong>Erreur:</strong> ${error.message}</p>
+                    <pre>${error.stack}</pre>
+                `;
+                showResult('redirect-test-result', result, 'error');
+            }
+        }
+
+        // Test API direct
+        async function testApiDirect() {
+            try {
+                const url = window.location.origin + window.location.pathname.replace('test-redirect.html', 'api/health');
+                console.log('Testing API direct:', url);
+
+                const response = await fetch(url, {
+                    method: 'GET',
+                    cache: 'no-cache'
+                });
+
+                let result = `
+                    <h3>Test API /health</h3>
+                    <p><strong>URL testée:</strong> ${url}</p>
+                    <p><strong>Status:</strong> ${response.status}</p>
+                    <p><strong>Content-Type:</strong> ${response.headers.get('content-type')}</p>
+                `;
+
+                if (response.ok) {
+                    const data = await response.json();
+                    result = result + `<pre>Response: ${JSON.stringify(data, null, 2)}</pre>`;
+                }
+
+                const resultType = response.ok ? 'success' : 'error';
+                showResult('api-test-result', result, resultType);
+
+            } catch (error) {
+                const result = `
+                    <h3>Erreur lors du test API</h3>
+                    <p><strong>Erreur:</strong> ${error.message}</p>
+                    <pre>${error.stack}</pre>
+                `;
+                showResult('api-test-result', result, 'error');
+            }
+        }
+
+        // Test API domains
+        async function testApiDomains() {
+            try {
+                const url = window.location.origin + window.location.pathname.replace('test-redirect.html', 'api/domains');
+                console.log('Testing API domains:', url);
+
+                const response = await fetch(url, {
+                    method: 'GET',
+                    cache: 'no-cache'
+                });
+
+                let result = `
+                    <h3>Test API /domains</h3>
+                    <p><strong>URL testée:</strong> ${url}</p>
+                    <p><strong>Status:</strong> ${response.status}</p>
+                    <p><strong>Content-Type:</strong> ${response.headers.get('content-type')}</p>
+                `;
+
+                if (response.ok) {
+                    const data = await response.json();
+                    result = result + `<p><strong>Nombre de domaines:</strong> ${data.data ? data.data.length : 'N/A'}</p>`;
+                    result = result + `<pre>Premier domaine: ${JSON.stringify(data.data ? data.data[0] : null, null, 2)}</pre>`;
+                }
+
+                const resultType = response.ok ? 'success' : 'error';
+                showResult('api-test-result', result, resultType);
+
+            } catch (error) {
+                const result = `
+                    <h3>Erreur lors du test API domains</h3>
+                    <p><strong>Erreur:</strong> ${error.message}</p>
+                    <pre>${error.stack}</pre>
+                `;
+                showResult('api-test-result', result, 'error');
+            }
+        }
+
+        // Test de chargement dans iframe
+        function testLoadCustomize() {
+            const iframe = document.getElementById('test-iframe');
+            const url = window.location.origin + window.location.pathname.replace('test-redirect.html', 'customize-text.html?domain=Technologie&topic=Intelligence+Artificielle');
+
+            iframe.src = url;
+            iframe.style.display = 'block';
+
+            const result = `
+                <h3>Test de chargement dans iframe</h3>
+                <p><strong>URL chargée:</strong> ${url}</p>
+                <p>Regardez dans l'iframe ci-dessous pour voir si la page se charge correctement.</p>
+            `;
+
+            showResult('load-test-result', result, 'info');
+
+            // Surveiller les changements dans l'iframe
+            iframe.onload = function() {
+                try {
+                    const iframeDoc = iframe.contentDocument || iframe.contentWindow.document;
+                    const currentUrl = iframe.contentWindow.location.href;
+
+                    if (currentUrl !== url) {
+                        const result = `
+                            <h3>Redirection détectée dans l'iframe !</h3>
+                            <p><strong>URL demandée:</strong> ${url}</p>
+                            <p><strong>URL actuelle:</strong> ${currentUrl}</p>
+                            <p><strong>Redirigée vers:</strong> ${currentUrl.split('/').pop()}</p>
+                        `;
+                        showResult('load-test-result', result, 'error');
+                    } else {
+                        const result = `
+                            <h3>Page chargée correctement dans l'iframe</h3>
+                            <p><strong>URL:</strong> ${currentUrl}</p>
+                            <p>La page ne s'est pas redirigée.</p>
+                        `;
+                        showResult('load-test-result', result, 'success');
+                    }
+                } catch (e) {
+                    const result = `
+                        <h3>Erreur d'accès à l'iframe</h3>
+                        <p><strong>Erreur:</strong> ${e.message}</p>
+                        <p>Ceci est normal si l'iframe charge une page d'un autre domaine.</p>
+                    `;
+                    showResult('load-test-result', result, 'warning');
+                }
+            };
+        }
+
+        // Test automatique au chargement
+        window.addEventListener('load', function() {
+            console.log('🚀 Test redirect page loaded');
+        });
+    </script>
+</body>
+</html>

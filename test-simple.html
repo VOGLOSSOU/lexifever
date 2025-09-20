@@ -3,103 +3,135 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Test Simple - Lexifever</title>
-    <script src="https://cdn.tailwindcss.com"></script>
+    <title>Test Simple</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; }
+        .test-section { margin: 20px 0; padding: 15px; border: 1px solid #ccc; border-radius: 5px; }
+        .success { background-color: #d4edda; border-color: #c3e6cb; }
+        .error { background-color: #f8d7da; border-color: #f5c6cb; }
+        .info { background-color: #d1ecf1; border-color: #bee5eb; }
+        .warning { background-color: #fff3cd; border-color: #ffeaa7; }
+    </style>
 </head>
-<body class="bg-gray-100 p-8">
-    <div class="max-w-4xl mx-auto">
-        <h1 class="text-3xl font-bold mb-8">🧪 Test Simple API</h1>
-        
-        <div class="bg-white rounded-lg shadow p-6 mb-6">
-            <h2 class="text-xl font-semibold mb-4">Test direct de l'API</h2>
-            
-            <div class="space-y-4">
-                <div>
-                    <strong>URL de base:</strong> <span id="api-url"></span>
-                </div>
-                
-                <button id="test-fetch" class="bg-blue-500 text-white px-6 py-2 rounded hover:bg-blue-600">
-                    Test Fetch Direct
-                </button>
-                
-                <div id="result" class="mt-4 p-4 bg-gray-50 rounded"></div>
-            </div>
-        </div>
+<body>
+    <h1>🧪 Test Simple de customize-text.html</h1>
+
+    <div class="test-section info">
+        <h2>📍 Informations actuelles</h2>
+        <p><strong>URL actuelle:</strong> <span id="current-url"></span></p>
+        <p><strong>Timestamp:</strong> <span id="timestamp"></span></p>
+    </div>
+
+    <div class="test-section">
+        <h2>🔗 Test de redirection directe</h2>
+        <button onclick="testDirectRedirect()">Tester redirection directe</button>
+        <div id="redirect-result"></div>
+    </div>
+
+    <div class="test-section">
+        <h2>📊 Test de chargement de customize-text.html</h2>
+        <button onclick="testLoadPage()">Charger customize-text.html</button>
+        <div id="load-result"></div>
+    </div>
+
+    <div class="test-section">
+        <h2>🌐 Test API simple</h2>
+        <button onclick="testApiSimple()">Tester API /health</button>
+        <div id="api-result"></div>
     </div>
 
     <script>
-        // Configuration API
-        const API_BASE_URL = window.location.origin + '/api';
-        document.getElementById('api-url').textContent = API_BASE_URL;
-        
-        console.log('🌐 API Base URL:', API_BASE_URL);
-        console.log('🏠 Window origin:', window.location.origin);
-        
-        document.getElementById('test-fetch').addEventListener('click', async () => {
-            const resultDiv = document.getElementById('result');
-            resultDiv.innerHTML = '<div class="text-blue-600">Test en cours...</div>';
-            
+        // Informations actuelles
+        document.getElementById('current-url').textContent = window.location.href;
+        document.getElementById('timestamp').textContent = new Date().toISOString();
+
+        // Fonction utilitaire pour afficher les résultats
+        function showResult(elementId, result, type = 'info') {
+            const element = document.getElementById(elementId);
+            element.className = `test-section ${type}`;
+            element.innerHTML = result;
+        }
+
+        // Test de redirection directe
+        function testDirectRedirect() {
+            const url = window.location.origin + window.location.pathname.replace('test-simple.html', 'customize-text.html?domain=Technologie&topic=Intelligence+Artificielle');
+            console.log('Redirecting to:', url);
+            window.location.href = url;
+        }
+
+        // Test de chargement de la page
+        async function testLoadPage() {
             try {
-                console.log('🚀 Test fetch vers:', API_BASE_URL + '/health');
-                
-                const response = await fetch(API_BASE_URL + '/health');
-                console.log('📡 Réponse:', response);
-                
-                if (!response.ok) {
-                    throw new Error(`HTTP ${response.status}: ${response.statusText}`);
-                }
-                
-                const data = await response.json();
-                console.log('✅ Données:', data);
-                
-                resultDiv.innerHTML = `
-                    <div class="text-green-600">
-                        <h3 class="font-bold">✅ Succès !</h3>
-                        <pre class="mt-2 text-sm bg-white p-2 rounded border">${JSON.stringify(data, null, 2)}</pre>
-                    </div>
-                `;
-                
-                // Test génération
-                console.log('🎯 Test génération...');
-                const generateResponse = await fetch(API_BASE_URL + '/generate-text', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify({
-                        domain: 'Technologie',
-                        topic: 'Intelligence Artificielle',
-                        level: 'intermediate',
-                        tone: 'conversational'
-                    })
+                const url = window.location.origin + window.location.pathname.replace('test-simple.html', 'customize-text.html?domain=Technologie&topic=Intelligence+Artificielle');
+                console.log('Loading page:', url);
+
+                const response = await fetch(url, {
+                    method: 'GET',
+                    cache: 'no-cache'
                 });
-                
-                if (!generateResponse.ok) {
-                    throw new Error(`Génération failed: ${generateResponse.status}`);
-                }
-                
-                const generateData = await generateResponse.json();
-                console.log('✅ Génération réussie:', generateData);
-                
-                resultDiv.innerHTML += `
-                    <div class="text-green-600 mt-4">
-                        <h3 class="font-bold">✅ Génération réussie !</h3>
-                        <p class="mt-2 text-sm bg-white p-2 rounded border">
-                            ${generateData.data.englishText.substring(0, 200)}...
-                        </p>
-                    </div>
+
+                const result = `
+                    <h3>Résultat du chargement</h3>
+                    <p><strong>URL:</strong> ${url}</p>
+                    <p><strong>Status:</strong> ${response.status}</p>
+                    <p><strong>Content-Type:</strong> ${response.headers.get('content-type')}</p>
+                    <p><strong>Content-Length:</strong> ${response.headers.get('content-length')}</p>
+                    <p><strong>Redirected:</strong> ${response.redirected ? 'OUI' : 'NON'}</p>
+                    ${response.redirected ? `<p><strong>URL finale:</strong> ${response.url}</p>` : ''}
                 `;
-                
+
+                const type = response.status === 200 && !response.redirected ? 'success' : 'warning';
+                showResult('load-result', result, type);
+
             } catch (error) {
-                console.error('❌ Erreur:', error);
-                resultDiv.innerHTML = `
-                    <div class="text-red-600">
-                        <h3 class="font-bold">❌ Erreur</h3>
-                        <p class="mt-2">${error.message}</p>
-                        <pre class="mt-2 text-sm bg-white p-2 rounded border">${error.stack}</pre>
-                    </div>
+                const result = `
+                    <h3>Erreur lors du chargement</h3>
+                    <p><strong>Erreur:</strong> ${error.message}</p>
+                    <pre>${error.stack}</pre>
                 `;
+                showResult('load-result', result, 'error');
             }
+        }
+
+        // Test API simple
+        async function testApiSimple() {
+            try {
+                const url = window.location.origin + window.location.pathname.replace('test-simple.html', 'api/health');
+                console.log('Testing API:', url);
+
+                const response = await fetch(url, {
+                    method: 'GET',
+                    cache: 'no-cache'
+                });
+
+                const result = `
+                    <h3>Test API /health</h3>
+                    <p><strong>URL:</strong> ${url}</p>
+                    <p><strong>Status:</strong> ${response.status}</p>
+                    <p><strong>Content-Type:</strong> ${response.headers.get('content-type')}</p>
+                `;
+
+                if (response.ok) {
+                    const data = await response.json();
+                    result += `<pre>Response: ${JSON.stringify(data, null, 2)}</pre>`;
+                }
+
+                const type = response.ok ? 'success' : 'error';
+                showResult('api-result', result, type);
+
+            } catch (error) {
+                const result = `
+                    <h3>Erreur API</h3>
+                    <p><strong>Erreur:</strong> ${error.message}</p>
+                    <pre>${error.stack}</pre>
+                `;
+                showResult('api-result', result, 'error');
+            }
+        }
+
+        // Test automatique au chargement
+        window.addEventListener('load', function() {
+            console.log('🚀 Test simple page loaded');
         });
     </script>
 </body>

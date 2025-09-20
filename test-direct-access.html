@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Accès Direct</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; }
+        .test-section { margin: 20px 0; padding: 15px; border: 1px solid #ccc; border-radius: 5px; }
+        .success { background-color: #d4edda; border-color: #c3e6cb; }
+        .error { background-color: #f8d7da; border-color: #f5c6cb; }
+        .info { background-color: #d1ecf1; border-color: #bee5eb; }
+        button { padding: 10px 15px; margin: 5px; cursor: pointer; }
+        pre { background: #f4f4f4; padding: 10px; border-radius: 3px; overflow-x: auto; }
+    </style>
+</head>
+<body>
+    <h1>🧪 Test Accès Direct aux Fichiers</h1>
+
+    <div class="test-section info">
+        <h2>🔍 Informations sur l'URL actuelle</h2>
+        <p><strong>URL complète:</strong> <span id="current-url"></span></p>
+        <p><strong>Origin:</strong> <span id="origin"></span></p>
+        <p><strong>Pathname:</strong> <span id="pathname"></span></p>
+    </div>
+
+    <div class="test-section">
+        <h2>📄 Test Accès Direct aux Fichiers</h2>
+        <button onclick="testFileAccess('customize-text.html')">Tester customize-text.html</button>
+        <button onclick="testFileAccess('select-domain.html')">Tester select-domain.html</button>
+        <button onclick="testFileAccess('select-topic.html')">Tester select-topic.html</button>
+        <div id="file-access-result"></div>
+    </div>
+
+    <div class="test-section">
+        <h2>🔗 Test Accès avec Paramètres</h2>
+        <button onclick="testParameterizedAccess('customize-text.html?domain=Technologie&topic=Intelligence+Artificielle')">
+            Tester customize-text.html avec paramètres
+        </button>
+        <button onclick="testParameterizedAccess('select-topic.html?domain=Technologie')">
+            Tester select-topic.html avec paramètres
+        </button>
+        <div id="param-access-result"></div>
+    </div>
+
+    <div class="test-section">
+        <h2>🌐 Test API Direct</h2>
+        <button onclick="testApiDirect('http://localhost/lexifever/api/health')">API Health (localhost)</button>
+        <button onclick="testApiDirect(window.location.origin + '/lexifever/api/health')">API Health (origin)</button>
+        <div id="api-direct-result"></div>
+    </div>
+
+    <script>
+        // Informations sur l'URL actuelle
+        document.getElementById('current-url').textContent = window.location.href;
+        document.getElementById('origin').textContent = window.location.origin;
+        document.getElementById('pathname').textContent = window.location.pathname;
+
+        // Fonction utilitaire pour afficher les résultats
+        function showResult(elementId, result, isSuccess = null) {
+            const element = document.getElementById(elementId);
+            let className = 'info';
+
+            if (isSuccess === true) className = 'success';
+            else if (isSuccess === false) className = 'error';
+
+            element.className = `test-section ${className}`;
+            element.innerHTML = result;
+        }
+
+        // Test d'accès direct aux fichiers
+        async function testFileAccess(filename) {
+            try {
+                console.log('📄 Testing direct access to:', filename);
+                const url = window.location.origin + window.location.pathname.replace('test-direct-access.html', filename);
+                console.log('🌐 Full URL:', url);
+
+                const response = await fetch(url, {
+                    method: 'HEAD', // HEAD request pour juste vérifier l'existence
+                    cache: 'no-cache'
+                });
+
+                console.log('📊 Response status:', response.status);
+                console.log('📄 Response URL:', response.url);
+                console.log('📋 Response headers:', Object.fromEntries(response.headers.entries()));
+
+                const result = `
+                    <h3>Test d'accès à ${filename}</h3>
+                    <p><strong>URL testée:</strong> ${url}</p>
+                    <p><strong>Status HTTP:</strong> ${response.status}</p>
+                    <p><strong>URL finale:</strong> ${response.url}</p>
+                    <p><strong>Content-Type:</strong> ${response.headers.get('content-type') || 'N/A'}</p>
+                    <p><strong>Content-Length:</strong> ${response.headers.get('content-length') || 'N/A'}</p>
+                    <p><strong>Redirected:</strong> ${response.redirected ? 'OUI' : 'NON'}</p>
+                    ${response.redirected ? `<p><strong>URL de redirection:</strong> ${response.url}</p>` : ''}
+                `;
+
+                const isSuccess = response.status === 200 && !response.redirected;
+                showResult('file-access-result', result, isSuccess);
+
+            } catch (error) {
+                console.error('❌ File access test error:', error);
+                const result = `
+                    <h3>Erreur lors du test d'accès à ${filename}</h3>
+                    <p><strong>Erreur:</strong> ${error.message}</p>
+                    <pre>${error.stack}</pre>
+                `;
+                showResult('file-access-result', result, false);
+            }
+        }
+
+        // Test d'accès avec paramètres
+        async function testParameterizedAccess(url) {
+            try {
+                console.log('🔗 Testing parameterized access to:', url);
+                const fullUrl = window.location.origin + window.location.pathname.replace('test-direct-access.html', url);
+                console.log('🌐 Full URL:', fullUrl);
+
+                const response = await fetch(fullUrl, {
+                    method: 'GET',
+                    cache: 'no-cache'
+                });
+
+                console.log('📊 Response status:', response.status);
+                console.log('📄 Response URL:', response.url);
+
+                // Récupérer le début du contenu pour voir si c'est la bonne page
+                const content = await response.text();
+                const titleMatch = content.match(/<title>(.*?)<\/title>/i);
+                const title = titleMatch ? titleMatch[1] : 'Titre non trouvé';
+
+                const result = `
+                    <h3>Test d'accès paramétré</h3>
+                    <p><strong>URL testée:</strong> ${fullUrl}</p>
+                    <p><strong>Status HTTP:</strong> ${response.status}</p>
+                    <p><strong>URL finale:</strong> ${response.url}</p>
+                    <p><strong>Titre de la page:</strong> ${title}</p>
+                    <p><strong>Redirected:</strong> ${response.redirected ? 'OUI' : 'NON'}</p>
+                    <p><strong>Content-Length:</strong> ${response.headers.get('content-length') || 'N/A'}</p>
+                    ${response.redirected ? `<p><strong>URL de redirection:</strong> ${response.url}</p>` : ''}
+                `;
+
+                const isSuccess = response.status === 200 && !response.redirected && title.includes('Personnalisez');
+                showResult('param-access-result', result, isSuccess);
+
+            } catch (error) {
+                console.error('❌ Parameterized access test error:', error);
+                const result = `
+                    <h3>Erreur lors du test d'accès paramétré</h3>
+                    <p><strong>Erreur:</strong> ${error.message}</p>
+                    <pre>${error.stack}</pre>
+                `;
+                showResult('param-access-result', result, false);
+            }
+        }
+
+        // Test API direct
+        async function testApiDirect(apiUrl) {
+            try {
+                console.log('🌐 Testing direct API access to:', apiUrl);
+
+                const response = await fetch(apiUrl, {
+                    method: 'GET',
+                    cache: 'no-cache'
+                });
+
+                console.log('📊 API Response status:', response.status);
+                console.log('📄 API Response URL:', response.url);
+
+                let content = 'N/A';
+                if (response.headers.get('content-type')?.includes('json')) {
+                    content = await response.json();
+                    content = JSON.stringify(content, null, 2);
+                } else {
+                    content = await response.text();
+                    content = content.substring(0, 200) + '...';
+                }
+
+                const result = `
+                    <h3>Test API direct</h3>
+                    <p><strong>URL testée:</strong> ${apiUrl}</p>
+                    <p><strong>Status HTTP:</strong> ${response.status}</p>
+                    <p><strong>Content-Type:</strong> ${response.headers.get('content-type') || 'N/A'}</p>
+                    <p><strong>Content-Length:</strong> ${response.headers.get('content-length') || 'N/A'}</p>
+                    <pre style="max-height: 200px; overflow-y: auto;">${content}</pre>
+                `;
+
+                const isSuccess = response.status === 200;
+                showResult('api-direct-result', result, isSuccess);
+
+            } catch (error) {
+                console.error('❌ API direct test error:', error);
+                const result = `
+                    <h3>Erreur lors du test API direct</h3>
+                    <p><strong>Erreur:</strong> ${error.message}</p>
+                    <pre>${error.stack}</pre>
+                `;
+                showResult('api-direct-result', result, false);
+            }
+        }
+
+        // Test automatique au chargement
+        window.addEventListener('load', function() {
+            console.log('🚀 Test Direct Access loaded');
+            console.log('🔧 Current location:', window.location);
+        });
+    </script>
+</body>
+</html>

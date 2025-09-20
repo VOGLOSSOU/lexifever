@@ -38,14 +38,15 @@ class Validator {
 
         // Validation du niveau
         $validLevels = ['beginner', 'intermediate', 'advanced'];
+        $validNumericLevels = [1, 2, 3, 4, 5];
         if (empty($data['level'])) {
             $this->errors['level'] = 'Le niveau est obligatoire';
-        } elseif (!in_array($data['level'], $validLevels)) {
-            $this->errors['level'] = 'Niveau non valide. Valeurs acceptées: ' . implode(', ', $validLevels);
+        } elseif (!in_array($data['level'], $validLevels) && !in_array((int)$data['level'], $validNumericLevels)) {
+            $this->errors['level'] = 'Niveau non valide. Valeurs acceptées: ' . implode(', ', $validLevels) . ' ou 1-5';
         }
 
         // Validation du ton
-        $validTones = ['informative', 'formal', 'conversational', 'enthusiastic', 'educational', 'technical'];
+        $validTones = ['informative', 'formal', 'casual', 'enthusiastic', 'professional', 'educational', 'conversational', 'technical'];
         if (empty($data['tone'])) {
             $this->errors['tone'] = 'Le ton est obligatoire';
         } elseif (!in_array($data['tone'], $validTones)) {
@@ -60,12 +61,20 @@ class Validator {
             $this->errors['length'] = 'Longueur non valide. Valeurs acceptées: ' . implode(', ', $validLengths);
         }
 
-        // Validation des options booléennes
+        // Validation des options booléennes (optionnelles)
         $booleanFields = ['includeExamples', 'includeQuestions'];
         foreach ($booleanFields as $field) {
             if (isset($data[$field]) && !is_bool($data[$field])) {
                 $this->errors[$field] = "Le champ {$field} doit être un booléen";
             }
+        }
+
+        // Définir les valeurs par défaut pour les champs optionnels
+        if (!isset($data['includeExamples'])) {
+            $data['includeExamples'] = false;
+        }
+        if (!isset($data['includeQuestions'])) {
+            $data['includeQuestions'] = false;
         }
 
         return empty($this->errors);

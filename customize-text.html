@@ -4,6 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Lexifever - Personnalisez votre texte</title>
+
+
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script>
@@ -12,7 +14,7 @@
                 extend: {
                     colors: {
                         primary: {
-                            50: '#f0f9ff',
+                            50: '#f0f9ff', 
                             100: '#e0f2fe',
                             200: '#bae6fd',
                             300: '#7dd3fc',
@@ -300,7 +302,7 @@
     <!-- Main Content -->
     <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-28 pb-12">
         <!-- Breadcrumb -->
-        <nav class="flex mb-8 animate-slide-up" aria-label="Breadcrumb">
+        <nav id="breadcrumb" class="flex mb-8 animate-slide-up" aria-label="Breadcrumb">
             <ol class="inline-flex items-center space-x-1 md:space-x-3">
                 <li class="inline-flex items-center">
                     <a href="select-domain.html" class="inline-flex items-center text-sm font-medium text-gray-500 hover:text-primary-600 transition-colors duration-300">
@@ -311,23 +313,23 @@
                 <li>
                     <div class="flex items-center">
                         <i class="fas fa-chevron-right text-gray-400 mx-2 text-xs"></i>
-                        <a href="select-topic.html" class="breadcrumb-domain text-sm font-medium text-gray-500 hover:text-primary-600 transition-colors duration-300">Technologie</a>
+                        <a href="#" id="breadcrumb-domain-link" class="breadcrumb-domain text-sm font-medium text-gray-500 hover:text-primary-600 transition-colors duration-300">Chargement...</a>
                     </div>
                 </li>
                 <li>
                     <div class="flex items-center">
                         <i class="fas fa-chevron-right text-gray-400 mx-2 text-xs"></i>
-                        <span class="breadcrumb-topic text-sm font-medium text-primary-600">Intelligence Artificielle</span>
+                        <span id="breadcrumb-topic" class="breadcrumb-topic text-sm font-medium text-primary-600">Chargement...</span>
                     </div>
                 </li>
             </ol>
         </nav>
 
         <div class="text-center mb-12 animate-slide-up" style="animation-delay: 0.1s;">
-            <h1 class="text-3xl font-extrabold text-gray-900 sm:text-4xl lg:text-5xl">
+            <h1 id="page-title" class="text-3xl font-extrabold text-gray-900 sm:text-4xl lg:text-5xl">
                 <span class="bg-gradient-to-r from-primary-600 to-secondary-500 bg-clip-text text-transparent">Personnalisez votre texte</span>
             </h1>
-            <p class="mt-4 max-w-2xl mx-auto text-xl text-gray-600">
+            <p id="page-subtitle" class="mt-4 max-w-2xl mx-auto text-xl text-gray-600">
                 Définissez les caractéristiques du texte que vous souhaitez générer.
             </p>
         </div>
@@ -645,28 +647,475 @@
     </footer>
 
     <script>
+        // =========================================
+        // CONFIGURATION ET UTILITAIRES
+        // =========================================
+
+        // Configuration de l'API (même logique que js/app.js)
+        let API_BASE_URL = window.location.origin + '/api';
+
+        // Fonction pour déterminer l'URL de l'API
+        function getApiBaseUrl() {
+            // Override si défini globalement (priorité haute)
+            if (window.API_BASE_URL && window.API_BASE_URL !== API_BASE_URL) {
+                console.log('🔧 Utilisation de window.API_BASE_URL:', window.API_BASE_URL);
+                return window.API_BASE_URL;
+            }
+
+            // Détection automatique du chemin correct pour le développement local
+            if (window.location.pathname.includes('/lexifever/')) {
+                const detectedUrl = window.location.origin + '/lexifever/api';
+                console.log('🔍 Chemin /lexifever/ détecté, URL API:', detectedUrl);
+                return detectedUrl;
+            }
+
+            // Par défaut
+            const defaultUrl = window.location.origin + '/api';
+            console.log('📍 URL API par défaut:', defaultUrl);
+            return defaultUrl;
+        }
+
+        // Initialisation de l'API_BASE_URL
+        API_BASE_URL = getApiBaseUrl();
+        console.log('🚀 API_BASE_URL initialisée dans customize-text.html:', API_BASE_URL);
+
+        // Forcer le rechargement sans cache
+        if ('serviceWorker' in navigator) {
+            navigator.serviceWorker.getRegistrations().then(function(registrations) {
+                for(let registration of registrations) {
+                    registration.unregister();
+                }
+            });
+        }
+
+        // Vider le cache localStorage pour cette page
+        localStorage.removeItem('lexifever_cache');
+        sessionStorage.clear();
+
+        // État global
+        let currentDomain = null;
+        let currentTopic = null;
+
+        // =========================================
+        // CHARGEMENT DES DONNÉES
+        // =========================================
+
+        // Récupérer les paramètres depuis l'URL
+        function getParamsFromURL() {
+            const urlParams = new URLSearchParams(window.location.search);
+            const domain = urlParams.get('domain');
+            const topic = urlParams.get('topic');
+
+            console.log('🔍 URL complète:', window.location.href);
+            console.log('🔍 Paramètres bruts:', { domain, topic });
+
+            // Décoder les paramètres s'ils sont encodés
+            const decodedDomain = domain ? decodeURIComponent(domain) : null;
+            const decodedTopic = topic ? decodeURIComponent(topic) : null;
+
+            console.log('🔍 Paramètres décodés:', { decodedDomain, decodedTopic });
+
+            return {
+                domain: decodedDomain,
+                topic: decodedTopic
+            };
+        }
+
+        // Charger les informations du domaine et du sujet
+        async function loadDomainAndTopicInfo(domainName, topicName) {
+            try {
+                console.log('🔄 Chargement des informations:', { domainName, topicName });
+
+                // Vérifier que les paramètres sont valides
+                if (!domainName || !topicName) {
+                    throw new Error('Paramètres manquants: domaine ou sujet non défini');
+                }
+
+                // Vérifier l'URL de l'API
+                const domainsUrl = API_BASE_URL.replace('/api', '') + '/api/domains';
+                console.log('🌐 URL API domains:', domainsUrl);
+
+                // Charger tous les domaines pour trouver celui demandé
+                console.log('📡 Appel API domains...');
+                const domainsResponse = await fetch(domainsUrl);
+
+                console.log('📊 Status réponse domains:', domainsResponse.status);
+                console.log('📄 Headers:', Object.fromEntries(domainsResponse.headers.entries()));
+
+                if (!domainsResponse.ok) {
+                    throw new Error(`Erreur HTTP ${domainsResponse.status}: ${domainsResponse.statusText}`);
+                }
+
+                const domainsData = await domainsResponse.json();
+                console.log('📋 Données domains reçues:', domainsData);
+
+                if (!domainsData.success || !domainsData.data) {
+                    throw new Error('Format de réponse invalide pour les domaines');
+                }
+
+                // Trouver le domaine demandé
+                console.log('🔍 Recherche du domaine:', domainName);
+                const domain = domainsData.data.find(d => d.name.toLowerCase() === domainName.toLowerCase());
+                console.log('🎯 Domaine trouvé:', domain);
+
+                if (!domain) {
+                    console.error('❌ Domaine non trouvé dans:', domainsData.data.map(d => d.name));
+                    throw new Error(`Domaine "${domainName}" non trouvé. Domaines disponibles: ${domainsData.data.map(d => d.name).join(', ')}`);
+                }
+
+                currentDomain = domain;
+
+                // Charger les sujets du domaine
+                const topicsUrl = API_BASE_URL.replace('/api', '') + `/api/domains/${domain.id}/topics`;
+                console.log('📡 Appel API topics:', topicsUrl);
+
+                const topicsResponse = await fetch(topicsUrl);
+                console.log('📊 Status réponse topics:', topicsResponse.status);
+
+                if (!topicsResponse.ok) {
+                    throw new Error(`Erreur HTTP ${topicsResponse.status}: ${topicsResponse.statusText}`);
+                }
+
+                const topicsData = await topicsResponse.json();
+                console.log('📋 Données topics reçues:', topicsData);
+
+                if (!topicsData.success || !topicsData.data) {
+                    throw new Error('Format de réponse invalide pour les sujets');
+                }
+
+                // Trouver le sujet demandé
+                console.log('🔍 Recherche du sujet:', topicName);
+                const topic = topicsData.data.find(t => t.name.toLowerCase() === topicName.toLowerCase());
+                console.log('🎯 Sujet trouvé:', topic);
+
+                if (!topic) {
+                    console.error('❌ Sujet non trouvé dans:', topicsData.data.map(t => t.name));
+                    throw new Error(`Sujet "${topicName}" non trouvé. Sujets disponibles: ${topicsData.data.map(t => t.name).join(', ')}`);
+                }
+
+                currentTopic = topic;
+
+                console.log('✅ Informations chargées avec succès:', { domain, topic });
+
+                // Mettre à jour l'interface
+                updateBreadcrumb(domain, topic);
+                updatePageTitle(domain, topic);
+                updatePageSubtitle(domain, topic);
+
+                return { domain, topic };
+
+            } catch (error) {
+                console.error('❌ Erreur lors du chargement:', error);
+                console.error('🔍 Détails de l\'erreur:', {
+                    message: error.message,
+                    stack: error.stack,
+                    domainName,
+                    topicName
+                });
+
+                // Afficher l'erreur de manière plus visible
+                showError('Erreur lors du chargement des informations: ' + error.message);
+
+                // Ne pas rediriger automatiquement, laisser l'utilisateur voir l'erreur
+                return null;
+            }
+        }
+
+        // =========================================
+        // MISE À JOUR DE L'INTERFACE
+        // =========================================
+
+        // Mettre à jour le breadcrumb
+        function updateBreadcrumb(domain, topic) {
+            const breadcrumbDomainLink = document.getElementById('breadcrumb-domain-link');
+            const breadcrumbTopic = document.getElementById('breadcrumb-topic');
+
+            // Créer le lien vers la page des sujets
+            breadcrumbDomainLink.href = `select-topic.html?domain=${encodeURIComponent(domain.name)}`;
+            breadcrumbDomainLink.textContent = domain.name;
+
+            // Afficher le nom du sujet
+            breadcrumbTopic.textContent = topic.name;
+        }
+
+        // Mettre à jour le titre de la page
+        function updatePageTitle(domain, topic) {
+            const titleElement = document.getElementById('page-title');
+            titleElement.innerHTML = `
+                <span class="bg-gradient-to-r from-primary-600 to-secondary-500 bg-clip-text text-transparent">
+                    Personnalisez votre texte sur ${topic.name}
+                </span>
+            `;
+
+            // Mettre à jour le titre de la page
+            document.title = `Lexifever - ${topic.name} (${domain.name})`;
+        }
+
+        // Mettre à jour le sous-titre
+        function updatePageSubtitle(domain, topic) {
+            const subtitleElement = document.getElementById('page-subtitle');
+            subtitleElement.textContent = `Définissez les caractéristiques du texte sur ${topic.name} dans le domaine ${domain.name}.`;
+        }
+
+        // Afficher un message d'erreur
+        function showError(message) {
+            const mainContent = document.querySelector('main');
+            mainContent.innerHTML = `
+                <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-28 pb-12">
+                    <div class="text-center">
+                        <div class="text-red-500 mb-4">
+                            <i class="fas fa-exclamation-triangle text-4xl"></i>
+                        </div>
+                        <h1 class="text-2xl font-bold text-gray-900 mb-4">Erreur de chargement</h1>
+                        <p class="text-gray-600 mb-6">${message}</p>
+                        <div class="space-x-4">
+                            <a href="select-domain.html" class="bg-primary-600 text-white px-6 py-3 rounded-lg hover:bg-primary-700 transition-colors">
+                                <i class="fas fa-arrow-left mr-2"></i>Retour aux domaines
+                            </a>
+                            <button onclick="window.location.reload()" class="bg-gray-600 text-white px-6 py-3 rounded-lg hover:bg-gray-700 transition-colors">
+                                <i class="fas fa-refresh mr-2"></i>Réessayer
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        // =========================================
+        // GESTION DU FORMULAIRE
+        // =========================================
+
+        // Préparer le formulaire avec les valeurs par défaut
+        function prepareForm() {
+            // Valeurs par défaut pour le formulaire
+            const defaultValues = {
+                tone: 'informative',
+                length: 'medium',
+                level: 3,
+                'include-examples': false,
+                'include-definitions': true,
+                'include-history': false,
+                focus: ''
+            };
+
+            // Appliquer les valeurs par défaut
+            Object.keys(defaultValues).forEach(key => {
+                const element = document.getElementById(key) || document.querySelector(`[name="${key}"]`);
+                if (element) {
+                    if (element.type === 'checkbox') {
+                        element.checked = defaultValues[key];
+                    } else if (element.type === 'radio') {
+                        const radioElement = document.querySelector(`[name="${key}"][value="${defaultValues[key]}"]`);
+                        if (radioElement) radioElement.checked = true;
+                    } else {
+                        element.value = defaultValues[key];
+                    }
+                }
+            });
+
+            // Mettre à jour l'affichage du niveau
+            updateLevelDisplay();
+        }
+
+        // Gérer la soumission du formulaire
+        function handleFormSubmission() {
+            const form = document.getElementById('customize-form');
+
+            form.addEventListener('submit', function(e) {
+                e.preventDefault(); // Empêcher la soumission normale
+
+                // Récupérer toutes les valeurs du formulaire
+                const formData = new FormData(form);
+                const params = new URLSearchParams();
+
+                // Ajouter les paramètres du domaine et du sujet
+                params.append('domain', currentDomain.name);
+                params.append('topic', currentTopic.name);
+
+                // Ajouter tous les paramètres du formulaire
+                for (let [key, value] of formData.entries()) {
+                    if (value !== '' && value !== null) {
+                        params.append(key, value);
+                    }
+                }
+
+                // Ajouter les checkboxes non cochées
+                const checkboxes = form.querySelectorAll('input[type="checkbox"]:not(:checked)');
+                checkboxes.forEach(checkbox => {
+                    params.append(checkbox.name, 'false');
+                });
+
+                // Animation du bouton
+                const submitButton = form.querySelector('button[type="submit"]');
+                const originalContent = submitButton.innerHTML;
+                submitButton.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i> Génération en cours...';
+                submitButton.disabled = true;
+
+                // Redirection vers la page de résultats
+                setTimeout(() => {
+                    window.location.href = `result.html?${params.toString()}`;
+                }, 1000);
+            });
+        }
+
+        // =========================================
+        // FONCTIONS UTILITAIRES
+        // =========================================
+
+        // Language level display with enhanced visual feedback
+        function updateLevelDisplay() {
+            const levelSlider = document.getElementById('level');
+            const levelDisplay = document.getElementById('level-display');
+
+            if (!levelSlider || !levelDisplay) return;
+
+            const updateDisplay = () => {
+                const value = levelSlider.value;
+                let levelText = 'Intermédiaire';
+                let levelColor = 'bg-primary-50 text-primary-600';
+
+                if (value == 1) {
+                    levelText = 'Débutant';
+                    levelColor = 'bg-green-50 text-green-600';
+                } else if (value == 2) {
+                    levelText = 'Élémentaire';
+                    levelColor = 'bg-blue-50 text-blue-600';
+                } else if (value == 3) {
+                    levelText = 'Intermédiaire';
+                    levelColor = 'bg-primary-50 text-primary-600';
+                } else if (value == 4) {
+                    levelText = 'Avancé';
+                    levelColor = 'bg-purple-50 text-purple-600';
+                } else if (value == 5) {
+                    levelText = 'Expert';
+                    levelColor = 'bg-secondary-50 text-secondary-600';
+                }
+
+                levelDisplay.textContent = levelText;
+                levelDisplay.className = `text-sm font-medium px-4 py-1 rounded-full ${levelColor}`;
+            };
+
+            levelSlider.addEventListener('input', updateDisplay);
+            updateDisplay();
+        }
+
+        // Enhanced radio button interactions
+        function setupRadioInteractions() {
+            document.querySelectorAll('input[type="radio"]').forEach(radio => {
+                radio.addEventListener('change', function() {
+                    if (this.name === 'length') {
+                        // Update icons for length options
+                        document.querySelectorAll('input[name="length"] + label i').forEach(icon => {
+                            icon.classList.add('text-gray-400');
+                            icon.classList.remove('text-primary-500');
+                        });
+
+                        const selectedIcon = document.querySelector(`label[for="${this.id}"] i`);
+                        if (selectedIcon) {
+                            selectedIcon.classList.remove('text-gray-400');
+                            selectedIcon.classList.add('text-primary-500');
+                        }
+                    }
+                });
+            });
+        }
+
+        // =========================================
+        // INITIALISATION
+        // =========================================
+
+        // Charger les données au chargement de la page
+        document.addEventListener('DOMContentLoaded', async function() {
+            console.log('🚀 Initialisation de customize-text.html');
+            console.log('📍 URL actuelle:', window.location.href);
+            console.log('🔧 API Base URL:', API_BASE_URL);
+
+            try {
+                // Récupérer les paramètres depuis l'URL
+                const { domain: domainName, topic: topicName } = getParamsFromURL();
+                console.log('📋 Paramètres URL extraits:', { domainName, topicName });
+
+                if (!domainName || !topicName) {
+                    console.error('❌ Paramètres manquants:', { domainName, topicName });
+                    console.error('🔍 URL complète:', window.location.href);
+                    console.error('🔍 Search string:', window.location.search);
+
+                    // Afficher un message d'erreur mais NE PAS rediriger automatiquement
+                    showError('Paramètres manquants dans l\'URL. Veuillez revenir à la sélection des sujets.');
+                    console.log('⚠️ Erreur affichée, mais pas de redirection automatique');
+                    return;
+                }
+
+                console.log('✅ Paramètres valides, chargement des informations...');
+
+                // Charger les informations du domaine et du sujet
+                const result = await loadDomainAndTopicInfo(domainName, topicName);
+
+                if (result) {
+                    console.log('✅ Informations chargées avec succès');
+                    console.log('🎯 Domaine actuel:', currentDomain);
+                    console.log('🎯 Sujet actuel:', currentTopic);
+
+                    // Préparer le formulaire
+                    console.log('🔧 Préparation du formulaire...');
+                    prepareForm();
+
+                    // Configurer les interactions
+                    console.log('🔧 Configuration des interactions...');
+                    setupRadioInteractions();
+                    updateLevelDisplay();
+                    handleFormSubmission();
+
+                    console.log('🎉 Page complètement prête !');
+                    console.log('📝 Formulaire initialisé avec succès');
+                } else {
+                    console.error('❌ Échec du chargement des informations');
+                    console.error('🔍 Vérifiez les logs ci-dessus pour plus de détails');
+
+                    // Afficher un message d'erreur mais NE PAS rediriger automatiquement
+                    showError('Impossible de charger les informations du domaine et du sujet.');
+                    console.log('⚠️ Erreur affichée, mais pas de redirection automatique');
+                }
+
+            } catch (error) {
+                console.error('❌ Erreur lors de l\'initialisation:', error);
+                console.error('🔍 Stack trace:', error.stack);
+                console.error('🔍 URL au moment de l\'erreur:', window.location.href);
+
+                // Afficher un message d'erreur mais NE PAS rediriger automatiquement
+                showError('Erreur lors du chargement de la page: ' + error.message);
+                console.log('⚠️ Erreur affichée, mais pas de redirection automatique');
+            }
+        });
+
+        // =========================================
+        // AUTRES FONCTIONNALITÉS
+        // =========================================
+
         // Mobile menu toggle with animation
         const mobileMenuButton = document.getElementById('mobile-menu-button');
         const mobileMenu = document.getElementById('mobile-menu');
         const menuIcon = document.getElementById('menu-icon');
 
-        mobileMenuButton.addEventListener('click', () => {
-            mobileMenu.classList.toggle('hidden');
-            
-            if (mobileMenu.classList.contains('hidden')) {
-                menuIcon.classList.remove('fa-times');
-                menuIcon.classList.add('fa-bars');
-                menuIcon.style.transform = 'rotate(0deg)';
-            } else {
-                menuIcon.classList.remove('fa-bars');
-                menuIcon.classList.add('fa-times');
-                menuIcon.style.transform = 'rotate(180deg)';
-            }
-        });
+        if (mobileMenuButton) {
+            mobileMenuButton.addEventListener('click', () => {
+                mobileMenu.classList.toggle('hidden');
+
+                if (mobileMenu.classList.contains('hidden')) {
+                    menuIcon.classList.remove('fa-times');
+                    menuIcon.classList.add('fa-bars');
+                    menuIcon.style.transform = 'rotate(0deg)';
+                } else {
+                    menuIcon.classList.remove('fa-bars');
+                    menuIcon.classList.add('fa-times');
+                    menuIcon.style.transform = 'rotate(180deg)';
+                }
+            });
+        }
 
         // Navbar background change on scroll
         const navbar = document.getElementById('navbar');
-        
+
         window.addEventListener('scroll', () => {
             if (window.scrollY > 50) {
                 navbar.classList.add('bg-white/95');
@@ -675,69 +1124,6 @@
                 navbar.classList.add('bg-white/80');
                 navbar.classList.remove('bg-white/95');
             }
-        });
-
-        // Language level display with enhanced visual feedback
-        const levelSlider = document.getElementById('level');
-        const levelDisplay = document.getElementById('level-display');
-
-        const updateLevelDisplay = () => {
-            const value = levelSlider.value;
-            let levelText = 'Intermédiaire';
-            let levelColor = 'bg-primary-50 text-primary-600';
-            
-            if (value == 1) {
-                levelText = 'Débutant';
-                levelColor = 'bg-green-50 text-green-600';
-            } else if (value == 2) {
-                levelText = 'Élémentaire';
-                levelColor = 'bg-blue-50 text-blue-600';
-            } else if (value == 3) {
-                levelText = 'Intermédiaire';
-                levelColor = 'bg-primary-50 text-primary-600';
-            } else if (value == 4) {
-                levelText = 'Avancé';
-                levelColor = 'bg-purple-50 text-purple-600';
-            } else if (value == 5) {
-                levelText = 'Expert';
-                levelColor = 'bg-secondary-50 text-secondary-600';
-            }
-            
-            levelDisplay.textContent = levelText;
-            
-            // Update the color class
-            levelDisplay.className = `text-sm font-medium px-4 py-1 rounded-full ${levelColor}`;
-        };
-
-        levelSlider.addEventListener('input', updateLevelDisplay);
-        updateLevelDisplay();
-
-        // Enhanced radio button interactions
-        document.querySelectorAll('input[type="radio"]').forEach(radio => {
-            radio.addEventListener('change', function() {
-                if (this.name === 'length') {
-                    // Update icons for length options
-                    document.querySelectorAll('input[name="length"] + label i').forEach(icon => {
-                        icon.classList.add('text-gray-400');
-                        icon.classList.remove('text-primary-500');
-                    });
-                    
-                    const selectedIcon = document.querySelector(`label[for="${this.id}"] i`);
-                    if (selectedIcon) {
-                        selectedIcon.classList.remove('text-gray-400');
-                        selectedIcon.classList.add('text-primary-500');
-                    }
-                }
-            });
-        });
-
-        // Form submission animation
-        document.getElementById('customize-form').addEventListener('submit', function(e) {
-            const submitButton = this.querySelector('button[type="submit"]');
-            submitButton.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i> Génération en cours...';
-            submitButton.disabled = true;
-            
-            // We don't prevent default as we want the form to actually submit
         });
 
         // Intersection Observer for animations
