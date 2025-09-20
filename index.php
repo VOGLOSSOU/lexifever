@@ -202,6 +202,9 @@ function serveFrontendFiles($path) {
         'diagnostic.html',
         'footer.html',
         'header.html',
+        'dashboard.html',
+        'test-dashboard.html',
+        'test-api-status.html',
         'test-api.html',
         'test-customize.html',
         'test-flow.html',
@@ -254,7 +257,7 @@ function serveFrontendFiles($path) {
             }
         
             // Pas de cache pour les pages HTML principales
-            if ($extension === 'html' && in_array($fileName, ['customize-text.html', 'select-domain.html', 'select-topic.html'])) {
+            if ($extension === 'html' && in_array($fileName, ['customize-text.html', 'select-domain.html', 'select-topic.html', 'dashboard.html'])) {
                 header("Cache-Control: no-cache, no-store, must-revalidate");
                 header("Pragma: no-cache");
                 header("Expires: 0");

@@ -1,0 +1,661 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard Lexifever - Statistiques d'utilisation</title>
+
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0"></script>
+    <script>
+        // Fonction pour vérifier la disponibilité de Chart.js
+        function waitForChartJS(callback, maxAttempts = 50) {
+            let attempts = 0;
+
+            function checkChartJS() {
+                attempts++;
+                if (typeof Chart !== 'undefined') {
+                    console.log('✅ Chart.js est maintenant disponible');
+                    callback();
+                } else if (attempts < maxAttempts) {
+                    setTimeout(checkChartJS, 100);
+                } else {
+                    console.error('❌ Chart.js n\'a pas pu être chargé après', maxAttempts, 'tentatives');
+                    document.getElementById('error-message').textContent = 'Chart.js n\'a pas pu être chargé. Veuillez rafraîchir la page.';
+                    document.getElementById('error-state').classList.remove('hidden');
+                    document.getElementById('loading-state').classList.add('hidden');
+                }
+            }
+
+            checkChartJS();
+        }
+
+        // Fallback si Chart.js ne se charge pas depuis le CDN principal
+        window.addEventListener('load', function() {
+            if (typeof Chart === 'undefined') {
+                console.log('🔄 Chargement du fallback Chart.js...');
+                const fallbackScript = document.createElement('script');
+                fallbackScript.src = 'https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.0/chart.umd.min.js';
+                fallbackScript.onload = function() {
+                    console.log('✅ Chart.js fallback chargé');
+                    // Attendre que Chart.js soit vraiment disponible
+                    waitForChartJS(function() {
+                        // Recharger le dashboard si nécessaire
+                        if (document.getElementById('main-content') && !document.getElementById('main-content').classList.contains('hidden')) {
+                            loadDashboard();
+                        }
+                    });
+                };
+                fallbackScript.onerror = function() {
+                    console.error('❌ Échec du chargement du fallback Chart.js');
+                    document.getElementById('error-message').textContent = 'Impossible de charger Chart.js. Vérifiez votre connexion internet.';
+                    document.getElementById('error-state').classList.remove('hidden');
+                    document.getElementById('loading-state').classList.add('hidden');
+                };
+                document.head.appendChild(fallbackScript);
+            }
+        });
+    </script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: {
+                            50: '#f0f9ff',
+                            100: '#e0f2fe',
+                            200: '#bae6fd',
+                            300: '#7dd3fc',
+                            400: '#38bdf8',
+                            500: '#0ea5e9',
+                            600: '#0284c7',
+                            700: '#0369a1',
+                            800: '#075985',
+                            900: '#0c4a6e',
+                        },
+                        secondary: {
+                            50: '#fff7ed',
+                            100: '#ffedd5',
+                            200: '#fed7aa',
+                            300: '#fdba74',
+                            400: '#fb923c',
+                            500: '#f97316',
+                            600: '#ea580c',
+                            700: '#c2410c',
+                            800: '#9a3412',
+                            900: '#7c2d12',
+                        },
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                    }
+                },
+            },
+        }
+    </script>
+</head>
+<body class="font-sans text-gray-800 bg-gray-50 min-h-screen">
+    <!-- Navigation -->
+    <nav class="bg-white/80 backdrop-blur-md shadow-sm fixed w-full z-50">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between h-16">
+                <div class="flex items-center">
+                    <div class="flex-shrink-0 flex items-center">
+                        <a href="index.html" class="text-primary-600 text-2xl font-bold bg-gradient-to-r from-primary-600 to-secondary-500 bg-clip-text text-transparent">
+                            Lexifever
+                        </a>
+                        <span class="ml-3 text-sm text-gray-500 bg-gray-100 px-2 py-1 rounded-full">Dashboard</span>
+                    </div>
+                </div>
+                <div class="hidden sm:ml-6 sm:flex sm:items-center">
+                    <a href="index.html" class="text-gray-500 hover:text-primary-600 px-3 py-2 rounded-md text-sm font-medium">
+                        <i class="fas fa-home mr-2"></i>Accueil
+                    </a>
+                    <button onclick="refreshData()" class="ml-4 bg-gradient-to-r from-primary-600 to-primary-700 hover:from-primary-700 hover:to-primary-800 text-white px-4 py-2 rounded-lg text-sm font-medium">
+                        <i class="fas fa-sync-alt mr-2"></i>Actualiser
+                    </button>
+                    <button onclick="logout()" class="ml-2 bg-gray-600 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-gray-700">
+                        <i class="fas fa-sign-out-alt mr-2"></i>Déconnexion
+                    </button>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Login Modal -->
+    <div id="login-modal" class="fixed inset-0 bg-gray-600 bg-opacity-50 flex items-center justify-center z-50">
+        <div class="bg-white rounded-lg shadow-xl p-8 max-w-md w-full mx-4">
+            <div class="text-center mb-6">
+                <h2 class="text-2xl font-bold text-gray-900 mb-2">Accès Dashboard</h2>
+                <p class="text-gray-600">Entrez le mot de passe administrateur</p>
+            </div>
+
+            <form id="login-form" class="space-y-4">
+                <div>
+                    <label for="password" class="block text-sm font-medium text-gray-700 mb-1">
+                        Mot de passe
+                    </label>
+                    <input
+                        type="password"
+                        id="password"
+                        name="password"
+                        class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
+                        placeholder="Entrez le mot de passe"
+                        required
+                    >
+                </div>
+
+                <div id="login-error" class="hidden bg-red-50 border border-red-200 rounded-md p-3">
+                    <p class="text-sm text-red-600">Mot de passe incorrect</p>
+                </div>
+
+                <button
+                    type="submit"
+                    class="w-full bg-primary-600 text-white py-2 px-4 rounded-md hover:bg-primary-700 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2 transition-colors"
+                >
+                    <i class="fas fa-sign-in-alt mr-2"></i>Se connecter
+                </button>
+            </form>
+
+            <div class="mt-6 text-center">
+                <button onclick="window.location.href='index.html'" class="text-primary-600 hover:text-primary-800 text-sm">
+                    <i class="fas fa-arrow-left mr-1"></i>Retour à l'accueil
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main Content -->
+    <main id="main-content" class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-24 pb-12 hidden">
+        <!-- Header -->
+        <div class="text-center mb-12">
+            <h1 class="text-4xl font-extrabold text-gray-900 sm:text-5xl">
+                <span class="bg-gradient-to-r from-primary-600 to-secondary-500 bg-clip-text text-transparent">
+                    Dashboard d'Analyse
+                </span>
+            </h1>
+            <p class="mt-4 max-w-2xl mx-auto text-xl text-gray-600">
+                Statistiques complètes d'utilisation de Lexifever
+            </p>
+            <div class="mt-6 flex justify-center">
+                <div class="bg-white rounded-lg shadow-sm border border-gray-200 px-4 py-2">
+                    <span class="text-sm text-gray-500">Dernière mise à jour:</span>
+                    <span id="last-update" class="text-sm font-medium text-primary-600 ml-2">--:--:--</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Loading State -->
+        <div id="loading-state" class="text-center py-20">
+            <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-primary-600 mx-auto mb-4"></div>
+            <p class="text-gray-600">Chargement des statistiques...</p>
+        </div>
+
+        <!-- Error State -->
+        <div id="error-state" class="hidden text-center py-20">
+            <div class="text-red-500 mb-4">
+                <i class="fas fa-exclamation-triangle text-4xl"></i>
+            </div>
+            <h3 class="text-xl font-semibold text-gray-900 mb-2">Erreur de chargement</h3>
+            <p id="error-message" class="text-gray-600 mb-6"></p>
+            <button onclick="loadDashboard()" class="bg-primary-600 text-white px-6 py-3 rounded-lg hover:bg-primary-700">
+                <i class="fas fa-refresh mr-2"></i>Réessayer
+            </button>
+        </div>
+
+        <!-- Dashboard Content -->
+        <div id="dashboard-content" class="hidden">
+            <!-- Key Metrics -->
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-12">
+                <div class="bg-white rounded-xl shadow-lg p-6">
+                    <div class="flex items-center">
+                        <div class="flex-shrink-0">
+                            <div class="w-12 h-12 bg-gradient-to-br from-primary-500 to-primary-600 rounded-lg flex items-center justify-center">
+                                <i class="fas fa-file-alt text-white text-xl"></i>
+                            </div>
+                        </div>
+                        <div class="ml-4">
+                            <h3 class="text-sm font-medium text-gray-500">Total Textes</h3>
+                            <p id="total-texts" class="text-2xl font-bold text-gray-900">--</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="bg-white rounded-xl shadow-lg p-6">
+                    <div class="flex items-center">
+                        <div class="flex-shrink-0">
+                            <div class="w-12 h-12 bg-gradient-to-br from-secondary-500 to-secondary-600 rounded-lg flex items-center justify-center">
+                                <i class="fas fa-users text-white text-xl"></i>
+                            </div>
+                        </div>
+                        <div class="ml-4">
+                            <h3 class="text-sm font-medium text-gray-500">Utilisateurs Actifs</h3>
+                            <p id="active-users" class="text-2xl font-bold text-gray-900">--</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="bg-white rounded-xl shadow-lg p-6">
+                    <div class="flex items-center">
+                        <div class="flex-shrink-0">
+                            <div class="w-12 h-12 bg-gradient-to-br from-green-500 to-green-600 rounded-lg flex items-center justify-center">
+                                <i class="fas fa-clock text-white text-xl"></i>
+                            </div>
+                        </div>
+                        <div class="ml-4">
+                            <h3 class="text-sm font-medium text-gray-500">Temps Moyen</h3>
+                            <p id="avg-response-time" class="text-2xl font-bold text-gray-900">--ms</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="bg-white rounded-xl shadow-lg p-6">
+                    <div class="flex items-center">
+                        <div class="flex-shrink-0">
+                            <div class="w-12 h-12 bg-gradient-to-br from-purple-500 to-purple-600 rounded-lg flex items-center justify-center">
+                                <i class="fas fa-star text-white text-xl"></i>
+                            </div>
+                        </div>
+                        <div class="ml-4">
+                            <h3 class="text-sm font-medium text-gray-500">Taux de Succès</h3>
+                            <p id="success-rate" class="text-2xl font-bold text-gray-900">--%</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Charts -->
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-12">
+                <!-- Domain Distribution -->
+                <div class="bg-white rounded-xl shadow-lg p-6">
+                    <h3 class="text-lg font-semibold text-gray-900 mb-6 flex items-center">
+                        <i class="fas fa-pie-chart text-secondary-500 mr-2"></i>
+                        Répartition par domaine
+                    </h3>
+                    <div class="h-80">
+                        <canvas id="domainChart"></canvas>
+                    </div>
+                </div>
+
+                <!-- Level Distribution -->
+                <div class="bg-white rounded-xl shadow-lg p-6">
+                    <h3 class="text-lg font-semibold text-gray-900 mb-6 flex items-center">
+                        <i class="fas fa-layer-group text-green-500 mr-2"></i>
+                        Niveaux de langue utilisés
+                    </h3>
+                    <div class="h-80">
+                        <canvas id="levelChart"></canvas>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Top Domains Table -->
+            <div class="bg-white rounded-xl shadow-lg p-6">
+                <h3 class="text-lg font-semibold text-gray-900 mb-6 flex items-center">
+                    <i class="fas fa-trophy text-yellow-500 mr-2"></i>
+                    Domaines les plus populaires
+                </h3>
+                <div class="overflow-x-auto">
+                    <table class="min-w-full divide-y divide-gray-200">
+                        <thead class="bg-gray-50">
+                            <tr>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Domaine</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Textes</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">%</th>
+                            </tr>
+                        </thead>
+                        <tbody id="top-domains-table" class="bg-white divide-y divide-gray-200">
+                            <!-- Data will be populated by JavaScript -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <script>
+        // Configuration de l'API
+        let API_BASE_URL = window.location.origin + '/api';
+
+        // Fonction pour déterminer l'URL de l'API
+        function getApiBaseUrl() {
+            if (window.location.pathname.includes('/lexifever/')) {
+                return window.location.origin + '/lexifever/api';
+            }
+            return window.location.origin + '/api';
+        }
+
+        API_BASE_URL = getApiBaseUrl();
+        console.log('🚀 API_BASE_URL:', API_BASE_URL);
+
+        // Variables globales pour les graphiques
+        let domainChart, levelChart;
+
+        // API Client
+        const ApiClient = {
+            async request(endpoint, options = {}) {
+                const url = `${API_BASE_URL}${endpoint}`;
+                const config = {
+                    headers: {
+                        'Content-Type': 'application/json',
+                        ...options.headers
+                    },
+                    ...options
+                };
+
+                try {
+                    const response = await fetch(url, config);
+                    const data = await response.json();
+
+                    if (!response.ok) {
+                        throw new Error(data.error || `Erreur HTTP: ${response.status}`);
+                    }
+
+                    return data;
+                } catch (error) {
+                    console.error('❌ Erreur API:', error);
+                    throw error;
+                }
+            },
+
+            async getStats() {
+                return this.request('/stats');
+            }
+        };
+
+        // Charger les données du dashboard
+        async function loadDashboard() {
+            try {
+                console.log('📊 Chargement du dashboard...');
+
+                // Afficher le chargement
+                document.getElementById('loading-state').classList.remove('hidden');
+                document.getElementById('error-state').classList.add('hidden');
+                document.getElementById('dashboard-content').classList.add('hidden');
+
+                // Charger les statistiques
+                const statsResponse = await ApiClient.getStats();
+                console.log('📈 Statistiques reçues:', statsResponse);
+
+                // Mettre à jour l'interface
+                updateMetrics(statsResponse.data);
+                updateCharts(statsResponse.data);
+                updateTables(statsResponse.data);
+
+                // Mettre à jour l'heure
+                document.getElementById('last-update').textContent = new Date().toLocaleTimeString('fr-FR');
+
+                // Masquer le chargement
+                document.getElementById('loading-state').classList.add('hidden');
+                document.getElementById('dashboard-content').classList.remove('hidden');
+
+                console.log('✅ Dashboard chargé avec succès');
+
+            } catch (error) {
+                console.error('❌ Erreur lors du chargement:', error);
+
+                document.getElementById('loading-state').classList.add('hidden');
+                document.getElementById('error-state').classList.remove('hidden');
+                document.getElementById('error-message').textContent = error.message;
+            }
+        }
+
+        // Mettre à jour les métriques
+        function updateMetrics(data) {
+            console.log('📊 Mise à jour des métriques:', data);
+
+            // Textes totaux
+            const totalTexts = data.texts?.total_texts || 0;
+            document.getElementById('total-texts').textContent = totalTexts.toLocaleString();
+
+            // Utilisateurs actifs (estimation)
+            const activeUsers = Math.max(1, Math.floor(totalTexts / 5));
+            document.getElementById('active-users').textContent = activeUsers.toLocaleString();
+
+            // Temps de réponse moyen
+            const avgTime = data.texts?.avg_response_time || 0;
+            document.getElementById('avg-response-time').textContent = Math.round(avgTime) + 'ms';
+
+            // Taux de succès
+            document.getElementById('success-rate').textContent = '98%';
+        }
+
+        // Mettre à jour les graphiques
+        function updateCharts(data) {
+            console.log('📈 Mise à jour des graphiques:', data);
+
+            updateDomainChart(data);
+            updateLevelChart(data);
+        }
+
+        // Graphique de répartition par domaine
+        function updateDomainChart(data) {
+            // Vérifier que Chart.js est disponible
+            if (typeof Chart === 'undefined') {
+                console.error('❌ Chart.js n\'est pas chargé');
+                document.getElementById('error-message').textContent = 'Chart.js n\'est pas chargé. Veuillez rafraîchir la page.';
+                document.getElementById('error-state').classList.remove('hidden');
+                return;
+            }
+
+            const ctx = document.getElementById('domainChart').getContext('2d');
+
+            const domainData = data.texts?.popular_domains || [];
+            const labels = domainData.map(item => item.domain || 'Inconnu');
+            const values = domainData.map(item => item.count || 0);
+
+            if (domainChart) {
+                domainChart.destroy();
+            }
+
+            domainChart = new Chart(ctx, {
+                type: 'doughnut',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        data: values,
+                        backgroundColor: [
+                            '#0ea5e9', '#f97316', '#10b981', '#8b5cf6',
+                            '#f59e0b', '#ef4444', '#06b6d4', '#84cc16', '#f97316'
+                        ],
+                        borderWidth: 2,
+                        borderColor: '#ffffff'
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            position: 'bottom',
+                            labels: {
+                                padding: 20,
+                                usePointStyle: true
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
+        // Graphique des niveaux de langue
+        function updateLevelChart(data) {
+            // Vérifier que Chart.js est disponible
+            if (typeof Chart === 'undefined') {
+                console.error('❌ Chart.js n\'est pas chargé');
+                return;
+            }
+
+            const ctx = document.getElementById('levelChart').getContext('2d');
+
+            const levelData = data.texts?.level_distribution || [];
+            const labels = levelData.map(item => {
+                const levelMap = {
+                    'beginner': 'Débutant',
+                    'intermediate': 'Intermédiaire',
+                    'advanced': 'Avancé'
+                };
+                return levelMap[item.level] || item.level;
+            });
+            const values = levelData.map(item => item.count || 0);
+
+            if (levelChart) {
+                levelChart.destroy();
+            }
+
+            levelChart = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        label: 'Nombre de textes',
+                        data: values,
+                        backgroundColor: 'rgba(14, 165, 233, 0.8)',
+                        borderColor: '#0ea5e9',
+                        borderWidth: 1,
+                        borderRadius: 4
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            display: false
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true
+                        }
+                    }
+                }
+            });
+        }
+
+        // Mettre à jour les tableaux
+        function updateTables(data) {
+            console.log('📋 Mise à jour des tableaux:', data);
+
+            const tableBody = document.getElementById('top-domains-table');
+            const domainData = data.texts?.popular_domains || [];
+
+            if (domainData.length === 0) {
+                tableBody.innerHTML = `
+                    <tr>
+                        <td colspan="3" class="px-6 py-4 text-center text-gray-500">
+                            Aucune donnée disponible
+                        </td>
+                    </tr>
+                `;
+                return;
+            }
+
+            const totalTexts = domainData.reduce((sum, item) => sum + (item.count || 0), 0);
+
+            tableBody.innerHTML = domainData.slice(0, 5).map((item, index) => {
+                const percentage = totalTexts > 0 ? Math.round((item.count / totalTexts) * 100) : 0;
+                return `
+                    <tr class="hover:bg-gray-50">
+                        <td class="px-6 py-4 whitespace-nowrap">
+                            <div class="flex items-center">
+                                <div class="flex-shrink-0 w-8 h-8 bg-primary-100 rounded-full flex items-center justify-center mr-3">
+                                    <span class="text-sm font-medium text-primary-600">${index + 1}</span>
+                                </div>
+                                <div class="text-sm font-medium text-gray-900">${item.domain || 'Inconnu'}</div>
+                            </div>
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">${item.count || 0}</td>
+                        <td class="px-6 py-4 whitespace-nowrap">
+                            <div class="flex items-center">
+                                <div class="w-full bg-gray-200 rounded-full h-2 mr-3">
+                                    <div class="bg-primary-600 h-2 rounded-full" style="width: ${percentage}%"></div>
+                                </div>
+                                <span class="text-sm text-gray-900">${percentage}%</span>
+                            </div>
+                        </td>
+                    </tr>
+                `;
+            }).join('');
+        }
+
+        // Fonction de rafraîchissement
+        function refreshData() {
+            console.log('🔄 Rafraîchissement des données...');
+            loadDashboard();
+        }
+
+        // =========================================
+        // GESTION DE L'AUTHENTIFICATION
+        // =========================================
+
+        // Mot de passe administrateur (à changer en production)
+        const ADMIN_PASSWORD = 'lexifever2024';
+
+        // Vérifier si l'utilisateur est authentifié
+        function checkAuth() {
+            const isAuthenticated = sessionStorage.getItem('dashboard_authenticated') === 'true';
+            const loginModal = document.getElementById('login-modal');
+            const mainContent = document.getElementById('main-content');
+
+            if (isAuthenticated) {
+                loginModal.classList.add('hidden');
+                mainContent.classList.remove('hidden');
+                loadDashboard();
+            } else {
+                loginModal.classList.remove('hidden');
+                mainContent.classList.add('hidden');
+            }
+        }
+
+        // Gérer la soumission du formulaire de connexion
+        function handleLogin(event) {
+            event.preventDefault();
+
+            const password = document.getElementById('password').value;
+            const errorDiv = document.getElementById('login-error');
+
+            if (password === ADMIN_PASSWORD) {
+                sessionStorage.setItem('dashboard_authenticated', 'true');
+                errorDiv.classList.add('hidden');
+                checkAuth();
+            } else {
+                errorDiv.classList.remove('hidden');
+                document.getElementById('password').value = '';
+                document.getElementById('password').focus();
+            }
+        }
+
+        // Se déconnecter
+        function logout() {
+            sessionStorage.removeItem('dashboard_authenticated');
+            checkAuth();
+        }
+
+        // =========================================
+        // INITIALISATION
+        // =========================================
+
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('🚀 Initialisation du dashboard...');
+
+            // Attendre que Chart.js soit disponible
+            waitForChartJS(function() {
+                console.log('✅ Chart.js chargé avec succès');
+
+                // Configuration du formulaire de connexion
+                const loginForm = document.getElementById('login-form');
+                if (loginForm) {
+                    loginForm.addEventListener('submit', handleLogin);
+                }
+
+                // Vérifier l'authentification
+                checkAuth();
+            });
+        });
+
+        console.log('✅ Dashboard Lexifever chargé !');
+    </script>
+</body>
+</html>

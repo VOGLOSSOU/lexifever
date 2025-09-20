@@ -311,7 +311,30 @@ const ApiClient = {
             const data = await response.json();
 
             if (!response.ok) {
-                throw new Error(data.error || `Erreur HTTP: ${response.status}`);
+                // Gérer les erreurs spécifiques selon le code HTTP
+                let errorMessage = data.error || `Erreur HTTP: ${response.status}`;
+
+                switch (response.status) {
+                    case 429:
+                        errorMessage = "Quota API dépassé. L'API Google Gemini a atteint sa limite de requêtes. Veuillez réessayer dans quelques minutes.";
+                        break;
+                    case 403:
+                        errorMessage = "Accès refusé à l'API. Vérifiez la configuration de l'API Gemini.";
+                        break;
+                    case 400:
+                        errorMessage = "Paramètres invalides. Vérifiez vos paramètres de génération.";
+                        break;
+                    case 500:
+                    case 502:
+                    case 503:
+                        errorMessage = "Erreur temporaire du serveur. Veuillez réessayer dans quelques instants.";
+                        break;
+                    case 404:
+                        errorMessage = "Service non trouvé. Vérifiez la configuration de l'API.";
+                        break;
+                }
+
+                throw new Error(errorMessage);
             }
 
             console.log('✅ Données reçues:', data);
@@ -322,12 +345,29 @@ const ApiClient = {
         }
     },
 
-    // Générer un texte
-    async generateText(params) {
-        return this.request('/generate-text', {
-            method: 'POST',
-            body: JSON.stringify(params)
-        });
+    // Générer un texte avec retry automatique
+    async generateText(params, retryCount = 0) {
+        const maxRetries = 2;
+
+        try {
+            return await this.request('/generate-text', {
+                method: 'POST',
+                body: JSON.stringify(params)
+            });
+        } catch (error) {
+            // Retry automatique pour les erreurs de quota
+            if (retryCount < maxRetries &&
+                (error.message.includes('Quota') || error.message.includes('429'))) {
+
+                const delay = Math.pow(2, retryCount) * 30000; // 30s, 60s, 120s
+                console.log(`⏳ Retry ${retryCount + 1}/${maxRetries} dans ${delay/1000}s pour cause quota...`);
+
+                await new Promise(resolve => setTimeout(resolve, delay));
+                return this.generateText(params, retryCount + 1);
+            }
+
+            throw error;
+        }
     },
 
     // Traduire un texte
@@ -839,7 +879,20 @@ const ResultPageHandler = {
 
         } catch (error) {
             console.error('❌ Erreur lors de la génération:', error);
-            this.showError(`Erreur lors de la génération du texte: ${error.message}`);
+
+            // Messages d'erreur améliorés avec des suggestions
+            let errorMessage = error.message;
+            let suggestions = '';
+
+            if (error.message.includes('Quota')) {
+                suggestions = '<br><br><strong>Suggestions :</strong><ul class="mt-2 text-left"><li>• Attendez quelques minutes avant de réessayer</li><li>• Utilisez des paramètres moins complexes</li><li>• Essayez un autre domaine/sujet</li></ul>';
+            } else if (error.message.includes('temporaire') || error.message.includes('serveur')) {
+                suggestions = '<br><br><strong>Suggestions :</strong><ul class="mt-2 text-left"><li>• Rafraîchissez la page et réessayez</li><li>• Vérifiez votre connexion internet</li></ul>';
+            } else if (error.message.includes('Paramètres invalides')) {
+                suggestions = '<br><br><strong>Suggestions :</strong><ul class="mt-2 text-left"><li>• Vérifiez vos paramètres de génération</li><li>• Recommencez le processus depuis le début</li></ul>';
+            }
+
+            this.showError(`Erreur lors de la génération du texte: ${errorMessage}${suggestions}`);
         }
     },
 

@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Dashboard API - Lexifever</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="font-sans bg-gray-50 p-8">
+    <div class="max-w-4xl mx-auto">
+        <h1 class="text-3xl font-bold text-gray-900 mb-8">Test Dashboard API</h1>
+
+        <div class="bg-white rounded-lg shadow-lg p-6 mb-6">
+            <h2 class="text-xl font-semibold mb-4">Test de l'endpoint /api/stats</h2>
+            <button onclick="testStatsAPI()" class="bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700">
+                Tester l'API Stats
+            </button>
+        </div>
+
+        <div id="results" class="bg-white rounded-lg shadow-lg p-6">
+            <h3 class="text-lg font-semibold mb-4">Résultats</h3>
+            <pre id="api-response" class="bg-gray-100 p-4 rounded text-sm overflow-auto"></pre>
+        </div>
+    </div>
+
+    <script>
+        async function testStatsAPI() {
+            const resultsDiv = document.getElementById('api-response');
+            resultsDiv.textContent = 'Chargement...';
+
+            try {
+                // Déterminer l'URL de base de l'API
+                const apiBaseUrl = window.location.pathname.includes('/lexifever/')
+                    ? window.location.origin + '/lexifever/api'
+                    : window.location.origin + '/api';
+
+                const response = await fetch(`${apiBaseUrl}/stats`);
+                const data = await response.json();
+
+                if (response.ok) {
+                    resultsDiv.textContent = JSON.stringify(data, null, 2);
+                } else {
+                    resultsDiv.textContent = `Erreur ${response.status}: ${data.error || 'Erreur inconnue'}`;
+                }
+            } catch (error) {
+                resultsDiv.textContent = `Erreur de réseau: ${error.message}`;
+            }
+        }
+
+        // Test automatique au chargement
+        window.addEventListener('load', () => {
+            setTimeout(testStatsAPI, 1000);
+        });
+    </script>
+</body>
+</html>

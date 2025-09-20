@@ -191,7 +191,29 @@ class GeminiAIService {
         }
 
         if ($httpCode !== 200) {
-            throw new Exception("Erreur API Gemini (HTTP {$httpCode}): " . $response);
+            // Gérer les erreurs spécifiques
+            $errorData = json_decode($response, true);
+            if ($errorData && isset($errorData['error']['code'])) {
+                $errorCode = $errorData['error']['code'];
+                $errorMessage = $errorData['error']['message'] ?? 'Erreur inconnue';
+
+                switch ($errorCode) {
+                    case 429:
+                        throw new Exception("Quota API dépassé. Veuillez réessayer dans quelques minutes. Détails: {$errorMessage}");
+                    case 403:
+                        throw new Exception("Accès refusé à l'API Gemini. Vérifiez votre clé API. Détails: {$errorMessage}");
+                    case 400:
+                        throw new Exception("Paramètres invalides pour l'API Gemini. Détails: {$errorMessage}");
+                    case 500:
+                    case 502:
+                    case 503:
+                        throw new Exception("Erreur temporaire du serveur Gemini. Veuillez réessayer. Détails: {$errorMessage}");
+                    default:
+                        throw new Exception("Erreur API Gemini (HTTP {$httpCode}): {$errorMessage}");
+                }
+            } else {
+                throw new Exception("Erreur API Gemini (HTTP {$httpCode}): " . $response);
+            }
         }
 
         $result = json_decode($response, true);

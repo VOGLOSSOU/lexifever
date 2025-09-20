@@ -125,7 +125,22 @@ class ApiController {
 
         } catch (Exception $e) {
             error_log("Erreur lors de la génération de texte: " . $e->getMessage());
-            ApiResponse::error('Erreur lors de la génération du texte: ' . $e->getMessage(), 500);
+
+            // Déterminer le code d'erreur approprié selon le type d'erreur
+            $errorMessage = $e->getMessage();
+            $statusCode = 500;
+
+            if (stripos($errorMessage, 'Quota') !== false || stripos($errorMessage, '429') !== false) {
+                $statusCode = 429; // Too Many Requests
+            } elseif (stripos($errorMessage, 'Accès refusé') !== false || stripos($errorMessage, '403') !== false) {
+                $statusCode = 403; // Forbidden
+            } elseif (stripos($errorMessage, 'Paramètres invalides') !== false || stripos($errorMessage, '400') !== false) {
+                $statusCode = 400; // Bad Request
+            } elseif (stripos($errorMessage, 'Erreur temporaire') !== false || stripos($errorMessage, '502') !== false || stripos($errorMessage, '503') !== false) {
+                $statusCode = 503; // Service Unavailable
+            }
+
+            ApiResponse::error($errorMessage, $statusCode);
         }
     }
 
