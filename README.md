@@ -1,197 +1,153 @@
-# 🚀 Lexifever - Enrichissez votre vocabulaire anglais
+# 🎨 Lexifever Frontend
 
-Lexifever est une application web innovante qui génère des textes personnalisés en anglais avec traduction française pour enrichir votre vocabulaire de manière ciblée et efficace.
+Interface utilisateur de l'application Lexifever pour l'enrichissement du vocabulaire anglais.
 
-## ✨ Fonctionnalités
+## 📁 Structure
 
-- **Sélection de domaine** : Choisissez parmi 9 domaines (Technologie, Sciences, Voyages, Business, Santé, etc.)
-- **Sélection de sujet** : Sujets spécialisés dans chaque domaine
-- **Personnalisation avancée** :
-  - Niveau de difficulté (Débutant, Intermédiaire, Avancé)
-  - Tonalité (Informatif, Conversationnel, Formel, Créatif, Technique)
-  - Longueur du texte (Court, Moyen, Long)
-  - Options supplémentaires (exemples, questions)
-- **Génération IA** : Textes générés par Together AI (Llama 3.2)
-- **Traduction automatique** : Traduction française instantanée
-- **Interface moderne** : Design responsive avec Tailwind CSS
-
-## 🛠️ Technologies utilisées
-
-### Frontend
-- HTML5, CSS3, JavaScript (Vanilla)
-- Tailwind CSS pour le design
-- Font Awesome pour les icônes
-
-### Backend
-- Node.js avec Express
-- Together AI API (Llama 3.2-11B-Vision-Instruct-Turbo)
-- Sécurisation avec Helmet et CORS
-- Rate limiting
-
-### Sécurité
-- Variables d'environnement pour les clés API
-- Rate limiting (100 requêtes/15min)
-- Validation des paramètres
-- Gestion d'erreurs robuste
-
-## 📦 Installation
-
-### Architecture Séparée Frontend/Backend
-
-Le projet est maintenant organisé en deux parties distinctes :
-- **`backend/`** : API Node.js/Express
-- **`frontend/`** : Interface utilisateur HTML/JS
-
-### Installation Rapide (Recommandée)
-
-1. **Cloner le projet**
-```bash
-git clone <votre-repo>
-cd lexifever
+```
+frontend/
+├── index.html              # Page d'accueil
+├── select-domain.html      # Sélection du domaine
+├── select-topic.html       # Sélection du sujet
+├── customize-text.html     # Personnalisation des paramètres
+├── result.html            # Affichage des résultats
+├── history.html           # Historique des textes
+├── header.html            # Header réutilisable
+├── footer.html            # Footer réutilisable
+├── test.html              # Page de test
+└── js/
+    └── app.js             # JavaScript principal
 ```
 
-2. **Démarrage automatique**
-```bash
-./start.sh
-```
-Ce script configure automatiquement le backend et démarre l'application complète.
+## 🚀 Démarrage Rapide
 
-### Installation Manuelle
+### Prérequis
+- Node.js (pour les outils de développement)
+- Backend Lexifever en cours d'exécution sur http://localhost:3000
 
-#### Backend
-```bash
-cd backend
-npm install
-cp .env.example .env
-# Éditer .env avec votre clé API Together AI
-npm start
-```
-
-#### Frontend (Développement séparé)
+### Installation
 ```bash
 cd frontend
 npm install
+```
+
+### Développement
+```bash
+# Serveur de développement avec rechargement automatique
 npm run dev
+
+# Ou serveur HTTP simple
+npm start
 ```
 
-### Accès à l'application
-- **Application complète** : http://localhost:3000 (backend sert le frontend)
-- **Frontend seul** : http://localhost:8080 (développement)
-- **API Backend** : http://localhost:3000/api/
+L'application sera accessible sur http://localhost:8080
 
-## 🎯 Utilisation
+## 🔧 Configuration
 
-### Flux utilisateur
-1. **Page d'accueil** (`index.html`) - Présentation de Lexifever
-2. **Sélection du domaine** (`select-domain.html`) - Choisir un domaine d'intérêt
-3. **Sélection du sujet** (`select-topic.html`) - Choisir un sujet spécifique
-4. **Personnalisation** (`customize-text.html`) - Configurer les paramètres
-5. **Résultat** (`result.html`) - Texte généré avec traduction
+### API Backend
+Le frontend est configuré pour communiquer avec le backend sur :
+- **URL par défaut** : `http://localhost:3000`
+- **Configuration** : Dans `js/app.js`, variable `API_BASE_URL`
 
-### API Endpoints
-
-#### `GET /api/health`
-Vérification de l'état de l'API
-
-#### `POST /api/generate-text`
-Génération de texte personnalisé
-```json
-{
-  "domain": "Technologie",
-  "topic": "Intelligence Artificielle", 
-  "level": "intermediate",
-  "tone": "informative",
-  "length": "medium",
-  "includeExamples": true,
-  "includeQuestions": false
-}
+Pour changer l'URL du backend, modifiez cette ligne dans `js/app.js` :
+```javascript
+const API_BASE_URL = 'http://localhost:3000/api';
 ```
 
-#### `POST /api/translate`
-Traduction de texte anglais vers français
-```json
-{
-  "text": "Your English text here"
-}
-```
+## 🎯 Fonctionnalités
+
+### Pages Principales
+1. **Accueil** (`index.html`) - Présentation de Lexifever
+2. **Domaines** (`select-domain.html`) - Sélection du domaine d'intérêt
+3. **Sujets** (`select-topic.html`) - Choix du sujet spécifique
+4. **Personnalisation** (`customize-text.html`) - Configuration des paramètres
+5. **Résultats** (`result.html`) - Affichage du texte généré et traduit
+6. **Historique** (`history.html`) - Gestion des textes sauvegardés
+
+### Composants JavaScript
+- **SessionManager** : Gestion des paramètres de session
+- **HistoryManager** : Gestion de l'historique des textes
+- **ApiClient** : Communication avec le backend
+- **UI** : Utilitaires d'interface utilisateur
+
+## 🎨 Technologies
+
+- **HTML5** : Structure sémantique
+- **Tailwind CSS** : Framework CSS (via CDN)
+- **JavaScript Vanilla** : Logique côté client
+- **Font Awesome** : Icônes (via CDN)
+- **LocalStorage** : Persistance des données côté client
+
+## 📱 Responsive Design
+
+L'interface est entièrement responsive et optimisée pour :
+- 📱 Mobile (320px+)
+- 📱 Tablette (768px+)
+- 💻 Desktop (1024px+)
+
+## 🔄 Flux Utilisateur
+
+1. **Sélection** : Domaine → Sujet → Personnalisation
+2. **Génération** : Appel API → Texte anglais → Traduction française
+3. **Affichage** : Texte bilingue avec options d'interaction
+4. **Sauvegarde** : Historique automatique dans localStorage
 
 ## 🧪 Tests
 
-Une page de test est disponible à `/test.html` pour vérifier :
+### Page de Test
+Accédez à `/test.html` pour tester :
 - Génération de texte
 - Traduction
 - Flux complet
+- Gestion de l'historique
 
-## 📁 Structure du projet
-
-```
-lexifever/
-├── 🎨 frontend/            # Interface utilisateur
-│   ├── index.html          # Page d'accueil
-│   ├── select-domain.html  # Sélection du domaine
-│   ├── select-topic.html   # Sélection du sujet
-│   ├── customize-text.html # Personnalisation
-│   ├── result.html         # Affichage des résultats
-│   ├── history.html        # Historique des textes
-│   ├── test.html           # Page de test
-│   ├── js/
-│   │   └── app.js          # JavaScript principal
-│   ├── package.json        # Dépendances frontend
-│   └── README.md           # Documentation frontend
-├── 🚀 backend/             # API et serveur
-│   ├── server.js           # Serveur Express
-│   ├── routes/
-│   │   └── api.js          # Routes API
-│   ├── package.json        # Dépendances backend
-│   ├── .env                # Variables d'environnement
-│   ├── ecosystem.config.js # Configuration PM2
-│   └── README.md           # Documentation backend
-├── start.sh                # Script de démarrage global
-├── README.md               # Documentation principale
-└── TECHNICAL.md            # Documentation technique
-```
-
-## 🔧 Configuration avancée
-
-### Variables d'environnement
-```bash
-TOGETHER_API_KEY=your_api_key_here
-PORT=3000
-NODE_ENV=development
-ALLOWED_ORIGINS=http://localhost:3000,http://127.0.0.1:5500
-```
-
-### Personnalisation des modèles
-Vous pouvez modifier le modèle IA dans `routes/api.js` :
-```javascript
-model: "meta-llama/Llama-3.2-11B-Vision-Instruct-Turbo"
-```
+### Tests Manuels
+1. Naviguez à travers toutes les pages
+2. Testez la génération avec différents paramètres
+3. Vérifiez la sauvegarde dans l'historique
+4. Testez sur différents appareils/navigateurs
 
 ## 🚀 Déploiement
 
-Pour déployer en production :
+### Développement Local
+```bash
+npm run dev
+```
 
-1. Configurer les variables d'environnement
-2. Utiliser un gestionnaire de processus (PM2)
-3. Configurer un reverse proxy (Nginx)
-4. Activer HTTPS
+### Production
+Le frontend peut être déployé sur n'importe quel serveur web statique :
+- Netlify
+- Vercel
+- GitHub Pages
+- Apache/Nginx
+
+**Important** : Assurez-vous de mettre à jour `API_BASE_URL` avec l'URL de production du backend.
+
+## 🔧 Personnalisation
+
+### Couleurs
+Les couleurs sont définies dans la configuration Tailwind dans chaque fichier HTML :
+```javascript
+colors: {
+  primary: { /* couleurs primaires */ },
+  secondary: { /* couleurs secondaires */ }
+}
+```
+
+### Animations
+Les animations CSS sont définies dans les balises `<style>` de chaque page.
+
+## 📞 Support
+
+Pour les problèmes liés au frontend :
+1. Vérifiez que le backend est en cours d'exécution
+2. Consultez la console du navigateur pour les erreurs
+3. Testez avec la page `/test.html`
 
 ## 🤝 Contribution
 
-Les contributions sont les bienvenues ! N'hésitez pas à :
-- Signaler des bugs
-- Proposer des améliorations
-- Ajouter de nouveaux domaines/sujets
-- Améliorer l'interface
-
-## 📄 Licence
-
-MIT License - Voir le fichier LICENSE pour plus de détails.
-
-## 👨‍💻 Auteur
-
-**VOGLOSSOU** - Développeur principal
-
----
-
-🌟 **Lexifever** - Enrichissez votre vocabulaire anglais avec l'IA !
+Pour contribuer au frontend :
+1. Respectez la structure existante
+2. Utilisez Tailwind CSS pour le styling
+3. Testez sur différents navigateurs
+4. Documentez les nouvelles fonctionnalités
