@@ -1,5 +1,47 @@
 // Configuration de l'API
-const API_BASE_URL = window.location.origin + '/api';
+let API_BASE_URL = window.location.origin + '/api';
+
+// Fonction pour déterminer l'URL de l'API
+function getApiBaseUrl() {
+    // Override si défini globalement (priorité haute)
+    if (window.API_BASE_URL) {
+        console.log('🔧 Utilisation de window.API_BASE_URL:', window.API_BASE_URL);
+        return window.API_BASE_URL;
+    }
+
+    // Détection automatique du chemin correct pour le développement local
+    if (window.location.pathname.includes('/lexifever/')) {
+        const detectedUrl = window.location.origin + '/lexifever/api';
+        console.log('🔍 Chemin /lexifever/ détecté, URL API:', detectedUrl);
+        return detectedUrl;
+    }
+
+    // Par défaut
+    const defaultUrl = window.location.origin + '/api';
+    console.log('📍 URL API par défaut:', defaultUrl);
+    return defaultUrl;
+}
+
+// Initialisation de l'API_BASE_URL
+API_BASE_URL = getApiBaseUrl();
+console.log('🚀 API_BASE_URL initialisée:', API_BASE_URL);
+
+// Réinitialisation périodique au cas où window.API_BASE_URL serait défini plus tard
+setTimeout(() => {
+    const newUrl = getApiBaseUrl();
+    if (newUrl !== API_BASE_URL) {
+        console.log('🔄 Mise à jour API_BASE_URL:', newUrl);
+        API_BASE_URL = newUrl;
+    }
+}, 100);
+
+// Réinitialisation plus agressive
+setTimeout(() => {
+    if (window.API_BASE_URL && window.API_BASE_URL !== API_BASE_URL) {
+        console.log('⚡ Forçage de la mise à jour API_BASE_URL:', window.API_BASE_URL);
+        API_BASE_URL = window.API_BASE_URL;
+    }
+}, 500);
 
 console.log('🚀 Lexifever App.js chargé !');
 console.log('📍 API Base URL:', API_BASE_URL);

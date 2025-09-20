@@ -4,6 +4,13 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Lexifever - Texte généré</title>
+    <!-- Override API base URL for this page -->
+    <script>
+        // Définir l'API_BASE_URL avant le chargement d'app.js
+        window.API_BASE_URL = window.location.origin + '/lexifever/api';
+        console.log('🔧 API Base URL définie:', window.API_BASE_URL);
+    </script>
+
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script>
@@ -385,19 +392,10 @@
                         </div>
                     </div>
                     <div class="prose max-w-none" id="english-text">
-                        <h3 class="text-xl font-semibold text-gray-800 mb-4">The Evolution of Artificial Intelligence</h3>
-                        
-                        <p>Artificial Intelligence (AI) has transformed from a theoretical concept into a powerful technology that impacts our daily lives. AI refers to computer systems designed to perform tasks that typically require human intelligence, such as visual perception, speech recognition, decision-making, and language translation.</p>
-                        
-                        <p>The field of AI has experienced remarkable growth in recent years, driven by advances in <span class="highlight-text" data-translation="apprentissage automatique">machine learning</span> algorithms, increased computational power, and the availability of vast amounts of data. Machine learning, a subset of AI, enables computers to learn from experience without being explicitly programmed. This approach has led to significant breakthroughs in various domains.</p>
-                        
-                        <p><span class="highlight-text" data-translation="apprentissage profond">Deep learning</span>, a specialized form of machine learning using <span class="highlight-text" data-translation="réseaux de neurones">neural networks</span> with multiple layers, has revolutionized AI capabilities. These neural networks are inspired by the structure of the human brain and can process complex patterns in data. They power applications like image recognition, <span class="highlight-text" data-translation="traitement du langage naturel">natural language processing</span>, and autonomous vehicles.</p>
-                        
-                        <p>Today, AI technologies are integrated into numerous aspects of our lives. Virtual assistants like Siri and Alexa use natural language processing to understand and respond to our queries. <span class="highlight-text" data-translation="systèmes de recommandation">Recommendation systems</span> on platforms like Netflix and Amazon analyze our preferences to suggest content and products. Healthcare professionals use AI tools to assist in diagnosing diseases and developing treatment plans.</p>
-                        
-                        <p>Despite these advancements, AI still faces significant challenges. <span class="highlight-text" data-translation="préoccupations éthiques">Ethical concerns</span> regarding privacy, bias in algorithms, and the potential impact on employment require careful consideration. As AI continues to evolve, finding the balance between technological innovation and responsible implementation remains crucial.</p>
-                        
-                        <p>The future of AI promises even more sophisticated applications, from fully <span class="highlight-text" data-translation="véhicules autonomes">autonomous vehicles</span> to AI-enhanced scientific research. As these technologies develop, they will likely become more integrated into our society, further transforming how we work, communicate, and solve problems.</p>
+                        <div class="flex items-center justify-center p-8">
+                            <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-primary-600 mr-3"></div>
+                            <span class="text-gray-600">Génération du texte en cours...</span>
+                        </div>
                     </div>
                 </div>
                 
@@ -416,19 +414,10 @@
                         </div>
                     </div>
                     <div class="prose max-w-none" id="french-text">
-                        <h3 class="text-xl font-semibold text-gray-800 mb-4">L'Évolution de l'Intelligence Artificielle</h3>
-                        
-                        <p>L'Intelligence Artificielle (IA) est passée d'un concept théorique à une technologie puissante qui impacte notre vie quotidienne. L'IA désigne des systèmes informatiques conçus pour effectuer des tâches qui nécessitent généralement l'intelligence humaine, comme la perception visuelle, la reconnaissance vocale, la prise de décision et la traduction linguistique.</p>
-                        
-                        <p>Le domaine de l'IA a connu une croissance remarquable ces dernières années, stimulée par les avancées des algorithmes d'<span class="highlight-text" data-original="machine learning">apprentissage automatique</span>, l'augmentation de la puissance de calcul et la disponibilité d'énormes quantités de données. L'apprentissage automatique, un sous-ensemble de l'IA, permet aux ordinateurs d'apprendre de l'expérience sans être explicitement programmés. Cette approche a conduit à des percées significatives dans divers domaines.</p>
-                        
-                        <p>L'<span class="highlight-text" data-original="deep learning">apprentissage profond</span>, une forme spécialisée d'apprentissage automatique utilisant des <span class="highlight-text" data-original="neural networks">réseaux de neurones</span> à plusieurs couches, a révolutionné les capacités de l'IA. Ces réseaux de neurones s'inspirent de la structure du cerveau humain et peuvent traiter des modèles complexes dans les données. Ils alimentent des applications comme la reconnaissance d'images, le <span class="highlight-text" data-original="natural language processing">traitement du langage naturel</span> et les véhicules autonomes.</p>
-                        
-                        <p>Aujourd'hui, les technologies d'IA sont intégrées dans de nombreux aspects de notre vie. Les assistants virtuels comme Siri et Alexa utilisent le traitement du langage naturel pour comprendre et répondre à nos requêtes. Les <span class="highlight-text" data-original="recommendation systems">systèmes de recommandation</span> sur des plateformes comme Netflix et Amazon analysent nos préférences pour suggérer du contenu et des produits. Les professionnels de la santé utilisent des outils d'IA pour aider au diagnostic des maladies et à l'élaboration de plans de traitement.</p>
-                        
-                        <p>Malgré ces avancées, l'IA fait encore face à d'importants défis. Les <span class="highlight-text" data-original="ethical concerns">préoccupations éthiques</span> concernant la vie privée, les biais dans les algorithmes et l'impact potentiel sur l'emploi nécessitent une attention particulière. Alors que l'IA continue d'évoluer, trouver l'équilibre entre l'innovation technologique et une mise en œuvre responsable reste crucial.</p>
-                        
-                        <p>L'avenir de l'IA promet des applications encore plus sophistiquées, des systèmes de transport entièrement <span class="highlight-text" data-original="autonomous vehicles">véhicules autonomes</span> à la recherche scientifique améliorée par l'IA. À mesure que ces technologies se développent, elles deviendront probablement plus intégrées dans notre société, transformant davantage notre façon de travailler, de communiquer et de résoudre des problèmes.</p>
+                        <div class="flex items-center justify-center p-8">
+                            <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-secondary-600 mr-3"></div>
+                            <span class="text-gray-600">Traduction en cours...</span>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -916,6 +905,315 @@
 
     <!-- Include our app script -->
     <script src="js/app.js"></script>
+
+    <!-- Page-specific script for result generation -->
+    <script>
+        // Forcer la mise à jour de l'API_BASE_URL
+        if (typeof API_BASE_URL !== 'undefined') {
+            API_BASE_URL = window.location.origin + '/lexifever/api';
+            console.log('⚡ API_BASE_URL forcée dans result.html:', API_BASE_URL);
+        }
+
+        // Initialize result page when DOM is loaded
+        document.addEventListener('DOMContentLoaded', async function() {
+            console.log('🔄 Initialisation de la page result.html');
+
+            // Get parameters from session storage
+            const params = SessionManager.getParams();
+            console.log('📋 Paramètres récupérés:', params);
+
+            // Check if we have required parameters
+            if (!params.domain || !params.topic) {
+                console.error('❌ Paramètres manquants, redirection vers select-domain.html');
+                showError('Paramètres manquants. Veuillez recommencer le processus.');
+                setTimeout(() => {
+                    window.location.href = 'select-domain.html';
+                }, 2000);
+                return;
+            }
+
+            // Update page elements with parameters
+            updatePageWithParams(params);
+
+            // Generate text
+            await generateText(params);
+        });
+
+        // Update page elements with parameters
+        function updatePageWithParams(params) {
+            // Update breadcrumb
+            const domainElement = document.getElementById('selected-domain');
+            const topicElement = document.getElementById('selected-topic');
+            const pageTitleElement = document.getElementById('page-title');
+
+            if (domainElement) domainElement.textContent = params.domain;
+            if (topicElement) topicElement.textContent = params.topic;
+            if (pageTitleElement) pageTitleElement.textContent = params.topic;
+
+            // Update parameter badges
+            const levelElement = document.getElementById('selected-level');
+            const toneElement = document.getElementById('selected-tone');
+            const lengthElement = document.getElementById('selected-length');
+
+            if (levelElement) levelElement.textContent = capitalizeFirst(params.level || 'intermediate');
+            if (toneElement) toneElement.textContent = capitalizeFirst(params.tone || 'informative');
+            if (lengthElement) lengthElement.textContent = capitalizeFirst(params.length || 'medium');
+        }
+
+        // Generate text using API
+        async function generateText(params) {
+            const englishContainer = document.getElementById('english-text');
+            const frenchContainer = document.getElementById('french-text');
+
+            if (!englishContainer || !frenchContainer) {
+                console.error('❌ Conteneurs de texte non trouvés');
+                showError('Erreur d\'initialisation de la page');
+                return;
+            }
+
+            try {
+                console.log('🚀 Génération du texte avec paramètres:', params);
+
+                // Generate English text
+                const textResponse = await ApiClient.generateText(params);
+                console.log('✅ Texte généré:', textResponse);
+
+                const englishText = textResponse.data.englishText;
+
+                // Display English text
+                englishContainer.innerHTML = formatText(englishText, 'english');
+
+                // Generate French translation
+                console.log('🌐 Traduction en français...');
+                const translationResponse = await ApiClient.translateText(englishText);
+                console.log('✅ Traduction générée:', translationResponse);
+
+                const frenchText = translationResponse.data.translatedText;
+
+                // Display French text
+                frenchContainer.innerHTML = formatText(frenchText, 'french');
+
+                // Save to history
+                const textId = HistoryManager.saveText({
+                    parameters: params,
+                    englishText: englishText,
+                    frenchText: frenchText
+                });
+                console.log('💾 Texte sauvegardé avec ID:', textId);
+
+                // Store current text ID for actions
+                window.currentTextId = textId;
+
+            } catch (error) {
+                console.error('❌ Erreur lors de la génération:', error);
+                showError(`Erreur lors de la génération du texte: ${error.message}`);
+            }
+        }
+
+        // Format text with proper HTML structure
+        function formatText(text, language) {
+            // Split into paragraphs
+            const paragraphs = text.split('\n\n').filter(p => p.trim());
+
+            if (paragraphs.length === 0) {
+                return `<p class="text-gray-800 leading-relaxed">${text}</p>`;
+            }
+
+            // Check if first paragraph looks like a title
+            let title = '';
+            let content = paragraphs;
+
+            if (paragraphs[0].length < 100 && !paragraphs[0].includes('.') && paragraphs.length > 1) {
+                title = paragraphs[0];
+                content = paragraphs.slice(1);
+            }
+
+            let html = '';
+            if (title) {
+                html += `<h3 class="text-xl font-semibold text-gray-800 mb-4">${title}</h3>`;
+            }
+
+            html += content.map(paragraph => {
+                // Simple highlighting for common terms (you can expand this)
+                let processedParagraph = paragraph;
+
+                // Add highlighting for some common terms based on language
+                if (language === 'english') {
+                    const englishTerms = ['machine learning', 'deep learning', 'neural networks', 'natural language processing', 'autonomous vehicles', 'recommendation systems', 'ethical concerns'];
+                    englishTerms.forEach(term => {
+                        const regex = new RegExp(`\\b${term}\\b`, 'gi');
+                        processedParagraph = processedParagraph.replace(regex, `<span class="highlight-text" data-translation="${getTranslation(term)}">${term}</span>`);
+                    });
+                } else if (language === 'french') {
+                    const frenchTerms = ['apprentissage automatique', 'apprentissage profond', 'réseaux de neurones', 'traitement du langage naturel', 'véhicules autonomes', 'systèmes de recommandation', 'préoccupations éthiques'];
+                    frenchTerms.forEach(term => {
+                        const regex = new RegExp(`\\b${term}\\b`, 'gi');
+                        processedParagraph = processedParagraph.replace(regex, `<span class="highlight-text" data-original="${getOriginal(term)}">${term}</span>`);
+                    });
+                }
+
+                return `<p class="text-gray-800 leading-relaxed mb-4">${processedParagraph}</p>`;
+            }).join('');
+
+            return html;
+        }
+
+        // Get translation for English terms
+        function getTranslation(term) {
+            const translations = {
+                'machine learning': 'apprentissage automatique',
+                'deep learning': 'apprentissage profond',
+                'neural networks': 'réseaux de neurones',
+                'natural language processing': 'traitement du langage naturel',
+                'autonomous vehicles': 'véhicules autonomes',
+                'recommendation systems': 'systèmes de recommandation',
+                'ethical concerns': 'préoccupations éthiques'
+            };
+            return translations[term.toLowerCase()] || term;
+        }
+
+        // Get original for French terms
+        function getOriginal(term) {
+            const originals = {
+                'apprentissage automatique': 'machine learning',
+                'apprentissage profond': 'deep learning',
+                'réseaux de neurones': 'neural networks',
+                'traitement du langage naturel': 'natural language processing',
+                'véhicules autonomes': 'autonomous vehicles',
+                'systèmes de recommandation': 'recommendation systems',
+                'préoccupations éthiques': 'ethical concerns'
+            };
+            return originals[term.toLowerCase()] || term;
+        }
+
+        // Capitalize first letter
+        function capitalizeFirst(str) {
+            return str.charAt(0).toUpperCase() + str.slice(1);
+        }
+
+        // Show error message
+        function showError(message) {
+            const englishContainer = document.getElementById('english-text');
+            const frenchContainer = document.getElementById('french-text');
+
+            const errorHtml = `
+                <div class="bg-red-50 border border-red-200 rounded-lg p-4 mb-4">
+                    <div class="flex">
+                        <div class="flex-shrink-0">
+                            <i class="fas fa-exclamation-triangle text-red-400"></i>
+                        </div>
+                        <div class="ml-3">
+                            <h3 class="text-sm font-medium text-red-800">Erreur</h3>
+                            <div class="mt-2 text-sm text-red-700">${message}</div>
+                        </div>
+                    </div>
+                </div>
+            `;
+
+            if (englishContainer) englishContainer.innerHTML = errorHtml;
+            if (frenchContainer) frenchContainer.innerHTML = errorHtml;
+        }
+
+        // Setup event listeners for buttons
+        document.addEventListener('DOMContentLoaded', function() {
+            // This will be called after the main DOMContentLoaded above
+            setTimeout(() => {
+                setupEventListeners();
+            }, 100);
+        });
+
+        function setupEventListeners() {
+            // Save button
+            const saveButton = document.getElementById('save-button');
+            if (saveButton) {
+                saveButton.addEventListener('click', () => {
+                    if (window.currentTextId) {
+                        // Show success feedback
+                        const originalContent = saveButton.innerHTML;
+                        saveButton.innerHTML = '<i class="fas fa-check mr-2"></i> Sauvegardé !';
+                        saveButton.classList.add('bg-green-500', 'hover:bg-green-600');
+                        saveButton.classList.remove('bg-white', 'hover:bg-primary-50', 'text-primary-600');
+                        saveButton.classList.add('text-white');
+
+                        setTimeout(() => {
+                            saveButton.innerHTML = originalContent;
+                            saveButton.classList.remove('bg-green-500', 'hover:bg-green-600', 'text-white');
+                            saveButton.classList.add('bg-white', 'hover:bg-primary-50', 'text-primary-600');
+                        }, 2000);
+                    }
+                });
+            }
+
+            // Share button
+            const shareButton = document.getElementById('share-button');
+            if (shareButton) {
+                shareButton.addEventListener('click', () => {
+                    const params = SessionManager.getParams();
+                    const shareData = {
+                        title: `Lexifever - ${params.topic}`,
+                        text: `Découvrez ce texte sur "${params.topic}" généré par Lexifever !`,
+                        url: window.location.href
+                    };
+
+                    if (navigator.share) {
+                        navigator.share(shareData).catch(console.error);
+                    } else {
+                        // Copy to clipboard fallback
+                        navigator.clipboard.writeText(window.location.href).then(() => {
+                            const originalContent = shareButton.innerHTML;
+                            shareButton.innerHTML = '<i class="fas fa-check mr-2"></i> Lien copié !';
+                            setTimeout(() => {
+                                shareButton.innerHTML = originalContent;
+                            }, 2000);
+                        });
+                    }
+                });
+            }
+
+            // Print button
+            const printButton = document.getElementById('print-button');
+            if (printButton) {
+                printButton.addEventListener('click', () => {
+                    window.print();
+                });
+            }
+
+            // Listen button
+            const listenButton = document.getElementById('listen-button');
+            if (listenButton) {
+                let isPlaying = false;
+                let utterance = null;
+
+                listenButton.addEventListener('click', () => {
+                    if (!isPlaying) {
+                        const englishText = document.querySelector('#english-text').textContent;
+                        utterance = new SpeechSynthesisUtterance(englishText);
+                        utterance.lang = 'en-US';
+                        utterance.rate = 0.9;
+
+                        utterance.onend = () => {
+                            isPlaying = false;
+                            listenButton.innerHTML = '<i class="fas fa-volume-up mr-2"></i> Écouter';
+                            listenButton.classList.remove('from-secondary-600', 'to-secondary-700');
+                            listenButton.classList.add('from-primary-600', 'to-primary-700');
+                        };
+
+                        window.speechSynthesis.speak(utterance);
+                        isPlaying = true;
+                        listenButton.innerHTML = '<i class="fas fa-pause mr-2"></i> Pause';
+                        listenButton.classList.remove('from-primary-600', 'to-primary-700');
+                        listenButton.classList.add('from-secondary-600', 'to-secondary-700');
+                    } else {
+                        window.speechSynthesis.cancel();
+                        isPlaying = false;
+                        listenButton.innerHTML = '<i class="fas fa-volume-up mr-2"></i> Écouter';
+                        listenButton.classList.remove('from-secondary-600', 'to-secondary-700');
+                        listenButton.classList.add('from-primary-600', 'to-primary-700');
+                    }
+                });
+            }
+        }
+    </script>
 
 
 </body>

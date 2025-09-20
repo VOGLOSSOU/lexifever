@@ -1,16 +1,16 @@
 <?php
 /**
- * Configuration Lexifever
- * Fichier de configuration centralisée
+ * Configuration locale pour les tests
+ * À utiliser uniquement en développement local
  */
 
 return [
-    // Configuration base de données
+    // Configuration base de données locale
     'database' => [
-        'host' => 'srv1580.hstgr.io',
-        'name' => 'u433704782_lexifever_data',
-        'user' => 'u433704782_myLexi_db_use',
-        'pass' => 'mylExiF3werMdp1607@',
+        'host' => 'localhost',
+        'name' => 'lexifever_local',
+        'user' => 'root',
+        'pass' => '', // Mot de passe vide pour XAMPP par défaut
         'charset' => 'utf8mb4',
         'options' => [
             PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
@@ -19,32 +19,33 @@ return [
         ]
     ],
 
-    // Configuration API Google Gemini
+    // Configuration API Google Gemini (même que production)
     'gemini' => [
         'api_key' => 'AIzaSyB-s8lbOkQdHBge6ZiHnn2vXXIb-YjfkAA',
         'base_url' => 'https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent',
-        'timeout' => 30, // secondes
+        'timeout' => 30,
         'max_retries' => 3,
-        'cache_duration' => 3600, // 1 heure
+        'cache_duration' => 3600,
     ],
 
     // Configuration application
     'app' => [
-        'name' => 'Lexifever',
+        'name' => 'Lexifever Local',
         'version' => '1.0.0',
-        'debug' => getenv('APP_DEBUG') ?: true,
+        'debug' => true,
         'log_errors' => true,
         'timezone' => 'Europe/Paris',
-        'session_lifetime' => 86400, // 24 heures
+        'session_lifetime' => 86400,
     ],
 
-    // Configuration CORS
+    // Configuration CORS pour développement local
     'cors' => [
         'allowed_origins' => [
+            'http://localhost',
+            'http://127.0.0.1',
             'http://localhost:3000',
             'http://127.0.0.1:5500',
-            'https://lexifever.com',
-            '*' // À restreindre en production
+            '*' // Permissif pour les tests locaux
         ],
         'allowed_methods' => ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
         'allowed_headers' => [
@@ -54,20 +55,20 @@ return [
             'Accept',
             'Origin'
         ],
-        'max_age' => 86400, // 24 heures
+        'max_age' => 86400,
     ],
 
-    // Configuration rate limiting
+    // Configuration rate limiting (désactivé pour les tests)
     'rate_limit' => [
-        'max_requests' => 100, // par fenêtre
-        'window_minutes' => 15, // fenêtre en minutes
-        'block_duration' => 60, // minutes de blocage
+        'max_requests' => 1000, // Très permissif pour les tests
+        'window_minutes' => 15,
+        'block_duration' => 1, // Blocage très court
     ],
 
     // Configuration cache
     'cache' => [
         'enabled' => true,
-        'default_ttl' => 3600, // 1 heure
+        'default_ttl' => 3600,
         'directory' => __DIR__ . '/../../cache',
     ],
 
@@ -76,10 +77,10 @@ return [
         'enabled' => true,
         'directory' => __DIR__ . '/../../logs',
         'max_files' => 30,
-        'max_file_size' => 10485760, // 10MB
+        'max_file_size' => 10485760,
     ],
 
-    // Domaines et sujets par défaut
+    // Domaines et sujets (même configuration)
     'domains' => [
         'Technologie' => [
             'Intelligence Artificielle',

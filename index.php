@@ -4,8 +4,18 @@
  * Routeur PHP pour l'API REST
  */
 
+// Détecter l'environnement et charger la configuration appropriée
+if (file_exists(__DIR__ . '/src/Config/config.local.php')) {
+    // Configuration locale pour les tests
+    $config = require __DIR__ . '/src/Config/config.local.php';
+    define('ENVIRONMENT', 'local');
+} else {
+    // Configuration de production
+    $config = require __DIR__ . '/src/Config/config.php';
+    define('ENVIRONMENT', 'production');
+}
+
 // Activer l'affichage des erreurs en développement
-$config = require __DIR__ . '/src/Config/config.php';
 if ($config['app']['debug']) {
     ini_set('display_errors', 1);
     ini_set('display_startup_errors', 1);

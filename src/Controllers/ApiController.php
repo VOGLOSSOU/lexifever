@@ -11,13 +11,23 @@ class ApiController {
     private $validator;
     private $config;
 
+    // Inclure les classes nécessaires
     public function __construct() {
+        // Inclure les dépendances
+        require_once __DIR__ . '/../Utils/Database.php';
+        require_once __DIR__ . '/../Utils/Validator.php';
+        require_once __DIR__ . '/../Utils/Cache.php';
+        require_once __DIR__ . '/../Services/GeminiAIService.php';
+        require_once __DIR__ . '/../Models/Domain.php';
+        require_once __DIR__ . '/../Models/GeneratedText.php';
+
         $this->config = require __DIR__ . '/../Config/config.php';
         $this->geminiService = new GeminiAIService();
         $this->domainModel = new Domain();
         $this->textModel = new GeneratedText();
         $this->validator = new Validator();
     }
+
 
     /**
      * Endpoint de santé de l'API
