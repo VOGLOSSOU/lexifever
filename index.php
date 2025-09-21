@@ -205,13 +205,15 @@ function serveFrontendFiles($path) {
         'dashboard.html',
         'test-dashboard.html',
         'test-api-status.html',
+        'test-audio.html',
         'test-api.html',
         'test-customize.html',
         'test-flow.html',
         'test-full-flow.html',
         'test-result.html',
         'test-simple.html',
-        'test.html'
+        'test.html',
+        'AUDIO_TROUBLESHOOTING.md'
     ];
 
     $allowedDirs = ['js'];

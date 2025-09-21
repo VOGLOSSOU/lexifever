@@ -1,0 +1,348 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Audio - Lexifever</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body class="font-sans bg-gray-50 p-8">
+    <div class="max-w-4xl mx-auto">
+        <div class="text-center mb-8">
+            <h1 class="text-3xl font-bold text-gray-900 mb-2">Test de la Fonctionnalité Audio</h1>
+            <p class="text-gray-600">Vérifiez que la synthèse vocale fonctionne correctement</p>
+        </div>
+
+        <!-- État du navigateur -->
+        <div class="bg-white rounded-lg shadow-lg p-6 mb-6">
+            <h2 class="text-xl font-semibold mb-4 flex items-center">
+                <i class="fas fa-info-circle text-blue-500 mr-2"></i>
+                Compatibilité Navigateur
+            </h2>
+            <div id="browser-support" class="text-center">
+                <div class="animate-spin rounded-full h-6 w-6 border-b-2 border-blue-600 mx-auto mb-4"></div>
+                <p class="text-gray-600">Vérification en cours...</p>
+            </div>
+        </div>
+
+        <!-- Test de texte -->
+        <div class="bg-white rounded-lg shadow-lg p-6 mb-6">
+            <h2 class="text-xl font-semibold mb-4 flex items-center">
+                <i class="fas fa-file-alt text-green-500 mr-2"></i>
+                Texte de Test
+            </h2>
+            <div id="english-text" class="prose max-w-none mb-4">
+                <h3 class="text-xl font-semibold text-gray-800 mb-4">The Future of Artificial Intelligence</h3>
+                <p class="text-gray-800 leading-relaxed mb-4">
+                    Artificial intelligence has made remarkable progress in recent years. From self-driving cars to virtual assistants, AI technologies are becoming increasingly integrated into our daily lives. Researchers continue to push the boundaries of what machines can do, developing systems that can learn, reason, and make decisions with minimal human intervention.
+                </p>
+                <p class="text-gray-800 leading-relaxed mb-4">
+                    Machine learning and deep learning algorithms power many of today's most innovative applications. These technologies enable computers to recognize patterns, predict outcomes, and adapt to new information without explicit programming. The potential applications seem limitless, from healthcare diagnostics to financial market analysis.
+                </p>
+            </div>
+
+            <div class="flex justify-center space-x-4">
+                <button id="listen-button" class="bg-gradient-to-r from-primary-600 to-primary-700 hover:from-primary-700 hover:to-primary-800 text-white px-6 py-3 rounded-lg font-medium transition-all duration-300 transform hover:scale-105 flex items-center">
+                    <i class="fas fa-volume-up mr-2"></i>
+                    Écouter
+                </button>
+
+                <button onclick="testSpeechSynthesis()" class="bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-lg font-medium transition-all duration-300">
+                    <i class="fas fa-play mr-2"></i>
+                    Test Direct
+                </button>
+            </div>
+        </div>
+
+        <!-- Logs -->
+        <div class="bg-white rounded-lg shadow-lg p-6">
+            <h2 class="text-xl font-semibold mb-4 flex items-center">
+                <i class="fas fa-terminal text-purple-500 mr-2"></i>
+                Logs de Test
+            </h2>
+            <div id="logs" class="bg-gray-100 rounded-lg p-4 font-mono text-sm max-h-64 overflow-y-auto">
+                <div class="text-gray-600">Initialisation du test audio...</div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Fonction pour logger
+        function log(message, type = 'info') {
+            const logsDiv = document.getElementById('logs');
+            const timestamp = new Date().toLocaleTimeString();
+            const colorClass = type === 'error' ? 'text-red-600' :
+                              type === 'success' ? 'text-green-600' :
+                              type === 'warning' ? 'text-yellow-600' : 'text-gray-600';
+
+            logsDiv.innerHTML += `<div class="${colorClass}">[${timestamp}] ${message}</div>`;
+            logsDiv.scrollTop = logsDiv.scrollHeight;
+            console.log(`[${type.toUpperCase()}] ${message}`);
+        }
+
+        // Vérifier la compatibilité du navigateur
+        function checkBrowserSupport() {
+            const supportDiv = document.getElementById('browser-support');
+
+            if ('speechSynthesis' in window) {
+                log('✅ Speech Synthesis API supportée');
+
+                // Forcer le chargement des voix
+                speechSynthesis.getVoices();
+
+                // Attendre un peu et vérifier à nouveau
+                setTimeout(() => {
+                    updateVoicesInfo();
+                }, 100);
+
+            } else {
+                log('❌ Speech Synthesis API non supportée', 'error');
+
+                supportDiv.innerHTML = `
+                    <div class="text-red-600 mb-2">
+                        <i class="fas fa-times-circle text-2xl"></i>
+                    </div>
+                    <h3 class="text-lg font-semibold text-red-600">Navigateur Non Compatible</h3>
+                    <p class="text-gray-600">Votre navigateur ne supporte pas la synthèse vocale</p>
+                `;
+
+                // Désactiver les boutons
+                document.getElementById('listen-button').disabled = true;
+                document.getElementById('listen-button').classList.add('opacity-50', 'cursor-not-allowed');
+            }
+        }
+
+        // Mettre à jour les informations sur les voix
+        function updateVoicesInfo() {
+            const supportDiv = document.getElementById('browser-support');
+            const voices = speechSynthesis.getVoices();
+
+            log(`📊 ${voices.length} voix disponibles`);
+
+            if (voices.length > 0) {
+                // Chercher une voix anglaise
+                const englishVoices = voices.filter(voice => voice.lang.startsWith('en'));
+                log(`🇺🇸 ${englishVoices.length} voix anglaises disponibles`);
+
+                // Lister quelques voix pour debug
+                voices.slice(0, 3).forEach((voice, index) => {
+                    log(`🎤 Voix ${index + 1}: ${voice.name} (${voice.lang}) - ${voice.localService ? 'Local' : 'Remote'}`);
+                });
+
+                supportDiv.innerHTML = `
+                    <div class="text-green-600 mb-2">
+                        <i class="fas fa-check-circle text-2xl"></i>
+                    </div>
+                    <h3 class="text-lg font-semibold text-green-600">Navigateur Compatible</h3>
+                    <p class="text-gray-600">${voices.length} voix disponibles, dont ${englishVoices.length} en anglais</p>
+                    <details class="mt-2 text-left">
+                        <summary class="cursor-pointer text-sm text-blue-600 hover:text-blue-800">Voir les voix disponibles</summary>
+                        <ul class="mt-2 text-xs space-y-1 max-h-32 overflow-y-auto">
+                            ${voices.map(voice => `<li>• ${voice.name} (${voice.lang})</li>`).join('')}
+                        </ul>
+                    </details>
+                `;
+            } else {
+                log('⚠️ Aucune voix disponible', 'warning');
+
+                supportDiv.innerHTML = `
+                    <div class="text-yellow-600 mb-2">
+                        <i class="fas fa-exclamation-triangle text-2xl"></i>
+                    </div>
+                    <h3 class="text-lg font-semibold text-yellow-600">Voix Non Chargées</h3>
+                    <p class="text-gray-600">Les voix ne sont pas encore chargées. Actualisez la page ou patientez.</p>
+                    <button onclick="checkBrowserSupport()" class="mt-2 bg-blue-600 text-white px-4 py-2 rounded text-sm hover:bg-blue-700">
+                        Réessayer
+                    </button>
+                `;
+            }
+        }
+
+        // Extraire le texte pur d'un élément HTML
+        function extractPlainText(element) {
+            if (!element) return '';
+
+            const tempDiv = document.createElement('div');
+            tempDiv.innerHTML = element.innerHTML;
+
+            // Supprimer les éléments qui ne doivent pas être lus
+            const elementsToRemove = tempDiv.querySelectorAll('.highlight-text[data-translation]');
+            elementsToRemove.forEach(el => {
+                el.outerHTML = el.textContent;
+            });
+
+            return tempDiv.textContent || tempDiv.innerText || '';
+        }
+
+        // Test direct de la synthèse vocale
+        function testSpeechSynthesis() {
+            if (!('speechSynthesis' in window)) {
+                alert('La synthèse vocale n\'est pas supportée par votre navigateur.');
+                return;
+            }
+
+            const voices = speechSynthesis.getVoices();
+            if (voices.length === 0) {
+                log('❌ Aucune voix disponible pour le test', 'error');
+                alert('Aucune voix n\'est disponible. Actualisez la page et réessayez.');
+                return;
+            }
+
+            const text = "Hello! This is a test of the speech synthesis functionality. The audio feature should now be working correctly.";
+            log(`🎵 Test direct avec le texte: "${text.substring(0, 50)}..."`);
+            log(`🎤 Utilisation de ${voices.length} voix disponibles`);
+
+            const utterance = new SpeechSynthesisUtterance(text);
+
+            // Essayer de trouver une voix anglaise
+            const englishVoice = voices.find(voice => voice.lang.startsWith('en'));
+            if (englishVoice) {
+                utterance.voice = englishVoice;
+                log(`🇺🇸 Utilisation de la voix anglaise: ${englishVoice.name}`);
+            } else {
+                log('⚠️ Aucune voix anglaise trouvée, utilisation de la voix par défaut');
+            }
+
+            utterance.lang = 'en-US';
+            utterance.rate = 0.9;
+            utterance.pitch = 1.0;
+            utterance.volume = 1.0;
+
+            utterance.onstart = () => log('▶️ Lecture démarrée', 'success');
+            utterance.onend = () => log('⏹️ Lecture terminée', 'success');
+            utterance.onerror = (event) => {
+                log(`❌ Erreur lors de la lecture: ${event.error}`, 'error');
+
+                let errorMessage = 'Erreur de synthèse vocale: ' + event.error;
+                if (event.error === 'synthesis-unavailable') {
+                    errorMessage += '\n\nCause possible: Le service de synthèse vocale n\'est pas disponible.';
+                } else if (event.error === 'synthesis-failed') {
+                    errorMessage += '\n\nCause possible: Échec de la synthèse. Essayez de rafraîchir la page.';
+                } else if (event.error === 'not-allowed') {
+                    errorMessage += '\n\nCause possible: Permission requise. Actualisez la page et autorisez l\'audio.';
+                }
+
+                alert(errorMessage);
+            };
+
+            try {
+                speechSynthesis.speak(utterance);
+                log('📢 Commande speak() exécutée');
+            } catch (error) {
+                log(`❌ Erreur lors de l'exécution de speak(): ${error.message}`, 'error');
+                alert('Erreur lors du démarrage de la synthèse: ' + error.message);
+            }
+        }
+
+        // Gestionnaire du bouton Écouter (même logique que dans l'app)
+        let isPlaying = false;
+        let utterance = null;
+
+        document.getElementById('listen-button').addEventListener('click', () => {
+            try {
+                if (!isPlaying) {
+                    // Arrêter toute lecture en cours
+                    if (utterance) {
+                        speechSynthesis.cancel();
+                    }
+
+                    const englishContainer = document.getElementById('english-text');
+                    const englishText = extractPlainText(englishContainer);
+
+                    if (!englishText.trim()) {
+                        alert('Aucun texte à lire.');
+                        return;
+                    }
+
+                    log(`🔊 Lecture du texte extrait: "${englishText.substring(0, 100)}..."`);
+
+                    utterance = new SpeechSynthesisUtterance(englishText);
+                    utterance.lang = 'en-US';
+                    utterance.rate = 0.9;
+                    utterance.pitch = 1.0;
+                    utterance.volume = 1.0;
+
+                    utterance.onstart = () => {
+                        log('▶️ Lecture audio démarrée', 'success');
+                    };
+
+                    utterance.onend = () => {
+                        log('⏹️ Lecture audio terminée', 'success');
+                        isPlaying = false;
+                        document.getElementById('listen-button').innerHTML = '<i class="fas fa-volume-up mr-2"></i> Écouter';
+                        document.getElementById('listen-button').classList.remove('from-secondary-600', 'to-secondary-700');
+                        document.getElementById('listen-button').classList.add('from-primary-600', 'to-primary-700');
+                    };
+
+                    utterance.onerror = (event) => {
+                        log(`❌ Erreur de synthèse vocale: ${event.error}`, 'error');
+                        isPlaying = false;
+                        document.getElementById('listen-button').innerHTML = '<i class="fas fa-volume-up mr-2"></i> Écouter';
+                        document.getElementById('listen-button').classList.remove('from-secondary-600', 'to-secondary-700');
+                        document.getElementById('listen-button').classList.add('from-primary-600', 'to-primary-700');
+
+                        let errorMessage = 'Erreur lors de la lecture audio.';
+                        if (event.error === 'not-allowed') {
+                            errorMessage += ' Autorisation requise pour la synthèse vocale.';
+                        } else if (event.error === 'no-speech') {
+                            errorMessage += ' Aucun contenu vocal détecté.';
+                        } else {
+                            errorMessage += ' Votre navigateur ne supporte peut-être pas cette fonctionnalité.';
+                        }
+                        alert(errorMessage);
+                    };
+
+                    speechSynthesis.speak(utterance);
+                    isPlaying = true;
+                    document.getElementById('listen-button').innerHTML = '<i class="fas fa-pause mr-2"></i> Pause';
+                    document.getElementById('listen-button').classList.remove('from-primary-600', 'to-primary-700');
+                    document.getElementById('listen-button').classList.add('from-secondary-600', 'to-secondary-700');
+
+                } else {
+                    log('⏸️ Arrêt de la lecture audio');
+                    speechSynthesis.cancel();
+                    isPlaying = false;
+                    document.getElementById('listen-button').innerHTML = '<i class="fas fa-volume-up mr-2"></i> Écouter';
+                    document.getElementById('listen-button').classList.remove('from-secondary-600', 'to-secondary-700');
+                    document.getElementById('listen-button').classList.add('from-primary-600', 'to-primary-700');
+                }
+            } catch (error) {
+                log(`❌ Erreur générale: ${error.message}`, 'error');
+                alert('Erreur lors de la gestion audio: ' + error.message);
+                isPlaying = false;
+                document.getElementById('listen-button').innerHTML = '<i class="fas fa-volume-up mr-2"></i> Écouter';
+                document.getElementById('listen-button').classList.remove('from-secondary-600', 'to-secondary-700');
+                document.getElementById('listen-button').classList.add('from-primary-600', 'to-primary-700');
+            }
+        });
+
+        // Initialisation
+        document.addEventListener('DOMContentLoaded', function() {
+            log('🚀 Initialisation du test audio');
+            checkBrowserSupport();
+
+            // Les voix peuvent être chargées de manière asynchrone
+            speechSynthesis.onvoiceschanged = function() {
+                log('🔄 Liste des voix mise à jour');
+                checkBrowserSupport();
+            };
+
+            // Essayer de forcer le chargement des voix après un délai
+            setTimeout(() => {
+                const voices = speechSynthesis.getVoices();
+                if (voices.length === 0) {
+                    log('⚠️ Tentative de forçage du chargement des voix');
+                    // Forcer un appel pour déclencher le chargement
+                    speechSynthesis.getVoices();
+                    speechSynthesis.cancel(); // Annuler immédiatement
+
+                    setTimeout(() => {
+                        checkBrowserSupport();
+                    }, 500);
+                }
+            }, 1000);
+        });
+    </script>
+</body>
+</html>

@@ -47,6 +47,39 @@ console.log('🚀 Lexifever App.js chargé !');
 console.log('📍 API Base URL:', API_BASE_URL);
 console.log('📄 Page actuelle:', window.location.pathname);
 
+// Forcer le chargement des voix pour la synthèse vocale
+if ('speechSynthesis' in window) {
+    console.log('🔊 Initialisation de la synthèse vocale...');
+
+    // Forcer le chargement des voix
+    window.speechSynthesis.getVoices();
+
+    // Attendre que les voix soient chargées
+    let voicesLoaded = false;
+    const checkVoices = () => {
+        const voices = window.speechSynthesis.getVoices();
+        if (voices.length > 0 && !voicesLoaded) {
+            voicesLoaded = true;
+            console.log(`✅ ${voices.length} voix chargées:`, voices.map(v => `${v.name} (${v.lang})`));
+        }
+    };
+
+    // Vérifier immédiatement
+    checkVoices();
+
+    // Et écouter les changements
+    window.speechSynthesis.onvoiceschanged = checkVoices;
+
+    // Forcer un appel après un délai pour certains navigateurs
+    setTimeout(() => {
+        window.speechSynthesis.getVoices();
+        checkVoices();
+    }, 1000);
+
+} else {
+    console.warn('🔇 Synthèse vocale non supportée par ce navigateur');
+}
+
 // Configuration des domaines et leurs sujets
 const DOMAINS_CONFIG = {
     'Technologie': [
@@ -972,6 +1005,25 @@ const ResultPageHandler = {
         return str.charAt(0).toUpperCase() + str.slice(1);
     },
 
+    // Extraire le texte pur d'un élément HTML (sans les balises)
+    extractPlainText(element) {
+        if (!element) return '';
+
+        // Créer un élément temporaire pour extraire le texte proprement
+        const tempDiv = document.createElement('div');
+        tempDiv.innerHTML = element.innerHTML;
+
+        // Supprimer les éléments qui ne doivent pas être lus (comme les tooltips)
+        const elementsToRemove = tempDiv.querySelectorAll('.highlight-text[data-translation]');
+        elementsToRemove.forEach(el => {
+            // Garder seulement le texte, pas les attributs data-
+            el.outerHTML = el.textContent;
+        });
+
+        // Retourner le texte pur
+        return tempDiv.textContent || tempDiv.innerText || '';
+    },
+
     showError(message) {
         const englishContainer = document.getElementById('english-text');
         const frenchContainer = document.getElementById('french-text');
@@ -1096,27 +1148,110 @@ const ResultPageHandler = {
             let isPlaying = false;
             let utterance = null;
 
-            listenButton.addEventListener('click', () => {
-                if (!isPlaying) {
-                    const englishText = document.querySelector('#english-text').textContent;
-                    utterance = new SpeechSynthesisUtterance(englishText);
-                    utterance.lang = 'en-US';
-                    utterance.rate = 0.9;
+            // Vérifier si la synthèse vocale est supportée
+            if (!('speechSynthesis' in window)) {
+                listenButton.style.display = 'none';
+                console.warn('🔇 Synthèse vocale non supportée par ce navigateur');
+                return;
+            }
 
-                    utterance.onend = () => {
+            listenButton.addEventListener('click', () => {
+                try {
+                    if (!isPlaying) {
+                        // Arrêter toute lecture en cours au cas où
+                        if (utterance) {
+                            window.speechSynthesis.cancel();
+                        }
+
+                        // Extraire le texte pur en supprimant les balises HTML
+                        const englishContainer = document.querySelector('#english-text');
+                        const englishText = englishContainer ? this.extractPlainText(englishContainer) : '';
+
+                        if (!englishText.trim()) {
+                            alert('Aucun texte à lire. Veuillez d\'abord générer un texte.');
+                            return;
+                        }
+
+                        // Vérifier que le texte n'est pas un message d'erreur ou de chargement
+                        if (englishText.includes('Erreur') || englishText.includes('Chargement') || englishText.includes('Génération')) {
+                            alert('Le texte n\'est pas encore prêt. Veuillez attendre la fin de la génération.');
+                            return;
+                        }
+
+                        console.log('🔊 Lecture audio du texte:', englishText.substring(0, 100) + '...');
+
+                        utterance = new SpeechSynthesisUtterance(englishText);
+    
+                        // Essayer de trouver et utiliser une voix anglaise
+                        const voices = window.speechSynthesis.getVoices();
+                        console.log(`🎤 ${voices.length} voix disponibles pour la lecture`);
+
+                        if (voices.length > 0) {
+                            const englishVoice = voices.find(voice => voice.lang.startsWith('en'));
+                            if (englishVoice) {
+                                utterance.voice = englishVoice;
+                                console.log('🇺🇸 Utilisation de la voix anglaise:', englishVoice.name);
+                            } else {
+                                // Utiliser la première voix disponible si aucune anglaise
+                                utterance.voice = voices[0];
+                                console.log('⚠️ Aucune voix anglaise, utilisation de:', voices[0].name);
+                            }
+                        } else {
+                            console.warn('⚠️ Aucune voix disponible, utilisation des paramètres par défaut');
+                        }
+    
+                        utterance.lang = 'en-US';
+                        utterance.rate = 0.9;
+                        utterance.pitch = 1.0;
+                        utterance.volume = 1.0;
+
+                        utterance.onstart = () => {
+                            console.log('▶️ Lecture audio démarrée');
+                        };
+
+                        utterance.onend = () => {
+                            console.log('⏹️ Lecture audio terminée');
+                            isPlaying = false;
+                            listenButton.innerHTML = '<i class="fas fa-volume-up mr-2"></i> Écouter';
+                            listenButton.classList.remove('from-secondary-600', 'to-secondary-700');
+                            listenButton.classList.add('from-primary-600', 'to-primary-700');
+                        };
+
+                        utterance.onerror = (event) => {
+                            console.error('❌ Erreur de synthèse vocale:', event);
+                            isPlaying = false;
+                            listenButton.innerHTML = '<i class="fas fa-volume-up mr-2"></i> Écouter';
+                            listenButton.classList.remove('from-secondary-600', 'to-secondary-700');
+                            listenButton.classList.add('from-primary-600', 'to-primary-700');
+
+                            let errorMessage = 'Erreur lors de la lecture audio.';
+                            if (event.error === 'not-allowed') {
+                                errorMessage += ' Autorisation requise pour la synthèse vocale.';
+                            } else if (event.error === 'no-speech') {
+                                errorMessage += ' Aucun contenu vocal détecté.';
+                            } else {
+                                errorMessage += ' Votre navigateur ne supporte peut-être pas cette fonctionnalité.';
+                            }
+                            alert(errorMessage);
+                        };
+
+                        window.speechSynthesis.speak(utterance);
+                        isPlaying = true;
+                        listenButton.innerHTML = '<i class="fas fa-pause mr-2"></i> Pause';
+                        listenButton.classList.remove('from-primary-600', 'to-primary-700');
+                        listenButton.classList.add('from-secondary-600', 'to-secondary-700');
+
+                    } else {
+                        console.log('⏸️ Arrêt de la lecture audio');
+                        window.speechSynthesis.cancel();
                         isPlaying = false;
                         listenButton.innerHTML = '<i class="fas fa-volume-up mr-2"></i> Écouter';
                         listenButton.classList.remove('from-secondary-600', 'to-secondary-700');
                         listenButton.classList.add('from-primary-600', 'to-primary-700');
-                    };
-
-                    window.speechSynthesis.speak(utterance);
-                    isPlaying = true;
-                    listenButton.innerHTML = '<i class="fas fa-pause mr-2"></i> Pause';
-                    listenButton.classList.remove('from-primary-600', 'to-primary-700');
-                    listenButton.classList.add('from-secondary-600', 'to-secondary-700');
-                } else {
-                    window.speechSynthesis.cancel();
+                    }
+                } catch (error) {
+                    console.error('❌ Erreur générale lors de la gestion audio:', error);
+                    alert('Erreur lors de la gestion audio: ' + error.message);
                     isPlaying = false;
                     listenButton.innerHTML = '<i class="fas fa-volume-up mr-2"></i> Écouter';
                     listenButton.classList.remove('from-secondary-600', 'to-secondary-700');
