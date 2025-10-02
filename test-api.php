@@ -1,63 +1,59 @@
 <?php
 /**
- * Script de test simple pour diagnostiquer les problèmes API
+ * Script de test pour l'API Lexifever
  */
 
-echo "🔍 Test de l'API Lexifever\n\n";
+require_once 'src/Config/config.php';
+require_once 'src/Utils/ApiResponse.php';
+require_once 'src/Utils/Database.php';
+require_once 'src/Utils/Validator.php';
+require_once 'src/Utils/Cache.php';
+require_once 'src/Services/GeminiAIService.php';
 
-// Test 1: Vérifier la configuration
-echo "1. Test de la configuration...\n";
+header('Content-Type: application/json');
+
 try {
-    if (file_exists(__DIR__ . '/src/Config/config.local.php')) {
-        $config = require __DIR__ . '/src/Config/config.local.php';
-        echo "✅ Configuration locale chargée\n";
-    } else {
-        $config = require __DIR__ . '/src/Config/config.php';
-        echo "✅ Configuration de production chargée\n";
+    echo "=== TEST API LEXIFEVER ===\n\n";
+
+    // Test 1: Configuration
+    echo "1. Test de configuration:\n";
+    $config = require 'src/Config/config.php';
+    echo "- Clé API configurée: " . (!empty($config['gemini']['api_key']) ? 'OUI' : 'NON') . "\n";
+    echo "- URL de base: " . $config['gemini']['base_url'] . "\n\n";
+
+    // Test 2: Service Gemini
+    echo "2. Test du service Gemini:\n";
+    $gemini = new GeminiAIService();
+    $health = $gemini->healthCheck();
+    echo "- Santé API: " . $health['status'] . "\n";
+    echo "- Clé API configurée: " . ($health['apiKeyConfigured'] ? 'OUI' : 'NON') . "\n";
+    if ($health['status'] !== 'OK') {
+        echo "- Message d'erreur: " . $health['message'] . "\n";
     }
-} catch (Exception $e) {
-    echo "❌ Erreur de configuration: " . $e->getMessage() . "\n";
-    exit(1);
-}
+    echo "\n";
 
-// Test 2: Vérifier les inclusions
-echo "\n2. Test des inclusions...\n";
-$files = [
-    'src/Utils/ApiResponse.php',
-    'src/Controllers/ApiController.php'
-];
+    // Test 3: Génération de texte simple
+    echo "3. Test de génération de texte:\n";
+    $testParams = [
+        'domain' => 'Technologie',
+        'topic' => 'Intelligence Artificielle',
+        'level' => 'beginner',
+        'tone' => 'informative',
+        'length' => 'short'
+    ];
 
-foreach ($files as $file) {
-    if (file_exists(__DIR__ . '/' . $file)) {
-        echo "✅ {$file} existe\n";
-        try {
-            require_once __DIR__ . '/' . $file;
-            echo "✅ {$file} inclus avec succès\n";
-        } catch (Exception $e) {
-            echo "❌ Erreur lors de l'inclusion de {$file}: " . $e->getMessage() . "\n";
-        }
-    } else {
-        echo "❌ {$file} n'existe pas\n";
-    }
-}
+    echo "- Paramètres de test: " . json_encode($testParams) . "\n";
 
-// Test 3: Test de l'API Health
-echo "\n3. Test de l'endpoint /api/health...\n";
-try {
-    $apiController = new ApiController();
-    echo "✅ ApiController instancié\n";
-
-    // Simuler un appel à health
-    ob_start();
-    $apiController->health();
-    $output = ob_get_clean();
-
-    echo "✅ Endpoint health appelé\n";
-    echo "📄 Sortie: " . substr($output, 0, 200) . "...\n";
+    $result = $gemini->generateText($testParams);
+    echo "- Génération réussie: OUI\n";
+    echo "- Longueur du texte: " . strlen($result['englishText']) . " caractères\n";
+    echo "- Modèle utilisé: " . $result['model'] . "\n";
+    echo "- Début du texte: " . substr($result['englishText'], 0, 100) . "...\n";
 
 } catch (Exception $e) {
-    echo "❌ Erreur lors du test de l'API: " . $e->getMessage() . "\n";
-    echo "📍 Fichier: " . $e->getFile() . " ligne " . $e->getLine() . "\n";
+    echo "ERREUR: " . $e->getMessage() . "\n";
+    echo "Fichier: " . $e->getFile() . " (ligne " . $e->getLine() . ")\n";
 }
 
-echo "\n🏁 Test terminé\n";
+echo "\n=== FIN DU TEST ===";
+?>

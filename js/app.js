@@ -762,6 +762,8 @@ const HistoryManager = {
 
 // Gestionnaire pour la page de résultat
 const ResultPageHandler = {
+    speechRate: 1.0, // Vitesse de lecture par défaut
+
     async init() {
         console.log('📊 ResultPageHandler.init() appelé');
 
@@ -830,6 +832,12 @@ const ResultPageHandler = {
 
         console.log('✅ Paramètres valides, mise à jour de l\'interface...');
 
+        // Sauvegarder le domaine dans sessionStorage pour le test de langue
+        if (params.domain) {
+            sessionStorage.setItem('selectedDomain', params.domain);
+            console.log('💾 Domaine sauvegardé dans sessionStorage:', params.domain);
+        }
+
         // Mettre à jour l'interface avec les paramètres
         this.updatePageWithParams(params);
 
@@ -882,6 +890,11 @@ const ResultPageHandler = {
             // Générer le texte anglais
             const textResponse = await ApiClient.generateText(params);
             console.log('✅ Texte généré:', textResponse);
+
+            // Vérifier que la réponse contient les données attendues
+            if (!textResponse || !textResponse.data || !textResponse.data.englishText) {
+                throw new Error('Réponse API invalide: données manquantes');
+            }
 
             const englishText = textResponse.data.englishText;
 
@@ -1024,6 +1037,105 @@ const ResultPageHandler = {
         return tempDiv.textContent || tempDiv.innerText || '';
     },
 
+    // Préparer le texte pour la lecture avec surlignage dynamique
+    prepareTextForHighlighting(text, container) {
+        if (!container) return { words: [], elements: [] };
+
+        // Diviser le texte en mots (en gardant la ponctuation)
+        const words = text.split(/(\s+)/).filter(word => word.trim().length > 0);
+
+        // Créer des éléments span pour chaque mot
+        const wordElements = [];
+        let wordIndex = 0;
+
+        // Fonction récursive pour traiter tous les nœuds de texte
+        const processNode = (node) => {
+            if (node.nodeType === Node.TEXT_NODE) {
+                const text = node.textContent;
+                const textWords = text.split(/(\s+)/).filter(word => word.trim().length > 0);
+
+                if (textWords.length > 0) {
+                    const fragment = document.createDocumentFragment();
+
+                    textWords.forEach(word => {
+                        const span = document.createElement('span');
+                        span.textContent = word;
+                        span.className = 'speech-word';
+                        span.dataset.wordIndex = wordIndex;
+                        wordElements.push(span);
+                        fragment.appendChild(span);
+                        wordIndex++;
+                    });
+
+                    node.parentNode.replaceChild(fragment, node);
+                }
+            } else if (node.nodeType === Node.ELEMENT_NODE &&
+                      !['SCRIPT', 'STYLE', 'NOSCRIPT'].includes(node.tagName)) {
+                // Traiter les enfants récursivement
+                Array.from(node.childNodes).forEach(processNode);
+            }
+        };
+
+        // Traiter le conteneur
+        Array.from(container.childNodes).forEach(processNode);
+
+        return { words, elements: wordElements };
+    },
+
+    // Démarrer le surlignage dynamique pendant la lecture
+    startDynamicHighlighting(wordElements, speechRate = 0.9) {
+        // Annuler tout surlignage existant
+        this.stopDynamicHighlighting();
+
+        if (!wordElements || wordElements.length === 0) return;
+
+        // Estimer le temps par mot (mots par minute -> millisecondes par mot)
+        const wordsPerMinute = 150 * speechRate; // Ajusté pour la vitesse
+        const msPerWord = (60 / wordsPerMinute) * 1000;
+
+        this.highlightingInterval = setInterval(() => {
+            if (this.currentWordIndex >= wordElements.length) {
+                this.stopDynamicHighlighting();
+                return;
+            }
+
+            // Supprimer le surlignage du mot précédent
+            if (this.currentWordIndex > 0) {
+                const prevElement = wordElements[this.currentWordIndex - 1];
+                if (prevElement) {
+                    prevElement.classList.remove('speech-highlight');
+                }
+            }
+
+            // Surligner le mot actuel
+            const currentElement = wordElements[this.currentWordIndex];
+            if (currentElement) {
+                currentElement.classList.add('speech-highlight');
+                // Faire défiler pour garder le mot visible
+                currentElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            }
+
+            this.currentWordIndex++;
+        }, msPerWord);
+
+        this.currentWordIndex = 0;
+    },
+
+    // Arrêter le surlignage dynamique
+    stopDynamicHighlighting() {
+        if (this.highlightingInterval) {
+            clearInterval(this.highlightingInterval);
+            this.highlightingInterval = null;
+        }
+
+        // Supprimer tous les surlignages
+        document.querySelectorAll('.speech-word.speech-highlight').forEach(el => {
+            el.classList.remove('speech-highlight');
+        });
+
+        this.currentWordIndex = 0;
+    },
+
     showError(message) {
         const englishContainer = document.getElementById('english-text');
         const frenchContainer = document.getElementById('french-text');
@@ -1142,11 +1254,13 @@ const ResultPageHandler = {
             });
         }
 
-        // Bouton Écouter
+        // Bouton Écouter avec surlignage dynamique amélioré
         const listenButton = document.getElementById('listen-button');
         if (listenButton) {
             let isPlaying = false;
             let utterance = null;
+            let wordElements = [];
+            let speechRate = 1.0; // Vitesse par défaut
 
             // Vérifier si la synthèse vocale est supportée
             if (!('speechSynthesis' in window)) {
@@ -1154,6 +1268,9 @@ const ResultPageHandler = {
                 console.warn('🔇 Synthèse vocale non supportée par ce navigateur');
                 return;
             }
+
+            // Ajouter contrôle de vitesse
+            this.addSpeedControl();
 
             listenButton.addEventListener('click', () => {
                 try {
@@ -1180,8 +1297,13 @@ const ResultPageHandler = {
 
                         console.log('🔊 Lecture audio du texte:', englishText.substring(0, 100) + '...');
 
+                        // Préparer le texte pour le surlignage dynamique
+                        const prepareResult = this.prepareTextForHighlighting(englishText, englishContainer);
+                        wordElements = prepareResult.elements;
+                        console.log(`📝 Texte préparé: ${prepareResult.words.length} mots, ${wordElements.length} éléments`);
+
                         utterance = new SpeechSynthesisUtterance(englishText);
-    
+
                         // Essayer de trouver et utiliser une voix anglaise
                         const voices = window.speechSynthesis.getVoices();
                         console.log(`🎤 ${voices.length} voix disponibles pour la lecture`);
@@ -1199,18 +1321,22 @@ const ResultPageHandler = {
                         } else {
                             console.warn('⚠️ Aucune voix disponible, utilisation des paramètres par défaut');
                         }
-    
+
                         utterance.lang = 'en-US';
-                        utterance.rate = 0.9;
+                        utterance.rate = speechRate; // Utiliser la vitesse configurée
                         utterance.pitch = 1.0;
                         utterance.volume = 1.0;
 
                         utterance.onstart = () => {
                             console.log('▶️ Lecture audio démarrée');
+                            // Démarrer le surlignage dynamique
+                            this.startDynamicHighlighting(wordElements, utterance.rate);
                         };
 
                         utterance.onend = () => {
                             console.log('⏹️ Lecture audio terminée');
+                            // Arrêter le surlignage
+                            this.stopDynamicHighlighting();
                             isPlaying = false;
                             listenButton.innerHTML = '<i class="fas fa-volume-up mr-2"></i> Écouter';
                             listenButton.classList.remove('from-secondary-600', 'to-secondary-700');
@@ -1244,6 +1370,8 @@ const ResultPageHandler = {
                     } else {
                         console.log('⏸️ Arrêt de la lecture audio');
                         window.speechSynthesis.cancel();
+                        // Arrêter le surlignage immédiatement
+                        this.stopDynamicHighlighting();
                         isPlaying = false;
                         listenButton.innerHTML = '<i class="fas fa-volume-up mr-2"></i> Écouter';
                         listenButton.classList.remove('from-secondary-600', 'to-secondary-700');
@@ -1259,6 +1387,38 @@ const ResultPageHandler = {
                 }
             });
         }
+    },
+
+    // Ajouter contrôle de vitesse de lecture
+    addSpeedControl() {
+        const listenButton = document.getElementById('listen-button');
+        if (!listenButton) return;
+
+        // Créer le contrôle de vitesse
+        const speedControl = document.createElement('div');
+        speedControl.id = 'speed-control';
+        speedControl.className = 'inline-flex items-center ml-4 bg-white/10 rounded-lg px-3 py-1';
+        speedControl.innerHTML = `
+            <span class="text-white text-sm mr-2">Vitesse:</span>
+            <select id="speech-rate" class="bg-transparent text-white text-sm border-none outline-none">
+                <option value="0.5">0.5x</option>
+                <option value="0.75">0.75x</option>
+                <option value="1.0" selected>1x</option>
+                <option value="1.25">1.25x</option>
+                <option value="1.5">1.5x</option>
+                <option value="2.0">2x</option>
+            </select>
+        `;
+
+        // Insérer après le bouton écouter
+        listenButton.parentNode.insertBefore(speedControl, listenButton.nextSibling);
+
+        // Gérer le changement de vitesse
+        const rateSelect = document.getElementById('speech-rate');
+        rateSelect.addEventListener('change', (e) => {
+            this.speechRate = parseFloat(e.target.value);
+            console.log('🔧 Vitesse de lecture changée:', this.speechRate);
+        });
     }
 };
 

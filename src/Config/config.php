@@ -22,7 +22,7 @@ return [
     // Configuration API Google Gemini
     'gemini' => [
         'api_key' => 'AIzaSyB-s8lbOkQdHBge6ZiHnn2vXXIb-YjfkAA',
-        'base_url' => 'https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent',
+        'base_url' => 'https://generativelanguage.googleapis.com/v1beta/models/',
         'timeout' => 30, // secondes
         'max_retries' => 3,
         'cache_duration' => 3600, // 1 heure

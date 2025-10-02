@@ -1,0 +1,9 @@
+
+voici quelques trucs que je voudrais te recommander :                                                                                  
+    -la lecture du texte par la voix soit dynamique c'est as dire les mots soits colorés en fait as chaque fois que la voix lit un mot !   
+ -la partie sauvegarder j'ai pas bien compris as quoi elle sert vu qu'on as pas as créer de compte   
+
+ ( faudra expliquer dans le comment ça marche que l' user a la possibilité de sauvegarder les textes 
+ pour les lire after. Tu comprends ??? et si possible, ajouter un lien vers la page history dans le header des pages)         
+ 
+  - un  petit test de langue  pour que la personne puisse verifier le niveau que elle as eu en travaillant sur le domaine ainsi ca serait plus interessant pour la personne de partager ses résultats que juste le texte                                                                                                                 -la video au niveau de la landing page du site elle ne fonctionne pas je clique sur le bouton mais la video ne tourne pas                                                                                                                     -l'utilisateur devrait pouvoir régler la vitesse as laquelle la voix lis le texte

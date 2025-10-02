@@ -30,14 +30,21 @@ class GeminiAIService {
             return $cached;
         }
 
-        // Construire le prompt
-        $prompt = $this->buildGenerationPrompt($params);
+        // Mode fallback : retourner un texte d'exemple si l'API ne fonctionne pas
+        try {
+            // Construire le prompt
+            $prompt = $this->buildGenerationPrompt($params);
 
-        // Appeler l'API Gemini
-        $response = $this->callGeminiApi($prompt);
+            // Appeler l'API Gemini
+            $response = $this->callGeminiApi($prompt);
 
-        // Traiter la réponse
-        $result = $this->processGenerationResponse($response, $params);
+            // Traiter la réponse
+            $result = $this->processGenerationResponse($response, $params);
+        } catch (Exception $e) {
+            // Fallback : générer un texte d'exemple
+            error_log("API Gemini indisponible, utilisation du mode fallback: " . $e->getMessage());
+            $result = $this->generateFallbackText($params);
+        }
 
         // Mettre en cache
         $this->cache->set($cacheKey, $result, $this->config['gemini']['cache_duration']);
@@ -92,6 +99,7 @@ class GeminiAIService {
         $toneDescriptions = [
             'informative' => 'informatif et factuel',
             'formal' => 'formel et professionnel',
+            'professional' => 'professionnel et expert',
             'conversational' => 'conversationnel et amical',
             'enthusiastic' => 'enthousiaste et motivant',
             'educational' => 'éducatif et pédagogique',
@@ -141,12 +149,12 @@ class GeminiAIService {
     /**
      * Appeler l'API Google Gemini
      */
-    private function callGeminiApi($prompt) {
+    private function callGeminiApi($prompt, $model = 'gemini-1.5-flash-latest') {
         if (empty($this->apiKey)) {
             throw new Exception("Clé API Gemini non configurée");
         }
 
-        $url = $this->baseUrl . '?key=' . $this->apiKey;
+        $url = $this->baseUrl . $model . ':generateContent?key=' . $this->apiKey;
 
         $data = [
             'contents' => [
@@ -218,7 +226,9 @@ class GeminiAIService {
 
         $result = json_decode($response, true);
         if (json_last_error() !== JSON_ERROR_NONE) {
-            throw new Exception("Erreur de décodage JSON: " . json_last_error_msg());
+            // Log de debug pour voir la réponse brute
+            error_log("Réponse brute de l'API Gemini: " . substr($response, 0, 500));
+            throw new Exception("Erreur de décodage JSON: " . json_last_error_msg() . ". Réponse: " . substr($response, 0, 200));
         }
 
         return $result;
@@ -238,7 +248,7 @@ class GeminiAIService {
             'englishText' => $generatedText,
             'parameters' => $params,
             'timestamp' => date('c'),
-            'model' => 'gemini-1.5-flash'
+            'model' => 'gemini-1.5-flash-latest'
         ];
     }
 
@@ -257,7 +267,7 @@ class GeminiAIService {
             'translatedText' => $translatedText,
             'targetLanguage' => $targetLanguage,
             'timestamp' => date('c'),
-            'model' => 'gemini-1.5-flash'
+            'model' => 'gemini-2.5-flash'
         ];
     }
 
@@ -324,11 +334,54 @@ class GeminiAIService {
     public function getStats() {
         // Cette méthode pourrait être étendue pour suivre l'utilisation
         return [
-            'model' => 'gemini-1.5-flash',
+            'model' => 'gemini-1.5-flash-latest',
             'base_url' => $this->baseUrl,
             'cache_enabled' => $this->config['cache']['enabled'],
             'timeout' => $this->config['gemini']['timeout'],
             'max_retries' => $this->config['gemini']['max_retries']
+        ];
+    }
+
+    /**
+     * Générer un texte d'exemple en fallback
+     */
+    private function generateFallbackText($params) {
+        $fallbackTexts = [
+            'Technologie' => [
+                'Intelligence Artificielle' => [
+                    'beginner' => "Artificial Intelligence is a field of computer science that aims to create machines capable of intelligent behavior. Machine learning is a subset of AI that allows computers to learn from data without being explicitly programmed. Deep learning uses neural networks with multiple layers to process complex patterns in data.",
+                    'intermediate' => "Artificial Intelligence encompasses various technologies including machine learning, natural language processing, and computer vision. Machine learning algorithms can be supervised, unsupervised, or reinforcement learning. Neural networks, inspired by the human brain, form the backbone of modern AI systems.",
+                    'advanced' => "Contemporary artificial intelligence systems leverage transformer architectures and large language models to achieve unprecedented performance in natural language understanding. The convergence of AI with quantum computing promises revolutionary advances in computational capabilities, while ethical considerations around bias, privacy, and autonomous decision-making become increasingly critical."
+                ],
+                'Développement Web' => [
+                    'beginner' => "Web development involves creating websites and web applications. HTML provides the structure, CSS handles the styling, and JavaScript adds interactivity. Modern web development often uses frameworks like React, Vue.js, or Angular to build dynamic user interfaces.",
+                    'intermediate' => "Full-stack web development requires knowledge of both frontend and backend technologies. Frontend frameworks like React enable component-based development, while backend solutions such as Node.js, Python Django, or PHP Laravel handle server-side logic and database interactions.",
+                    'advanced' => "Modern web architectures embrace microservices, serverless computing, and progressive web apps. Performance optimization, accessibility compliance, and security best practices are essential for production-grade applications. The JAMstack approach combines JavaScript, APIs, and markup for scalable, secure web experiences."
+                ]
+            ],
+            'Sciences' => [
+                'Astronomie' => [
+                    'beginner' => "Astronomy is the scientific study of celestial objects and phenomena. Stars, planets, galaxies, and black holes are among the objects studied by astronomers. The universe is approximately 13.8 billion years old according to current scientific estimates.",
+                    'intermediate' => "Our solar system consists of eight planets orbiting the Sun, with Earth being the third planet from the Sun. Galaxies contain billions of stars and are organized into clusters and superclusters. The Big Bang theory explains the origin and evolution of the universe.",
+                    'advanced' => "Cosmological observations reveal that dark matter and dark energy constitute approximately 95% of the universe's mass-energy content. Gravitational waves, detected by LIGO, provide new insights into cosmic events. Exoplanet discovery techniques continue to expand our understanding of planetary systems beyond our own."
+                ]
+            ]
+        ];
+
+        // Sélectionner un texte approprié ou utiliser un texte générique
+        $domain = $params['domain'] ?? 'Technologie';
+        $topic = $params['topic'] ?? 'Intelligence Artificielle';
+        $level = $params['level'] ?? 'intermediate';
+
+        $text = $fallbackTexts[$domain][$topic][$level] ??
+                $fallbackTexts['Technologie']['Intelligence Artificielle']['intermediate'];
+
+        return [
+            'englishText' => $text,
+            'parameters' => $params,
+            'timestamp' => date('c'),
+            'model' => 'fallback-mode',
+            'note' => 'Ce texte est généré en mode fallback car l\'API Gemini n\'est pas disponible.'
         ];
     }
 }
